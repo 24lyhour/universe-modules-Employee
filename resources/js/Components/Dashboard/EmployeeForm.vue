@@ -14,35 +14,35 @@ import {
 } from '@/components/ui/select';
 import { ImageUpload } from '@/components/shared';
 import type { InertiaForm } from '@inertiajs/vue3';
-import type { EmployeeFormData, InstitutionOption, DepartmentOption, EmployeeTypeOption } from '../../types';
+import type { EmployeeFormData, SchoolOption, DepartmentOption, EmployeeTypeOption } from '../../types';
 
 interface Props {
     form: InertiaForm<EmployeeFormData>;
     mode?: 'create' | 'edit';
-    institutions?: InstitutionOption[];
+    schools?: SchoolOption[];
     departments?: DepartmentOption[];
     employeeTypes?: EmployeeTypeOption[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
     mode: 'create',
-    institutions: () => [],
+    schools: () => [],
     departments: () => [],
     employeeTypes: () => [],
 });
 
 const emit = defineEmits<{
-    institutionChange: [institutionId: number | null];
+    schoolChange: [schoolId: number | null];
 }>();
 
-// Computed for institution select
-const selectedInstitution = computed({
-    get: () => props.form.institution_id?.toString(),
+// Computed for school select
+const selectedSchool = computed({
+    get: () => props.form.school_id?.toString(),
     set: (value: string | undefined) => {
         const newValue = value ? parseInt(value) : null;
-        props.form.institution_id = newValue;
+        props.form.school_id = newValue;
         props.form.department_id = null;
-        emit('institutionChange', newValue);
+        emit('schoolChange', newValue);
     },
 });
 
@@ -264,32 +264,32 @@ const genderOptions = [
                 </CardHeader>
                 <CardContent>
                     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                        <!-- Institution -->
+                        <!-- School -->
                         <div class="space-y-2">
-                            <Label for="institution_id">Institution</Label>
-                            <Select v-model="selectedInstitution">
-                                <SelectTrigger id="institution_id">
-                                    <SelectValue placeholder="Select institution" />
+                            <Label for="school_id">School</Label>
+                            <Select v-model="selectedSchool">
+                                <SelectTrigger id="school_id">
+                                    <SelectValue placeholder="Select school" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem
-                                        v-for="institution in props.institutions"
-                                        :key="institution.id"
-                                        :value="institution.id.toString()"
+                                        v-for="school in props.schools"
+                                        :key="school.id"
+                                        :value="school.id.toString()"
                                     >
-                                        {{ institution.name }}
+                                        {{ school.name }}
                                     </SelectItem>
                                 </SelectContent>
                             </Select>
-                            <p v-if="props.form.errors.institution_id" class="text-xs text-destructive">
-                                {{ props.form.errors.institution_id }}
+                            <p v-if="props.form.errors.school_id" class="text-xs text-destructive">
+                                {{ props.form.errors.school_id }}
                             </p>
                         </div>
 
                         <!-- Department -->
                         <div class="space-y-2">
                             <Label for="department_id">Department</Label>
-                            <Select v-model="selectedDepartment" :disabled="!props.form.institution_id">
+                            <Select v-model="selectedDepartment" :disabled="!props.form.school_id">
                                 <SelectTrigger id="department_id">
                                     <SelectValue placeholder="Select department" />
                                 </SelectTrigger>

@@ -4,6 +4,7 @@ namespace Modules\Employee\Actions\Dashboard\V1;
 
 use Modules\Employee\Http\Resources\Dashboard\V1\EmployeeResource;
 use Modules\Employee\Models\Employee;
+use Modules\School\Models\School;
 
 class GetEmployeeIndexDataAction
 {
@@ -21,8 +22,8 @@ class GetEmployeeIndexDataAction
             });
         }
 
-        if (!empty($filters['institution_id'])) {
-            $query->where('institution_id', $filters['institution_id']);
+        if (!empty($filters['school_id'])) {
+            $query->where('school_id', $filters['school_id']);
         }
 
         if (!empty($filters['department_id'])) {
@@ -54,6 +55,18 @@ class GetEmployeeIndexDataAction
             ->values()
             ->all();
 
+        // Get schools for filter dropdown (handle case where table doesn't exist)
+        try {
+            $schools = School::select('id', 'name')
+                ->where('status', true)
+                ->orderBy('name')
+                ->get()
+                ->map(fn($school) => ['id' => $school->id, 'name' => $school->name])
+                ->all();
+        } catch (\Exception $e) {
+            $schools = [];
+        }
+
         return [
             'employees' => [
                 'data' => EmployeeResource::collection($employees)->resolve(),
@@ -67,6 +80,7 @@ class GetEmployeeIndexDataAction
             'filters' => $filters,
             'stats' => $stats,
             'employeeTypes' => $employeeTypes,
+            'schools' => $schools,
         ];
     }
 }

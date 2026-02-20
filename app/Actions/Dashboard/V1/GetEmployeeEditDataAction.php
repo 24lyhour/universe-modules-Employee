@@ -5,25 +5,25 @@ namespace Modules\Employee\Actions\Dashboard\V1;
 use Modules\Employee\Http\Resources\Dashboard\V1\EmployeeResource;
 use Modules\Employee\Models\Employee;
 use Modules\School\Models\Department;
-use Modules\School\Models\Institution;
+use Modules\School\Models\School;
 
 class GetEmployeeEditDataAction
 {
     public function execute(Employee $employee): array
     {
         try {
-            $institutions = Institution::where('status', true)
+            $schools = School::where('status', true)
                 ->select('id', 'name')
                 ->orderBy('name')
                 ->get();
         } catch (\Exception $e) {
-            $institutions = collect();
+            $schools = collect();
         }
 
         try {
             $departments = Department::where('status', true)
-                ->when($employee->institution_id, function ($query) use ($employee) {
-                    $query->where('institution_id', $employee->institution_id);
+                ->when($employee->school_id, function ($query) use ($employee) {
+                    $query->where('school_id', $employee->school_id);
                 })
                 ->select('id', 'name')
                 ->orderBy('name')
@@ -40,7 +40,7 @@ class GetEmployeeEditDataAction
 
         return [
             'employee' => (new EmployeeResource($employee))->resolve(),
-            'institutions' => $institutions,
+            'schools' => $schools,
             'departments' => $departments,
             'employeeTypes' => $employeeTypes,
         ];

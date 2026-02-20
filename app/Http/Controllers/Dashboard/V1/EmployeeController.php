@@ -22,7 +22,7 @@ use Modules\Employee\Http\Resources\Dashboard\V1\EmployeeResource;
 use Modules\Employee\Models\Employee;
 use Modules\Employee\Services\EmployeeService;
 use Modules\School\Models\Department;
-use Modules\School\Models\Institution;
+use Modules\School\Models\School;
 
 class EmployeeController extends Controller
 {
@@ -44,18 +44,18 @@ class EmployeeController extends Controller
     public function index(Request $request): Response
     {
         $perPage = $request->input('per_page', 10);
-        $filters = $request->only(['search', 'status', 'employee_type', 'institution_id', 'department_id']);
+        $filters = $request->only(['search', 'status', 'employee_type', 'school_id', 'department_id']);
 
         $data = $this->getIndexDataAction->execute($perPage, $filters);
 
-        // Add institutions for filters (handle case where table doesn't exist)
+        // Add schools for filters (handle case where table doesn't exist)
         try {
-            $data['institutions'] = Institution::where('status', true)
+            $data['schools'] = School::where('status', true)
                 ->select('id', 'name')
                 ->orderBy('name')
                 ->get();
         } catch (\Exception $e) {
-            $data['institutions'] = collect([]);
+            $data['schools'] = collect([]);
         }
 
         return Inertia::render('employee::Dashboard/V1/Employee/Index', $data);
@@ -66,8 +66,8 @@ class EmployeeController extends Controller
      */
     public function create(Request $request): Response
     {
-        $institutionId = $request->input('institution_id') ? (int) $request->input('institution_id') : null;
-        $data = $this->getCreateDataAction->execute($institutionId);
+        $schoolId = $request->input('school_id') ? (int) $request->input('school_id') : null;
+        $data = $this->getCreateDataAction->execute($schoolId);
 
         // Add generated employee code
         $data['generatedCode'] = $this->employeeService->generateEmployeeCode();
@@ -124,7 +124,7 @@ class EmployeeController extends Controller
      */
     public function confirmDelete(Employee $employee): Modal
     {
-        $employee->load(['institution', 'department']);
+        $employee->load(['school', 'department']);
         $employee->loadCount('courses');
 
         return Inertia::modal('employee::Dashboard/V1/Employee/Delete', [
@@ -159,14 +159,14 @@ class EmployeeController extends Controller
     }
 
     /**
-     * Get departments for a specific institution (AJAX).
+     * Get departments for a specific school (AJAX).
      */
     public function getDepartments(Request $request): \Illuminate\Http\JsonResponse
     {
-        $institutionId = $request->input('institution_id');
+        $schoolId = $request->input('school_id');
 
         try {
-            $departments = Department::where('institution_id', $institutionId)
+            $departments = Department::where('school_id', $schoolId)
                 ->where('status', true)
                 ->select('id', 'name')
                 ->orderBy('name')

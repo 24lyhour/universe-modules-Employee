@@ -38,7 +38,7 @@ export const employeeSchema = z.object({
         .max(500, 'Address must be less than 500 characters')
         .optional()
         .nullable(),
-    institution_id: z.number().int().positive().optional().nullable(),
+    school_id: z.number().int().positive().optional().nullable(),
     department_id: z.number().int().positive().optional().nullable(),
     position_id: z.number().int().positive().optional().nullable(),
     job_title: z

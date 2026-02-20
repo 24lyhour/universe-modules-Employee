@@ -30,7 +30,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 const search = ref(props.filters.search || '');
 const statusFilter = ref(props.filters.status || 'all');
 const employeeTypeFilter = ref(props.filters.employee_type || 'all');
-const institutionFilter = ref(props.filters.institution_id || 'all');
+const schoolFilter = ref(props.filters.school_id || 'all');
 
 const getInitials = (name: string) => {
     return name
@@ -63,9 +63,9 @@ const columns: TableColumn<Employee>[] = [
         render: (employee) => employee.employee_type_label || '-',
     },
     {
-        key: 'institution_name',
-        label: 'Institution',
-        render: (employee) => employee.institution_name || '-',
+        key: 'school_name',
+        label: 'School',
+        render: (employee) => employee.school_name || '-',
     },
     {
         key: 'department_name',
@@ -110,7 +110,7 @@ const getFilterParams = () => ({
     search: search.value || undefined,
     status: statusFilter.value !== 'all' ? statusFilter.value : undefined,
     employee_type: employeeTypeFilter.value !== 'all' ? employeeTypeFilter.value : undefined,
-    institution_id: institutionFilter.value !== 'all' ? institutionFilter.value : undefined,
+    school_id: schoolFilter.value !== 'all' ? schoolFilter.value : undefined,
 });
 
 const handlePageChange = (page: number) => {
@@ -132,7 +132,7 @@ const handleSearch = () => {
     router.get('/dashboard/employees', getFilterParams(), { preserveState: true });
 };
 
-watch([statusFilter, employeeTypeFilter, institutionFilter], () => {
+watch([statusFilter, employeeTypeFilter, schoolFilter], () => {
     router.get('/dashboard/employees', getFilterParams(), { preserveState: true });
 });
 
@@ -222,18 +222,18 @@ const handleStatusToggle = (employee: Employee, newStatus: boolean) => {
                             <SelectItem value="intern">Intern</SelectItem>
                         </SelectContent>
                     </Select>
-                    <Select v-model="institutionFilter">
+                    <Select v-model="schoolFilter">
                         <SelectTrigger class="w-[180px]">
-                            <SelectValue placeholder="Institution" />
+                            <SelectValue placeholder="School" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">All Institutions</SelectItem>
+                            <SelectItem value="all">All Schools</SelectItem>
                             <SelectItem
-                                v-for="institution in props.institutions"
-                                :key="institution.id"
-                                :value="institution.id.toString()"
+                                v-for="school in props.schools"
+                                :key="school.id"
+                                :value="school.id.toString()"
                             >
-                                {{ institution.name }}
+                                {{ school.name }}
                             </SelectItem>
                         </SelectContent>
                     </Select>

@@ -16,7 +16,7 @@ export interface Employee {
     date_of_birth: string | null;
     birth_place: string | null;
     current_address: string | null;
-    institution_id: number | null;
+    school_id: number | null;
     department_id: number | null;
     position_id: number | null;
     type_employee_id: number | null;
@@ -36,7 +36,7 @@ export interface Employee {
     employee_barcode: string | null;
     status: boolean;
     is_on_probation: boolean;
-    institution_name: string | null;
+    school_name: string | null;
     department_name: string | null;
     courses_count: number | null;
     created_at: string;
@@ -67,7 +67,7 @@ export interface EmployeeFilters {
     status?: string;
     search?: string;
     employee_type?: string;
-    institution_id?: string;
+    school_id?: string;
     department_id?: string;
 }
 
@@ -81,7 +81,7 @@ export interface EmployeeFormData {
     date_of_birth: string;
     birth_place: string;
     current_address: string;
-    institution_id: number | null;
+    school_id: number | null;
     department_id: number | null;
     position_id: number | null;
     type_employee_id: number | null;
@@ -98,7 +98,7 @@ export interface EmployeeFormData {
     status: boolean;
 }
 
-export interface InstitutionOption {
+export interface SchoolOption {
     id: number;
     name: string;
 }
@@ -117,7 +117,7 @@ export interface EmployeeIndexProps {
     employees: PaginatedResponse<Employee>;
     filters: EmployeeFilters;
     stats: EmployeeStats;
-    institutions: InstitutionOption[];
+    schools: SchoolOption[];
 }
 
 export interface EmployeeShowProps {
@@ -125,7 +125,7 @@ export interface EmployeeShowProps {
 }
 
 export interface EmployeeCreateProps {
-    institutions: InstitutionOption[];
+    schools: SchoolOption[];
     departments: DepartmentOption[];
     employeeTypes: EmployeeTypeOption[];
     generatedCode: string;
@@ -133,7 +133,7 @@ export interface EmployeeCreateProps {
 
 export interface EmployeeEditProps {
     employee: Employee;
-    institutions: InstitutionOption[];
+    schools: SchoolOption[];
     departments: DepartmentOption[];
     employeeTypes: EmployeeTypeOption[];
 }

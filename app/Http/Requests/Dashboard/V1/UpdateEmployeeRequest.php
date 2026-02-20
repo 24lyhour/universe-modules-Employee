@@ -25,7 +25,7 @@ class UpdateEmployeeRequest extends FormRequest
             'date_of_birth' => ['nullable', 'date', 'before:today'],
             'birth_place' => ['nullable', 'string', 'max:255'],
             'current_address' => ['nullable', 'string', 'max:500'],
-            'institution_id' => ['nullable', 'integer', 'exists:institutions,id'],
+            'school_id' => ['nullable', 'integer', 'exists:schools,id'],
             'department_id' => ['nullable', 'integer', 'exists:departments,id'],
             'position_id' => ['nullable', 'integer'],
             'job_title' => ['nullable', 'string', 'max:100'],
@@ -54,7 +54,7 @@ class UpdateEmployeeRequest extends FormRequest
             'employee_type.in' => 'Invalid employee type selected.',
             'date_of_birth.before' => 'Date of birth must be in the past.',
             'probation_end_date.after' => 'Probation end date must be after probation start date.',
-            'institution_id.exists' => 'The selected institution does not exist.',
+            'school_id.exists' => 'The selected school does not exist.',
             'department_id.exists' => 'The selected department does not exist.',
         ];
     }

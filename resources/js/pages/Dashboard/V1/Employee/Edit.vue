@@ -33,9 +33,10 @@ const form = useForm<EmployeeFormData>({
     date_of_birth: props.employee.date_of_birth || '',
     birth_place: props.employee.birth_place || '',
     current_address: props.employee.current_address || '',
-    institution_id: props.employee.institution_id,
+    school_id: props.employee.school_id,
     department_id: props.employee.department_id,
     position_id: props.employee.position_id,
+    type_employee_id: props.employee.type_employee_id,
     job_title: props.employee.job_title || '',
     employee_type: props.employee.employee_type,
     salary: props.employee.salary,
@@ -64,7 +65,7 @@ const getFormData = () => ({
     date_of_birth: form.date_of_birth || null,
     birth_place: form.birth_place || null,
     current_address: form.current_address || null,
-    institution_id: form.institution_id,
+    school_id: form.school_id,
     department_id: form.department_id,
     position_id: form.position_id,
     job_title: form.job_title || null,
@@ -84,14 +85,14 @@ watch([() => form.first_name, () => form.last_name], () => validateForm(getFormD
 
 const isFormInvalid = createIsFormInvalid(getFormData);
 
-const handleInstitutionChange = async (institutionId: number | null) => {
-    if (!institutionId) {
+const handleSchoolChange = async (schoolId: number | null) => {
+    if (!schoolId) {
         departments.value = [];
         return;
     }
 
     try {
-        const response = await fetch(`/dashboard/employees/departments?institution_id=${institutionId}`);
+        const response = await fetch(`/dashboard/employees/departments?school_id=${schoolId}`);
         if (response.ok) {
             departments.value = await response.json();
         }
@@ -133,10 +134,10 @@ const handleSubmit = () => {
                 <EmployeeForm
                     :form="form"
                     mode="edit"
-                    :institutions="props.institutions"
+                    :schools="props.schools"
                     :departments="departments"
                     :employee-types="props.employeeTypes"
-                    @institution-change="handleInstitutionChange"
+                    @school-change="handleSchoolChange"
                 />
 
                 <!-- Actions at Bottom -->

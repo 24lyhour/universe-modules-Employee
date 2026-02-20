@@ -32,9 +32,10 @@ const form = useForm<EmployeeFormData>({
     date_of_birth: '',
     birth_place: '',
     current_address: '',
-    institution_id: null,
+    school_id: null,
     department_id: null,
     position_id: null,
+    type_employee_id: null,
     job_title: '',
     employee_type: null,
     salary: null,
@@ -63,7 +64,7 @@ const getFormData = () => ({
     date_of_birth: form.date_of_birth || null,
     birth_place: form.birth_place || null,
     current_address: form.current_address || null,
-    institution_id: form.institution_id,
+    school_id: form.school_id,
     department_id: form.department_id,
     position_id: form.position_id,
     job_title: form.job_title || null,
@@ -87,14 +88,14 @@ watch([() => form.employee_code, () => form.first_name, () => form.last_name], (
 
 const isFormInvalid = createIsFormInvalid(getFormData);
 
-const handleInstitutionChange = async (institutionId: number | null) => {
-    if (!institutionId) {
+const handleSchoolChange = async (schoolId: number | null) => {
+    if (!schoolId) {
         departments.value = [];
         return;
     }
 
     try {
-        const response = await fetch(`/dashboard/employees/departments?institution_id=${institutionId}`);
+        const response = await fetch(`/dashboard/employees/departments?school_id=${schoolId}`);
         if (response.ok) {
             departments.value = await response.json();
         }
@@ -137,10 +138,10 @@ const handleSubmit = () => {
                 <EmployeeForm
                     :form="form"
                     mode="create"
-                    :institutions="props.institutions"
+                    :schools="props.schools"
                     :departments="departments"
                     :employee-types="props.employeeTypes"
-                    @institution-change="handleInstitutionChange"
+                    @school-change="handleSchoolChange"
                 />
 
                 <!-- Actions at Bottom -->

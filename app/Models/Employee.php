@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
-use Modules\School\Models\Institution;
+use Modules\School\Models\School;
 use Modules\School\Models\Department;
 use Modules\School\Models\Course;
 use Modules\Employee\Models\EmployeeType;
@@ -40,7 +40,7 @@ class Employee extends Model
         'date_of_birth',
         'birth_place',
         'current_address',
-        'institution_id',
+        'school_id',
         'department_id',
         'position_id',
         'type_employee_id',
@@ -103,11 +103,11 @@ class Employee extends Model
     }
 
     /**
-     * Get the institution that the employee belongs to.
+     * Get the school that the employee belongs to.
      */
-    public function institution(): BelongsTo
+    public function school(): BelongsTo
     {
-        return $this->belongsTo(Institution::class);
+        return $this->belongsTo(School::class);
     }
 
     /**

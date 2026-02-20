@@ -4,25 +4,25 @@ namespace Modules\Employee\Actions\Dashboard\V1;
 
 use Modules\Employee\Models\Employee;
 use Modules\School\Models\Department;
-use Modules\School\Models\Institution;
+use Modules\School\Models\School;
 
 class GetEmployeeCreateDataAction
 {
-    public function execute(?int $institutionId = null): array
+    public function execute(?int $schoolId = null): array
     {
         try {
-            $institutions = Institution::where('status', true)
+            $schools = School::where('status', true)
                 ->select('id', 'name')
                 ->orderBy('name')
                 ->get();
         } catch (\Exception $e) {
-            $institutions = collect();
+            $schools = collect();
         }
 
         $departments = collect();
-        if ($institutionId) {
+        if ($schoolId) {
             try {
-                $departments = Department::where('institution_id', $institutionId)
+                $departments = Department::where('school_id', $schoolId)
                     ->where('status', true)
                     ->select('id', 'name')
                     ->orderBy('name')
@@ -39,7 +39,7 @@ class GetEmployeeCreateDataAction
             ->all();
 
         return [
-            'institutions' => $institutions,
+            'schools' => $schools,
             'departments' => $departments,
             'employeeTypes' => $employeeTypes,
         ];

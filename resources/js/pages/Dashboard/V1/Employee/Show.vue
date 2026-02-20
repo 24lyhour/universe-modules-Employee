@@ -114,7 +114,7 @@ const formatCurrency = (value: number | null) => {
                                 </div>
                                 <div>
                                     <p class="text-xs text-muted-foreground">Organization</p>
-                                    <p class="text-sm">{{ employee.institution_name || '-' }}</p>
+                                    <p class="text-sm">{{ employee.school_name || '-' }}</p>
                                     <p v-if="employee.department_name" class="text-xs text-muted-foreground">{{ employee.department_name }}</p>
                                 </div>
                             </div>
