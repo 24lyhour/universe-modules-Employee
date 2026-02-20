@@ -48,6 +48,12 @@ class GetEmployeeIndexDataAction
             'contract' => Employee::where('employee_type', 'contract')->count(),
         ];
 
+        // Transform employee types to array of {value, label} objects
+        $employeeTypes = collect(Employee::getEmployeeTypes())
+            ->map(fn($label, $value) => ['value' => $value, 'label' => $label])
+            ->values()
+            ->all();
+
         return [
             'employees' => [
                 'data' => EmployeeResource::collection($employees)->resolve(),
@@ -60,7 +66,7 @@ class GetEmployeeIndexDataAction
             ],
             'filters' => $filters,
             'stats' => $stats,
-            'employeeTypes' => Employee::getEmployeeTypes(),
+            'employeeTypes' => $employeeTypes,
         ];
     }
 }

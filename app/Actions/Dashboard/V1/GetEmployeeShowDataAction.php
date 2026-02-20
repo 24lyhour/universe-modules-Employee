@@ -9,6 +9,9 @@ class GetEmployeeShowDataAction
 {
     public function execute(Employee $employee): array
     {
+        // Load relationships so they appear in the resource
+        $employee->load(['institution', 'department']);
+
         return [
             'employee' => (new EmployeeResource($employee))->resolve(),
         ];

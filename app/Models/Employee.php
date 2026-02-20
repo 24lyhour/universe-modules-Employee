@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 use Modules\School\Models\Institution;
 use Modules\School\Models\Department;
 use Modules\School\Models\Course;
+use Modules\Employee\Models\TypeEmployee;
 
 class Employee extends Model
 {
@@ -155,5 +156,13 @@ class Employee extends Model
         }
 
         return now()->lessThan($this->probation_end_date);
+    }
+
+    /**
+     * Get the type employee that the employee belongs to.
+     */
+    public function typeEmployee(): BelongsTo
+    {
+        return $this->belongsTo(TypeEmployee::class);
     }
 }

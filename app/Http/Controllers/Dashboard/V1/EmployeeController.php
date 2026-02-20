@@ -64,7 +64,7 @@ class EmployeeController extends Controller
     /**
      * Show the form for creating a new employee.
      */
-    public function create(Request $request): Modal
+    public function create(Request $request): Response
     {
         $institutionId = $request->input('institution_id') ? (int) $request->input('institution_id') : null;
         $data = $this->getCreateDataAction->execute($institutionId);
@@ -72,8 +72,7 @@ class EmployeeController extends Controller
         // Add generated employee code
         $data['generatedCode'] = $this->employeeService->generateEmployeeCode();
 
-        return Inertia::modal('employee::Dashboard/V1/Employee/Create', $data)
-            ->baseRoute('employee.employees.index');
+        return Inertia::render('employee::Dashboard/V1/Employee/Create', $data);
     }
 
     /**
@@ -101,12 +100,11 @@ class EmployeeController extends Controller
     /**
      * Show the form for editing the employee.
      */
-    public function edit(Employee $employee): Modal
+    public function edit(Employee $employee): Response
     {
         $data = $this->getEditDataAction->execute($employee);
 
-        return Inertia::modal('employee::Dashboard/V1/Employee/Edit', $data)
-            ->baseRoute('employee.employees.index');
+        return Inertia::render('employee::Dashboard/V1/Employee/Edit', $data);
     }
 
     /**

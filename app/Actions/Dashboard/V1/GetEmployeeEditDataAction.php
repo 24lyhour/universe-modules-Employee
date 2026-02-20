@@ -32,11 +32,17 @@ class GetEmployeeEditDataAction
             $departments = collect();
         }
 
+        // Transform employee types to array of {value, label} objects
+        $employeeTypes = collect(Employee::getEmployeeTypes())
+            ->map(fn($label, $value) => ['value' => $value, 'label' => $label])
+            ->values()
+            ->all();
+
         return [
             'employee' => (new EmployeeResource($employee))->resolve(),
             'institutions' => $institutions,
             'departments' => $departments,
-            'employeeTypes' => Employee::getEmployeeTypes(),
+            'employeeTypes' => $employeeTypes,
         ];
     }
 }

@@ -1,27 +1,25 @@
 <script setup lang="ts">
-import { ModalForm } from '@/components/shared';
+import { Head, Link, router } from '@inertiajs/vue3';
+import AppLayout from '@/layouts/AppLayout.vue';
+import { Button } from '@/components/ui/button';
 import EmployeeForm from '@employee/Components/Dashboard/EmployeeForm.vue';
 import { useForm } from '@inertiajs/vue3';
-import { useModal } from 'momentum-modal';
-import { computed, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
 import { employeeSchema } from '@employee/validation/employeeSchema';
 import { useFormValidation } from '@/composables/useFormValidation';
+import { ChevronLeft } from 'lucide-vue-next';
+import type { BreadcrumbItem } from '@/types';
 import type { EmployeeFormData, EmployeeEditProps, DepartmentOption } from '@employee/types';
 
 const props = defineProps<EmployeeEditProps>();
 
-const { show, close, redirect } = useModal();
-
-const isOpen = computed({
-    get: () => show.value,
-    set: (val: boolean) => {
-        if (!val) {
-            close();
-            redirect();
-        }
-    },
-});
+const breadcrumbs: BreadcrumbItem[] = [
+    { title: 'Dashboard', href: '/dashboard' },
+    { title: 'Employees', href: '/dashboard/employees' },
+    { title: props.employee.full_name, href: `/dashboard/employees/${props.employee.id}` },
+    { title: 'Edit', href: `/dashboard/employees/${props.employee.id}/edit` },
+];
 
 const departments = ref<DepartmentOption[]>(props.departments || []);
 
@@ -51,13 +49,11 @@ const form = useForm<EmployeeFormData>({
     status: props.employee.status,
 });
 
-// Use shared validation composable
 const { validateForm, validateAndSubmit, createIsFormInvalid } = useFormValidation(
     employeeSchema,
-    ['employee_code', 'first_name', 'last_name'] // Required fields
+    ['employee_code', 'first_name', 'last_name']
 );
 
-// Get form data for validation
 const getFormData = () => ({
     employee_code: form.employee_code,
     first_name: form.first_name,
@@ -84,13 +80,10 @@ const getFormData = () => ({
     status: form.status,
 });
 
-// Watch form changes to validate in real-time
 watch([() => form.first_name, () => form.last_name], () => validateForm(getFormData()));
 
-// Check if form is valid for submit button state
 const isFormInvalid = createIsFormInvalid(getFormData);
 
-// Handle institution change to fetch departments
 const handleInstitutionChange = async (institutionId: number | null) => {
     if (!institutionId) {
         departments.value = [];
@@ -103,7 +96,6 @@ const handleInstitutionChange = async (institutionId: number | null) => {
             departments.value = await response.json();
         }
     } catch (error) {
-        console.error('Failed to fetch departments:', error);
         departments.value = [];
     }
 };
@@ -113,41 +105,50 @@ const handleSubmit = () => {
         form.put(`/dashboard/employees/${props.employee.id}`, {
             onSuccess: () => {
                 toast.success('Employee updated successfully.');
-                setTimeout(() => {
-                    close();
-                    redirect();
-                }, 100);
+                router.visit(`/dashboard/employees/${props.employee.id}`);
             },
         });
     });
 };
-
-const handleCancel = () => {
-    close();
-    redirect();
-};
 </script>
 
 <template>
-    <ModalForm
-        v-model:open="isOpen"
-        title="Edit Employee"
-        description="Update employee information"
-        mode="edit"
-        size="2xl"
-        submit-text="Save Changes"
-        :loading="form.processing"
-        :disabled="isFormInvalid"
-        @submit="handleSubmit"
-        @cancel="handleCancel"
-    >
-        <EmployeeForm
-            v-model="form"
-            mode="edit"
-            :institutions="props.institutions"
-            :departments="departments"
-            :employee-types="props.employeeTypes"
-            @institution-change="handleInstitutionChange"
-        />
-    </ModalForm>
+    <AppLayout :breadcrumbs="breadcrumbs">
+        <Head :title="`Edit ${employee.full_name}`" />
+
+        <div class="flex h-full flex-1 flex-col gap-6 p-6">
+            <!-- Header -->
+            <div class="flex items-center gap-4">
+               <Link href="/dashboard/employees" class="text-muted-foreground hover:text-foreground">
+                    <ChevronLeft class="h-5 w-5" />
+                </Link>
+                <div>
+                    <h1 class="text-xl font-semibold">Edit Employee</h1>
+                    <p class="text-sm text-muted-foreground">{{ employee.full_name }} - {{ employee.employee_code }}</p>
+                </div>
+            </div>
+
+            <!-- Form -->
+            <form @submit.prevent="handleSubmit" class="space-y-6">
+                <EmployeeForm
+                    :form="form"
+                    mode="edit"
+                    :institutions="props.institutions"
+                    :departments="departments"
+                    :employee-types="props.employeeTypes"
+                    @institution-change="handleInstitutionChange"
+                />
+
+                <!-- Actions at Bottom -->
+                <div class="flex justify-end gap-3 pt-4">
+                    <Button type="button" variant="outline" as-child>
+                        <Link :href="`/dashboard/employees/${employee.id}`">Cancel</Link>
+                    </Button>
+                    <Button type="submit" :disabled="isFormInvalid || form.processing">
+                        {{ form.processing ? 'Saving...' : 'Save Changes' }}
+                    </Button>
+                </div>
+            </form>
+        </div>
+    </AppLayout>
 </template>
