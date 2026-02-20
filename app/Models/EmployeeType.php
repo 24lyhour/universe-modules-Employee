@@ -4,9 +4,11 @@ namespace Modules\Employee\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 use Modules\Employee\Database\Factories\EmployeeTypeFactory;
+use Modules\School\Models\School;
 
 class EmployeeType extends Model
 {
@@ -22,6 +24,7 @@ class EmployeeType extends Model
      */
     protected $fillable = [
         'uuid',
+        'school_id',
         'name',
         'time_start',
         'time_end',
@@ -66,10 +69,26 @@ class EmployeeType extends Model
     }
 
     /**
+     * Get the school that owns this employee type.
+     */
+    public function school(): BelongsTo
+    {
+        return $this->belongsTo(School::class);
+    }
+
+    /**
      * Get the employees that belong to this type.
      */
     public function employees(): HasMany
     {
         return $this->hasMany(Employee::class, 'type_employee_id');
+    }
+
+    /**
+     * Scope for a specific school.
+     */
+    public function scopeForSchool($query, $schoolId)
+    {
+        return $query->where('school_id', $schoolId);
     }
 }
