@@ -34,6 +34,8 @@ class EmployeeResource extends JsonResource
             'probation_date' => $this->probation_date?->format('Y-m-d'),
             'probation_end_date' => $this->probation_end_date?->format('Y-m-d'),
             'certificate' => $this->certificate,
+            'certificate_image' => $this->certificate_image,
+            'certificate_code' => $this->certificate_code,
             'avatar_url' => $this->avatar_url,
             'employee_qr_code' => $this->employee_qr_code,
             'employee_barcode' => $this->employee_barcode,

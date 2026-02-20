@@ -49,6 +49,8 @@ class Employee extends Model
         'probation_date',
         'probation_end_date',
         'certificate',
+        'certificate_image',
+        'certificate_code',
         'avatar_url',
         'employee_qr_code',
         'employee_barcode',

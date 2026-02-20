@@ -9,8 +9,7 @@ class GetEmployeeIndexDataAction
 {
     public function execute(int $perPage = 10, array $filters = []): array
     {
-        $query = Employee::with(['institution', 'department'])
-            ->withCount('courses');
+        $query = Employee::query();
 
         if (!empty($filters['search'])) {
             $search = $filters['search'];

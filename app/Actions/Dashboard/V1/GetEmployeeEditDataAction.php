@@ -11,20 +11,26 @@ class GetEmployeeEditDataAction
 {
     public function execute(Employee $employee): array
     {
-        $employee->load(['institution', 'department']);
+        try {
+            $institutions = Institution::where('status', true)
+                ->select('id', 'name')
+                ->orderBy('name')
+                ->get();
+        } catch (\Exception $e) {
+            $institutions = collect();
+        }
 
-        $institutions = Institution::where('status', true)
-            ->select('id', 'name')
-            ->orderBy('name')
-            ->get();
-
-        $departments = Department::where('status', true)
-            ->when($employee->institution_id, function ($query) use ($employee) {
-                $query->where('institution_id', $employee->institution_id);
-            })
-            ->select('id', 'name')
-            ->orderBy('name')
-            ->get();
+        try {
+            $departments = Department::where('status', true)
+                ->when($employee->institution_id, function ($query) use ($employee) {
+                    $query->where('institution_id', $employee->institution_id);
+                })
+                ->select('id', 'name')
+                ->orderBy('name')
+                ->get();
+        } catch (\Exception $e) {
+            $departments = collect();
+        }
 
         return [
             'employee' => (new EmployeeResource($employee))->resolve(),

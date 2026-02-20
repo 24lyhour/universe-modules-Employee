@@ -48,13 +48,17 @@ class EmployeeController extends Controller
 
         $data = $this->getIndexDataAction->execute($perPage, $filters);
 
-        // Add institutions and departments for filters
-        $data['institutions'] = Institution::where('status', true)
-            ->select('id', 'name')
-            ->orderBy('name')
-            ->get();
+        // Add institutions for filters (handle case where table doesn't exist)
+        try {
+            $data['institutions'] = Institution::where('status', true)
+                ->select('id', 'name')
+                ->orderBy('name')
+                ->get();
+        } catch (\Exception $e) {
+            $data['institutions'] = collect([]);
+        }
 
-        return Inertia::render('employee::dashboard/Employee/Index', $data);
+        return Inertia::render('employee::Dashboard/V1/Employee/Index', $data);
     }
 
     /**
@@ -68,7 +72,7 @@ class EmployeeController extends Controller
         // Add generated employee code
         $data['generatedCode'] = $this->employeeService->generateEmployeeCode();
 
-        return Inertia::modal('employee::dashboard/Employee/Create', $data)
+        return Inertia::modal('employee::Dashboard/V1/Employee/Create', $data)
             ->baseRoute('employee.employees.index');
     }
 
@@ -91,7 +95,7 @@ class EmployeeController extends Controller
     {
         $data = $this->getShowDataAction->execute($employee);
 
-        return Inertia::render('employee::dashboard/Employee/Show', $data);
+        return Inertia::render('employee::Dashboard/V1/Employee/Show', $data);
     }
 
     /**
@@ -101,7 +105,7 @@ class EmployeeController extends Controller
     {
         $data = $this->getEditDataAction->execute($employee);
 
-        return Inertia::modal('employee::dashboard/Employee/Edit', $data)
+        return Inertia::modal('employee::Dashboard/V1/Employee/Edit', $data)
             ->baseRoute('employee.employees.index');
     }
 
@@ -125,7 +129,7 @@ class EmployeeController extends Controller
         $employee->load(['institution', 'department']);
         $employee->loadCount('courses');
 
-        return Inertia::modal('employee::dashboard/Employee/Delete', [
+        return Inertia::modal('employee::Dashboard/V1/Employee/Delete', [
             'employee' => (new EmployeeResource($employee))->resolve(),
         ])->baseRoute('employee.employees.index');
     }
@@ -163,11 +167,15 @@ class EmployeeController extends Controller
     {
         $institutionId = $request->input('institution_id');
 
-        $departments = Department::where('institution_id', $institutionId)
-            ->where('status', true)
-            ->select('id', 'name')
-            ->orderBy('name')
-            ->get();
+        try {
+            $departments = Department::where('institution_id', $institutionId)
+                ->where('status', true)
+                ->select('id', 'name')
+                ->orderBy('name')
+                ->get();
+        } catch (\Exception $e) {
+            $departments = collect([]);
+        }
 
         return response()->json($departments);
     }

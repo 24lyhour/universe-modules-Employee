@@ -2,6 +2,7 @@
 
 namespace Modules\Employee\Providers;
 
+use App\Services\MenuService;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Nwidart\Modules\Traits\PathNamespace;
@@ -27,6 +28,37 @@ class EmployeeServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
+        $this->registerMenuItems();
+    }
+
+    /**
+     * Register menu items for the Employee module.
+     */
+    protected function registerMenuItems(): void
+    {
+        $this->app->booted(function () {
+            MenuService::addMenuItem(
+                menu: 'primary',
+                id: 'employee',
+                title: __('Employees'),
+                url: route('employee.employees.index'),
+                icon: 'Users',
+                order: 50,
+                permissions: null,
+                route: 'employee.*'
+            );
+
+            MenuService::addSubmenuItem(
+                'primary',
+                'employee',
+                __('All Employees'),
+                route('employee.employees.index'),
+                10,
+                null,
+                'employee.employees.*',
+                'Users'
+            );
+        });
     }
 
     /**

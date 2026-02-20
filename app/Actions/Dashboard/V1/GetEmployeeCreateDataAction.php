@@ -10,18 +10,26 @@ class GetEmployeeCreateDataAction
 {
     public function execute(?int $institutionId = null): array
     {
-        $institutions = Institution::where('status', true)
-            ->select('id', 'name')
-            ->orderBy('name')
-            ->get();
-
-        $departments = collect();
-        if ($institutionId) {
-            $departments = Department::where('institution_id', $institutionId)
-                ->where('status', true)
+        try {
+            $institutions = Institution::where('status', true)
                 ->select('id', 'name')
                 ->orderBy('name')
                 ->get();
+        } catch (\Exception $e) {
+            $institutions = collect();
+        }
+
+        $departments = collect();
+        if ($institutionId) {
+            try {
+                $departments = Department::where('institution_id', $institutionId)
+                    ->where('status', true)
+                    ->select('id', 'name')
+                    ->orderBy('name')
+                    ->get();
+            } catch (\Exception $e) {
+                $departments = collect();
+            }
         }
 
         return [
