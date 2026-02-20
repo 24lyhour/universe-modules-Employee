@@ -79,11 +79,12 @@ class EmployeeTypeController extends Controller
     /**
      * Show the form for editing the employee type.
      */
-    public function edit(EmployeeType $employeeType): Response
+    public function edit(EmployeeType $employeeType): Modal
     {
         $data = $this->getEditDataAction->execute($employeeType);
 
-        return Inertia::render('employee::Dashboard/V1/EmployeeType/Edit', $data);
+        return Inertia::modal('employee::Dashboard/V1/EmployeeType/Edit', $data)
+            ->baseRoute('employee.employee-types.index');
     }
 
     /**

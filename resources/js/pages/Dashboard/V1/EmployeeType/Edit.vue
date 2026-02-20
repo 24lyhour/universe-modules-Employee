@@ -1,25 +1,30 @@
 <script setup lang="ts">
-import { Head, Link, router } from '@inertiajs/vue3';
-import AppLayout from '@/layouts/AppLayout.vue';
-import { Button } from '@/components/ui/button';
-import EmployeeTypeForm from '@employee/Components/Dashboard/EmployeeTypeForm.vue';
+import { ModalForm } from '@/components/shared';
 import { useForm } from '@inertiajs/vue3';
-import { watch } from 'vue';
+import { useModal } from 'momentum-modal';
+import { computed, watch } from 'vue';
 import { toast } from 'vue-sonner';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
 import { employeeTypeSchema } from '@employee/validation/employeeTypeSchema';
 import { useFormValidation } from '@/composables/useFormValidation';
-import { ChevronLeft } from 'lucide-vue-next';
-import type { BreadcrumbItem } from '@/types';
 import type { EmployeeTypeFormData, EmployeeTypeEditProps } from '@employee/types';
 
 const props = defineProps<EmployeeTypeEditProps>();
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Dashboard', href: '/dashboard' },
-    { title: 'Employee Types', href: '/dashboard/employee-types' },
-    { title: props.employeeType.name, href: `/dashboard/employee-types/${props.employeeType.id}` },
-    { title: 'Edit', href: `/dashboard/employee-types/${props.employeeType.id}/edit` },
-];
+const { show, close, redirect } = useModal();
+
+const isOpen = computed({
+    get: () => show.value,
+    set: (val: boolean) => {
+        if (!val) {
+            close();
+            redirect();
+        }
+    },
+});
 
 const form = useForm<EmployeeTypeFormData>({
     name: props.employeeType.name,
@@ -51,43 +56,111 @@ const handleSubmit = () => {
         form.put(`/dashboard/employee-types/${props.employeeType.id}`, {
             onSuccess: () => {
                 toast.success('Employee type updated successfully.');
-                router.visit(`/dashboard/employee-types/${props.employeeType.id}`);
+                setTimeout(() => {
+                    close();
+                    redirect();
+                }, 100);
             },
         });
     });
 };
+
+const handleCancel = () => {
+    close();
+    redirect();
+};
+
+const isActive = computed({
+    get: () => form.status,
+    set: (value: boolean) => {
+        form.status = value;
+    },
+});
 </script>
 
 <template>
-    <AppLayout :breadcrumbs="breadcrumbs">
-        <Head :title="`Edit ${employeeType.name}`" />
+    <ModalForm
+        v-model:open="isOpen"
+        title="Edit Employee Type"
+        :description="`Editing: ${employeeType.name}`"
+        mode="edit"
+        size="lg"
+        submit-text="Save Changes"
+        :loading="form.processing"
+        :disabled="isFormInvalid"
+        @submit="handleSubmit"
+        @cancel="handleCancel"
+    >
+        <div class="space-y-4">
+            <!-- Name -->
+            <div class="space-y-2">
+                <Label for="name">
+                    Name <span class="text-destructive">*</span>
+                </Label>
+                <Input
+                    id="name"
+                    v-model="form.name"
+                    placeholder="Enter type name"
+                    :class="{ 'border-destructive': form.errors.name }"
+                />
+                <p v-if="form.errors.name" class="text-xs text-destructive">
+                    {{ form.errors.name }}
+                </p>
+            </div>
 
-        <div class="flex h-full flex-1 flex-col gap-6 p-6">
-            <!-- Header -->
-            <div class="flex items-center gap-4">
-                <Link href="/dashboard/employee-types" class="text-muted-foreground hover:text-foreground">
-                    <ChevronLeft class="h-5 w-5" />
-                </Link>
-                <div>
-                    <h1 class="text-xl font-semibold">Edit Employee Type</h1>
-                    <p class="text-sm text-muted-foreground">{{ employeeType.name }}</p>
+            <!-- Description -->
+            <div class="space-y-2">
+                <Label for="description">Description</Label>
+                <Textarea
+                    id="description"
+                    v-model="form.description"
+                    placeholder="Enter type description"
+                    rows="3"
+                    :class="{ 'border-destructive': form.errors.description }"
+                />
+                <p v-if="form.errors.description" class="text-xs text-destructive">
+                    {{ form.errors.description }}
+                </p>
+            </div>
+
+            <!-- Time Range -->
+            <div class="grid gap-4 sm:grid-cols-2">
+                <div class="space-y-2">
+                    <Label for="time_start">Start Time</Label>
+                    <Input
+                        id="time_start"
+                        type="time"
+                        v-model="form.time_start"
+                        :class="{ 'border-destructive': form.errors.time_start }"
+                    />
+                    <p v-if="form.errors.time_start" class="text-xs text-destructive">
+                        {{ form.errors.time_start }}
+                    </p>
+                </div>
+                <div class="space-y-2">
+                    <Label for="time_end">End Time</Label>
+                    <Input
+                        id="time_end"
+                        type="time"
+                        v-model="form.time_end"
+                        :class="{ 'border-destructive': form.errors.time_end }"
+                    />
+                    <p v-if="form.errors.time_end" class="text-xs text-destructive">
+                        {{ form.errors.time_end }}
+                    </p>
                 </div>
             </div>
 
-            <!-- Form -->
-            <form @submit.prevent="handleSubmit" class="space-y-6">
-                <EmployeeTypeForm :form="form" mode="edit" />
-
-                <!-- Actions at Bottom -->
-                <div class="flex justify-end gap-3 pt-4">
-                    <Button type="button" variant="outline" as-child>
-                        <Link :href="`/dashboard/employee-types/${employeeType.id}`">Cancel</Link>
-                    </Button>
-                    <Button type="submit" :disabled="isFormInvalid || form.processing">
-                        {{ form.processing ? 'Saving...' : 'Save Changes' }}
-                    </Button>
+            <!-- Status -->
+            <div class="flex items-center justify-between rounded-lg border p-4">
+                <div>
+                    <p class="text-sm font-medium">Active Status</p>
+                    <p class="text-xs text-muted-foreground">
+                        {{ isActive ? 'Type is active' : 'Type is inactive' }}
+                    </p>
                 </div>
-            </form>
+                <Switch v-model="isActive" />
+            </div>
         </div>
-    </AppLayout>
+    </ModalForm>
 </template>
