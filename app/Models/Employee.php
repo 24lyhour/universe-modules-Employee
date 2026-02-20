@@ -46,6 +46,7 @@ class Employee extends Model
         'type_employee_id',
         'job_title',
         'employee_type',
+        'anttendent_value',
         'salary',
         'hire_date',
         'probation_date',
