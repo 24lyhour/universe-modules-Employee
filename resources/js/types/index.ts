@@ -19,9 +19,11 @@ export interface Employee {
     institution_id: number | null;
     department_id: number | null;
     position_id: number | null;
+    type_employee_id: number | null;
     job_title: string | null;
     employee_type: EmployeeType | null;
     employee_type_label: string | null;
+    employee_type_name: string | null;
     salary: number | null;
     hire_date: string | null;
     probation_date: string | null;
@@ -82,6 +84,7 @@ export interface EmployeeFormData {
     institution_id: number | null;
     department_id: number | null;
     position_id: number | null;
+    type_employee_id: number | null;
     job_title: string;
     employee_type: EmployeeType | null;
     salary: number | null;
@@ -137,4 +140,57 @@ export interface EmployeeEditProps {
 
 export interface EmployeeDeleteProps {
     employee: Employee;
+}
+
+// Employee Type (Model) Types
+export interface EmployeeTypeModel {
+    id: number;
+    uuid: string;
+    name: string;
+    description: string | null;
+    time_start: string | null;
+    time_end: string | null;
+    status: boolean;
+    employees_count: number | null;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface EmployeeTypeStats {
+    total: number;
+    active: number;
+    inactive: number;
+}
+
+export interface EmployeeTypeFilters {
+    status?: string;
+    search?: string;
+}
+
+export interface EmployeeTypeFormData {
+    name: string;
+    description: string;
+    time_start: string;
+    time_end: string;
+    status: boolean;
+}
+
+export interface EmployeeTypeIndexProps {
+    employeeTypes: PaginatedResponse<EmployeeTypeModel>;
+    filters: EmployeeTypeFilters;
+    stats: EmployeeTypeStats;
+}
+
+export interface EmployeeTypeShowProps {
+    employeeType: EmployeeTypeModel;
+}
+
+export interface EmployeeTypeCreateProps {}
+
+export interface EmployeeTypeEditProps {
+    employeeType: EmployeeTypeModel;
+}
+
+export interface EmployeeTypeDeleteProps {
+    employeeType: EmployeeTypeModel;
 }

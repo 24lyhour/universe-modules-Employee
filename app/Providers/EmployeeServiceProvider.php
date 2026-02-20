@@ -58,6 +58,17 @@ class EmployeeServiceProvider extends ServiceProvider
                 'employee.employees.*',
                 'Users'
             );
+
+            MenuService::addSubmenuItem(
+                'primary',
+                'employee',
+                __('Employee Types'),
+                route('employee.employee-types.index'),
+                20,
+                null,
+                'employee.employee-types.*',
+                'Tags'
+            );
         });
     }
 

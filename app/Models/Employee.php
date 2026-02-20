@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 use Modules\School\Models\Institution;
 use Modules\School\Models\Department;
 use Modules\School\Models\Course;
-use Modules\Employee\Models\TypeEmployee;
+use Modules\Employee\Models\EmployeeType;
 
 class Employee extends Model
 {
@@ -43,6 +43,7 @@ class Employee extends Model
         'institution_id',
         'department_id',
         'position_id',
+        'type_employee_id',
         'job_title',
         'employee_type',
         'salary',
@@ -159,10 +160,10 @@ class Employee extends Model
     }
 
     /**
-     * Get the type employee that the employee belongs to.
+     * Get the employee type that the employee belongs to.
      */
-    public function typeEmployee(): BelongsTo
+    public function employeeType(): BelongsTo
     {
-        return $this->belongsTo(TypeEmployee::class);
+        return $this->belongsTo(EmployeeType::class, 'type_employee_id');
     }
 }

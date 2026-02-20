@@ -12,6 +12,7 @@ class EmployeeDatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+            EmployeeTypeSeeder::class,
             EmployeeSeeder::class,
         ]);
     }

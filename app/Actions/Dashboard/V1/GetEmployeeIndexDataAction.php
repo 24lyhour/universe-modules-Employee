@@ -9,7 +9,7 @@ class GetEmployeeIndexDataAction
 {
     public function execute(int $perPage = 10, array $filters = []): array
     {
-        $query = Employee::query();
+        $query = Employee::query()->with('employeeType');
 
         if (!empty($filters['search'])) {
             $search = $filters['search'];

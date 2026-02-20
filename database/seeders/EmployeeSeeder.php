@@ -5,6 +5,7 @@ namespace Modules\Employee\Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 use Modules\Employee\Models\Employee;
+use Modules\Employee\Models\EmployeeType;
 
 class EmployeeSeeder extends Seeder
 {
@@ -178,6 +179,17 @@ class EmployeeSeeder extends Seeder
 
         $employeeCount = Employee::count();
 
+        // Map old employee_type values to EmployeeType names
+        $typeMapping = [
+            'full_time' => 'Full Time',
+            'part_time' => 'Part Time',
+            'contract' => 'Contract',
+            'intern' => 'Intern',
+        ];
+
+        // Cache employee types
+        $employeeTypes = EmployeeType::pluck('id', 'name')->toArray();
+
         foreach ($employees as $index => $data) {
             $code = sprintf('EMP-%06d', $employeeCount + $index + 1);
 
@@ -193,6 +205,13 @@ class EmployeeSeeder extends Seeder
                 $certificateImage = "https://placehold.co/800x600/1e40af/ffffff?text=" . urlencode($data['certificate']);
             }
 
+            // Get type_employee_id from mapping
+            $typeEmployeeId = null;
+            if (!empty($data['employee_type']) && isset($typeMapping[$data['employee_type']])) {
+                $typeName = $typeMapping[$data['employee_type']];
+                $typeEmployeeId = $employeeTypes[$typeName] ?? null;
+            }
+
             Employee::create([
                 'uuid' => (string) Str::uuid(),
                 'employee_code' => $code,
@@ -205,6 +224,7 @@ class EmployeeSeeder extends Seeder
                 'birth_place' => $data['birth_place'] ?? null,
                 'current_address' => $data['current_address'] ?? null,
                 'job_title' => $data['job_title'] ?? null,
+                'type_employee_id' => $typeEmployeeId,
                 'employee_type' => $data['employee_type'] ?? null,
                 'salary' => $data['salary'] ?? null,
                 'hire_date' => $data['hire_date'] ?? null,
