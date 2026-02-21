@@ -44,7 +44,7 @@ class EmployeeServiceProvider extends ServiceProvider
                 url: route('employee.employees.index'),
                 icon: 'Users',
                 order: 50,
-                permissions: null,
+                permissions: 'employees.view_any',
                 route: 'employee.*'
             );
 
@@ -54,7 +54,7 @@ class EmployeeServiceProvider extends ServiceProvider
                 __('All Employees'),
                 route('employee.employees.index'),
                 10,
-                null,
+                'employees.view_any',
                 'employee.employees.*',
                 'Users'
             );
@@ -65,7 +65,7 @@ class EmployeeServiceProvider extends ServiceProvider
                 __('Employee Types'),
                 route('employee.employee-types.index'),
                 20,
-                null,
+                'employee_types.view_any',
                 'employee.employee-types.*',
                 'Tags'
             );
@@ -77,7 +77,7 @@ class EmployeeServiceProvider extends ServiceProvider
                     __('Attendance'),
                     route('employee.attendances.index'),
                     30,
-                    null,
+                    'attendances.view_any',
                     'employee.attendances.*',
                     'ClipboardCheck'
                 );
@@ -88,7 +88,7 @@ class EmployeeServiceProvider extends ServiceProvider
                     __('QR Scanner'),
                     route('employee.attendances.scanner'),
                     40,
-                    null,
+                    'attendances.view_any',
                     'employee.attendances.scanner',
                     'QrCode'
                 );
