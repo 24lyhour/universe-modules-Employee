@@ -13,6 +13,8 @@ Route::middleware(['auth', 'verified'])->prefix('dashboard')->name('employee.')-
     Route::resource('employees', EmployeeController::class)->names('employees');
     Route::get('employees/{employee}/delete', [EmployeeController::class, 'confirmDelete'])->name('employees.confirm-delete');
     Route::put('employees/{employee}/toggle-status', [EmployeeController::class, 'toggleStatus'])->name('employees.toggle-status');
+    Route::get('employees/{employee}/qr-badge', [EmployeeController::class, 'qrCode'])->name('employees.qr-badge');
+    Route::post('employees/{employee}/regenerate-qr', [EmployeeController::class, 'regenerateQrCode'])->name('employees.regenerate-qr');
 
     // Employee Types
     Route::resource('employee-types', EmployeeTypeController::class)->names('employee-types');

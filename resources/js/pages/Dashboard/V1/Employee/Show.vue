@@ -4,7 +4,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowLeft, Pencil, Mail, Phone, MapPin, Building2, Calendar, Award, Banknote } from 'lucide-vue-next';
+import { ArrowLeft, Pencil, Mail, Phone, MapPin, Building2, Calendar, Award, Banknote, QrCode } from 'lucide-vue-next';
 import type { BreadcrumbItem } from '@/types';
 import type { EmployeeShowProps } from '@employee/types';
 
@@ -61,11 +61,18 @@ const formatCurrency = (value: number | null) => {
                         <p class="text-muted-foreground">{{ employee.job_title || 'Employee' }}</p>
                         <p class="text-sm text-muted-foreground font-mono mt-1">{{ employee.employee_code }}</p>
                     </div>
-                    <Button as-child>
-                        <Link :href="`/dashboard/employees/${employee.id}/edit`">
-                            <Pencil class="h-4 w-4 mr-2" /> Edit
-                        </Link>
-                    </Button>
+                    <div class="flex items-center gap-2">
+                        <Button variant="outline" as-child>
+                            <Link :href="`/dashboard/employees/${employee.id}/qr-badge`">
+                                <QrCode class="h-4 w-4 mr-2" /> QR Badge
+                            </Link>
+                        </Button>
+                        <Button as-child>
+                            <Link :href="`/dashboard/employees/${employee.id}/edit`">
+                                <Pencil class="h-4 w-4 mr-2" /> Edit
+                            </Link>
+                        </Button>
+                    </div>
                 </div>
 
                 <!-- Info Grid -->

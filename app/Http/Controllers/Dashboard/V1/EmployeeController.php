@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use Momentum\Modal\Modal;
+use Modules\Employee\Actions\Dashboard\V1\Attendance\GenerateQrCodeAction;
 use Modules\Employee\Actions\Dashboard\V1\CreateEmployeeAction;
 use Modules\Employee\Actions\Dashboard\V1\DeleteEmployeeAction;
 use Modules\Employee\Actions\Dashboard\V1\GetEmployeeCreateDataAction;
@@ -176,5 +177,46 @@ class EmployeeController extends Controller
         }
 
         return response()->json($departments);
+    }
+
+    /**
+     * Show QR code page for employee badge.
+     */
+    public function qrCode(Employee $employee, GenerateQrCodeAction $generateQrAction): Response
+    {
+        $employee->load(['school', 'department', 'employeeType']);
+
+        // Generate or get existing QR code
+        $qrCodeData = $generateQrAction->generateEmployeeQr($employee);
+
+        return Inertia::render('employee::Dashboard/V1/Employee/QrCode', [
+            'employee' => [
+                'id' => $employee->id,
+                'uuid' => $employee->uuid,
+                'employee_code' => $employee->employee_code,
+                'employee_qr_code' => $employee->employee_qr_code,
+                'full_name' => $employee->full_name,
+                'first_name' => $employee->first_name,
+                'last_name' => $employee->last_name,
+                'job_title' => $employee->job_title,
+                'avatar_url' => $employee->avatar_url,
+                'department_name' => $employee->department?->name,
+                'school_name' => $employee->school?->name,
+                'employee_type_name' => $employee->employeeType?->name,
+            ],
+            'qrData' => $qrCodeData['qr_data'],
+        ]);
+    }
+
+    /**
+     * Regenerate QR code for employee.
+     */
+    public function regenerateQrCode(Employee $employee, GenerateQrCodeAction $generateQrAction): RedirectResponse
+    {
+        $generateQrAction->regenerateEmployeeQr($employee);
+
+        return redirect()
+            ->back()
+            ->with('success', 'QR code regenerated successfully.');
     }
 }
