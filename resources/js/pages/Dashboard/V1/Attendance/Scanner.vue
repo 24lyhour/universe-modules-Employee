@@ -71,6 +71,7 @@ const recentScans = ref<Array<{
     employee_name: string;
     employee_code: string;
     avatar_url: string | null;
+    department_name: string | null;
     time: string;
     type: 'check_in' | 'check_out';
     status: string;
@@ -113,6 +114,7 @@ const fetchTodaySummary = async () => {
             employee_name: scan.employee.name,
             employee_code: scan.employee.code,
             avatar_url: scan.employee.avatar,
+            department_name: scan.department_name || scan.employee.department,
             time: scan.check_out || scan.check_in,
             type: scan.check_out ? 'check_out' : 'check_in',
             status: scan.status,
@@ -154,6 +156,7 @@ const processScan = async () => {
                     employee_name: employee.full_name,
                     employee_code: employee.employee_code,
                     avatar_url: employee.avatar_url,
+                    department_name: employee.department || response.data.data?.location_name,
                     time: scanType.value === 'check_in'
                         ? attendance.check_in_time
                         : attendance.check_out_time || '',
@@ -414,7 +417,12 @@ onUnmounted(() => {
                                     </Avatar>
                                     <div>
                                         <p class="font-medium">{{ scan.employee_name }}</p>
-                                        <p class="text-sm text-muted-foreground">{{ scan.employee_code }}</p>
+                                        <p class="text-sm text-muted-foreground">
+                                            {{ scan.employee_code }}
+                                            <span v-if="scan.department_name" class="text-primary">
+                                                - {{ scan.department_name }}
+                                            </span>
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="text-right">

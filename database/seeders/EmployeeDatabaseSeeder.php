@@ -14,6 +14,7 @@ class EmployeeDatabaseSeeder extends Seeder
         $this->call([
             EmployeeTypeSeeder::class,
             EmployeeSeeder::class,
+            AttendanceSeeder::class,
         ]);
     }
 }

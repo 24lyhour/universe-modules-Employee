@@ -45,19 +45,9 @@ class EmployeeController extends Controller
     public function index(Request $request): Response
     {
         $perPage = $request->input('per_page', 10);
-        $filters = $request->only(['search', 'status', 'employee_type', 'school_id', 'department_id']);
+        $filters = $request->only(['search', 'status', 'employee_type', 'school_id', 'department_id', 'date_from', 'date_to']);
 
         $data = $this->getIndexDataAction->execute($perPage, $filters);
-
-        // Add schools for filters (handle case where table doesn't exist)
-        try {
-            $data['schools'] = School::where('status', true)
-                ->select('id', 'name')
-                ->orderBy('name')
-                ->get();
-        } catch (\Exception $e) {
-            $data['schools'] = collect([]);
-        }
 
         return Inertia::render('employee::Dashboard/V1/Employee/Index', $data);
     }

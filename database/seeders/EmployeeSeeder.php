@@ -6,6 +6,8 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 use Modules\Employee\Models\Employee;
 use Modules\Employee\Models\EmployeeType;
+use Modules\School\Models\School;
+use Modules\School\Models\Department;
 
 class EmployeeSeeder extends Seeder
 {
@@ -14,6 +16,22 @@ class EmployeeSeeder extends Seeder
      */
     public function run(): void
     {
+        // Get available schools and departments
+        $schools = School::where('status', true)->pluck('id')->toArray();
+        $departmentsBySchool = [];
+
+        if (!empty($schools)) {
+            foreach ($schools as $schoolId) {
+                $deps = Department::where('school_id', $schoolId)
+                    ->where('status', true)
+                    ->pluck('id')
+                    ->toArray();
+                if (!empty($deps)) {
+                    $departmentsBySchool[$schoolId] = $deps;
+                }
+            }
+        }
+
         $employees = [
             [
                 'first_name' => 'John',
@@ -212,6 +230,16 @@ class EmployeeSeeder extends Seeder
                 $typeEmployeeId = $employeeTypes[$typeName] ?? null;
             }
 
+            // Assign random school and department
+            $schoolId = null;
+            $departmentId = null;
+            if (!empty($schools)) {
+                $schoolId = $schools[array_rand($schools)];
+                if (isset($departmentsBySchool[$schoolId]) && !empty($departmentsBySchool[$schoolId])) {
+                    $departmentId = $departmentsBySchool[$schoolId][array_rand($departmentsBySchool[$schoolId])];
+                }
+            }
+
             Employee::create([
                 'uuid' => (string) Str::uuid(),
                 'employee_code' => $code,
@@ -223,6 +251,8 @@ class EmployeeSeeder extends Seeder
                 'date_of_birth' => $data['date_of_birth'] ?? null,
                 'birth_place' => $data['birth_place'] ?? null,
                 'current_address' => $data['current_address'] ?? null,
+                'school_id' => $schoolId,
+                'department_id' => $departmentId,
                 'job_title' => $data['job_title'] ?? null,
                 'type_employee_id' => $typeEmployeeId,
                 'employee_type' => $data['employee_type'] ?? null,

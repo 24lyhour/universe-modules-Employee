@@ -266,7 +266,11 @@ class AttendanceController extends Controller
                 ->count(),
         ];
 
-        $recentScans = Attendance::with('employee:id,first_name,last_name,avatar_url,employee_code')
+        $recentScans = Attendance::with([
+                'employee:id,first_name,last_name,avatar_url,employee_code,department_id',
+                'employee.department:id,name',
+                'department:id,name',
+            ])
             ->whereDate('attendance_date', $today)
             ->latest('updated_at')
             ->limit(10)
@@ -277,7 +281,9 @@ class AttendanceController extends Controller
                     'name' => $a->employee->full_name,
                     'code' => $a->employee->employee_code,
                     'avatar' => $a->employee->avatar_url,
+                    'department' => $a->employee->department?->name ?? $a->department?->name,
                 ],
+                'department_name' => $a->department?->name ?? $a->employee->department?->name,
                 'check_in' => $a->check_in_time?->format('H:i'),
                 'check_out' => $a->check_out_time?->format('H:i'),
                 'status' => $a->status,

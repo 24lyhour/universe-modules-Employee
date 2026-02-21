@@ -16,7 +16,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Users, CheckCircle, XCircle, Search, Eye, Pencil, Trash2 } from 'lucide-vue-next';
+import { Plus, Users, CheckCircle, XCircle, Search, Eye, Pencil, Trash2, Clock, CalendarDays } from 'lucide-vue-next';
 import type { BreadcrumbItem } from '@/types';
 import type { EmployeeIndexProps, Employee } from '@employee/types';
 
@@ -31,6 +31,8 @@ const search = ref(props.filters.search || '');
 const statusFilter = ref(props.filters.status || 'all');
 const employeeTypeFilter = ref(props.filters.employee_type || 'all');
 const schoolFilter = ref(props.filters.school_id || 'all');
+const dateFrom = ref(props.filters.date_from || '');
+const dateTo = ref(props.filters.date_to || '');
 
 const getInitials = (name: string) => {
     return name
@@ -53,19 +55,14 @@ const columns: TableColumn<Employee>[] = [
         render: (employee) => employee.employee_code,
     },
     {
-        key: 'email',
-        label: 'Email',
-        render: (employee) => employee.email || '-',
-    },
-    {
         key: 'employee_type_label',
         label: 'Type',
         render: (employee) => employee.employee_type_label || '-',
     },
     {
-        key: 'school_name',
-        label: 'School',
-        render: (employee) => employee.school_name || '-',
+        key: 'attendance',
+        label: 'Attendance',
+        render: (employee) => `${employee.attendance_present ?? 0}/${employee.attendance_total ?? 0}`,
     },
     {
         key: 'department_name',
@@ -111,6 +108,8 @@ const getFilterParams = () => ({
     status: statusFilter.value !== 'all' ? statusFilter.value : undefined,
     employee_type: employeeTypeFilter.value !== 'all' ? employeeTypeFilter.value : undefined,
     school_id: schoolFilter.value !== 'all' ? schoolFilter.value : undefined,
+    date_from: dateFrom.value || undefined,
+    date_to: dateTo.value || undefined,
 });
 
 const handlePageChange = (page: number) => {
@@ -132,7 +131,7 @@ const handleSearch = () => {
     router.get('/dashboard/employees', getFilterParams(), { preserveState: true });
 };
 
-watch([statusFilter, employeeTypeFilter, schoolFilter], () => {
+watch([statusFilter, employeeTypeFilter, schoolFilter, dateFrom, dateTo], () => {
     router.get('/dashboard/employees', getFilterParams(), { preserveState: true });
 });
 
@@ -155,7 +154,7 @@ const handleStatusToggle = (employee: Employee, newStatus: boolean) => {
         <Head title="Employees" />
 
         <div class="flex h-full flex-1 flex-col gap-6 p-6">
-            <!-- Stats -->
+            <!-- Employee Stats -->
             <div class="grid gap-4 md:grid-cols-3">
                 <StatsCard
                     title="Total Employees"
@@ -173,6 +172,33 @@ const handleStatusToggle = (employee: Employee, newStatus: boolean) => {
                     :value="props.stats.inactive"
                     :icon="XCircle"
                     variant="warning"
+                />
+            </div>
+
+            <!-- Attendance Stats -->
+            <div class="grid gap-4 md:grid-cols-4">
+                <StatsCard
+                    title="Present"
+                    :value="props.attendanceStats.present"
+                    :icon="CheckCircle"
+                    variant="success"
+                />
+                <StatsCard
+                    title="Absent"
+                    :value="props.attendanceStats.absent"
+                    :icon="XCircle"
+                    variant="destructive"
+                />
+                <StatsCard
+                    title="Late"
+                    :value="props.attendanceStats.late"
+                    :icon="Clock"
+                    variant="warning"
+                />
+                <StatsCard
+                    title="On Leave"
+                    :value="props.attendanceStats.on_leave"
+                    :icon="CalendarDays"
                 />
             </div>
 
@@ -237,6 +263,21 @@ const handleStatusToggle = (employee: Employee, newStatus: boolean) => {
                             </SelectItem>
                         </SelectContent>
                     </Select>
+                    <div class="flex items-center gap-2">
+                        <Input
+                            v-model="dateFrom"
+                            type="date"
+                            class="w-[150px]"
+                            placeholder="From"
+                        />
+                        <span class="text-muted-foreground">to</span>
+                        <Input
+                            v-model="dateTo"
+                            type="date"
+                            class="w-[150px]"
+                            placeholder="To"
+                        />
+                    </div>
                 </div>
 
                 <!-- Table -->
@@ -266,6 +307,19 @@ const handleStatusToggle = (employee: Employee, newStatus: boolean) => {
                             {{ item.employee_type_label }}
                         </Badge>
                         <span v-else class="text-muted-foreground">-</span>
+                    </template>
+                    <template #cell-attendance="{ item }">
+                        <div class="flex items-center gap-2">
+                            <Badge variant="outline" class="text-green-600">
+                                {{ item.attendance_present ?? 0 }} P
+                            </Badge>
+                            <Badge v-if="(item.attendance_absent ?? 0) > 0" variant="destructive">
+                                {{ item.attendance_absent }} A
+                            </Badge>
+                            <Badge v-if="(item.attendance_late ?? 0) > 0" variant="secondary" class="text-yellow-600">
+                                {{ item.attendance_late }} L
+                            </Badge>
+                        </div>
                     </template>
                     <template #cell-status="{ item }">
                         <div class="flex items-center gap-2" @click.stop>
