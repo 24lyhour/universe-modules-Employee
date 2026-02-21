@@ -39,6 +39,12 @@ export interface Employee {
     school_name: string | null;
     department_name: string | null;
     courses_count: number | null;
+    // Attendance counts
+    attendance_total: number | null;
+    attendance_present: number | null;
+    attendance_absent: number | null;
+    attendance_late: number | null;
+    attendance_on_leave: number | null;
     created_at: string;
     updated_at: string;
 }
@@ -47,6 +53,18 @@ export interface EmployeeStats {
     total: number;
     active: number;
     inactive: number;
+}
+
+export interface EmployeeAttendanceStats {
+    total_records: number;
+    present: number;
+    absent: number;
+    late: number;
+    early_leave: number;
+    half_day: number;
+    on_leave: number;
+    date_from: string;
+    date_to: string;
 }
 
 export interface PaginationMeta {
@@ -69,6 +87,8 @@ export interface EmployeeFilters {
     employee_type?: string;
     school_id?: string;
     department_id?: string;
+    date_from?: string;
+    date_to?: string;
 }
 
 export interface EmployeeFormData {
@@ -117,6 +137,7 @@ export interface EmployeeIndexProps {
     employees: PaginatedResponse<Employee>;
     filters: EmployeeFilters;
     stats: EmployeeStats;
+    attendanceStats: EmployeeAttendanceStats;
     schools: SchoolOption[];
 }
 

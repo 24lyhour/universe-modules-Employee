@@ -128,6 +128,14 @@ class Employee extends Model
     }
 
     /**
+     * Get the attendance records for the employee.
+     */
+    public function attendances(): HasMany
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
+    /**
      * Get available employee types.
      */
     public static function getEmployeeTypes(): array

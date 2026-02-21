@@ -46,6 +46,12 @@ class EmployeeResource extends JsonResource
             'school_name' => $this->whenLoaded('school', fn() => $this->school?->name),
             'department_name' => $this->whenLoaded('department', fn() => $this->department?->name),
             'courses_count' => $this->whenCounted('courses'),
+            // Attendance counts (when loaded via withCount)
+            'attendance_total' => $this->attendance_total ?? null,
+            'attendance_present' => $this->attendance_present ?? null,
+            'attendance_absent' => $this->attendance_absent ?? null,
+            'attendance_late' => $this->attendance_late ?? null,
+            'attendance_on_leave' => $this->attendance_on_leave ?? null,
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
         ];
