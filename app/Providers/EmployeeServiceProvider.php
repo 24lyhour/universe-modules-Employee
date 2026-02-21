@@ -69,6 +69,30 @@ class EmployeeServiceProvider extends ServiceProvider
                 'employee.employee-types.*',
                 'Tags'
             );
+
+            if (\Route::has('employee.attendances.index')) {
+                MenuService::addSubmenuItem(
+                    'primary',
+                    'employee',
+                    __('Attendance'),
+                    route('employee.attendances.index'),
+                    30,
+                    null,
+                    'employee.attendances.*',
+                    'ClipboardCheck'
+                );
+
+                MenuService::addSubmenuItem(
+                    'primary',
+                    'employee',
+                    __('QR Scanner'),
+                    route('employee.attendances.scanner'),
+                    40,
+                    null,
+                    'employee.attendances.scanner',
+                    'QrCode'
+                );
+            }
         });
     }
 

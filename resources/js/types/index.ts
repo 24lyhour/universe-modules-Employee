@@ -194,3 +194,110 @@ export interface EmployeeTypeEditProps {
 export interface EmployeeTypeDeleteProps {
     employeeType: EmployeeTypeModel;
 }
+
+// Attendance Types
+export type AttendanceStatus = 'present' | 'absent' | 'late' | 'early_leave' | 'half_day' | 'on_leave';
+export type CheckInMethod = 'qr_scan' | 'manual' | 'biometric' | 'face_recognition';
+
+export interface Attendance {
+    id: number;
+    uuid: string;
+    employee_id: number;
+    employee_name: string | null;
+    employee_code: string | null;
+    employee_avatar: string | null;
+    school_id: number | null;
+    school_name: string | null;
+    department_id: number | null;
+    department_name: string | null;
+    classroom_id: number | null;
+    classroom_name: string | null;
+    attendance_date: string;
+    attendance_date_formatted: string;
+    check_in_time: string | null;
+    check_out_time: string | null;
+    status: AttendanceStatus;
+    status_label: string;
+    check_in_method: CheckInMethod;
+    check_in_method_label: string;
+    check_out_method: CheckInMethod | null;
+    check_out_method_label: string | null;
+    check_in_location: string | null;
+    check_out_location: string | null;
+    check_in_coordinates: { lat: number; lng: number } | null;
+    check_out_coordinates: { lat: number; lng: number } | null;
+    work_hours: number | null;
+    work_hours_formatted: string;
+    overtime_hours: number | null;
+    notes: string | null;
+    device_info: string | null;
+    ip_address: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface AttendanceStats {
+    total_employees: number;
+    present_today: number;
+    absent_today: number;
+    late_today: number;
+    on_leave_today: number;
+}
+
+export interface AttendanceFilters {
+    search?: string;
+    status?: string;
+    employee_id?: number;
+    department_id?: number;
+    date_from?: string;
+    date_to?: string;
+}
+
+export interface AttendanceFormData {
+    employee_id: number | null;
+    attendance_date: string;
+    check_in_time: string;
+    check_out_time: string;
+    status: AttendanceStatus;
+    department_id: number | null;
+    classroom_id: number | null;
+    notes: string;
+}
+
+export interface SelectOption {
+    value: number;
+    label: string;
+    department?: string;
+    department_id?: number;
+}
+
+export interface AttendanceIndexProps {
+    attendances: PaginatedResponse<Attendance>;
+    filters: AttendanceFilters;
+    stats: AttendanceStats;
+    statuses: Record<AttendanceStatus, string>;
+    employeeOptions: { id: number; name: string }[];
+    departmentOptions: DepartmentOption[];
+}
+
+export interface AttendanceShowProps {
+    attendance: Attendance;
+    statuses: Record<AttendanceStatus, string>;
+    methods: Record<CheckInMethod, string>;
+}
+
+export interface AttendanceCreateProps {
+    employeeOptions: SelectOption[];
+    departmentOptions: SelectOption[];
+    statuses: Record<AttendanceStatus, string>;
+}
+
+export interface AttendanceEditProps {
+    attendance: Attendance;
+    statuses: Record<AttendanceStatus, string>;
+}
+
+export interface AttendanceScannerProps {
+    departmentOptions: SelectOption[];
+    classroomOptions: SelectOption[];
+}
