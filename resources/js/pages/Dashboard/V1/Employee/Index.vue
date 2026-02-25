@@ -16,7 +16,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Users, CheckCircle, XCircle, Search, Eye, Pencil, Trash2, Clock, CalendarDays } from 'lucide-vue-next';
+import { Plus, Users, CheckCircle, XCircle, Search, Eye, Pencil, Trash2, Clock, CalendarDays, Download, Upload } from 'lucide-vue-next';
 import type { BreadcrumbItem } from '@/types';
 import type { EmployeeIndexProps, Employee } from '@employee/types';
 
@@ -43,6 +43,11 @@ const getInitials = (name: string) => {
         .slice(0, 2);
 };
 
+const formatGender = (gender: string | null): string => {
+    if (!gender) return '-';
+    return gender.charAt(0).toUpperCase() + gender.slice(1);
+};
+
 const columns: TableColumn<Employee>[] = [
     {
         key: 'employee',
@@ -53,6 +58,11 @@ const columns: TableColumn<Employee>[] = [
         key: 'employee_code',
         label: 'Code',
         render: (employee) => employee.employee_code,
+    },
+    {
+        key: 'gender',
+        label: 'Gender',
+        render: (employee) => formatGender(employee.gender),
     },
     {
         key: 'employee_type_label',
@@ -139,6 +149,25 @@ const handleCreate = () => {
     router.visit('/dashboard/employees/create');
 };
 
+const handleExport = () => {
+    const params = new URLSearchParams();
+    const filters = getFilterParams();
+    Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined) {
+            params.append(key, String(value));
+        }
+    });
+    window.location.href = `/dashboard/employees/export?${params.toString()}`;
+};
+
+const handleImport = () => {
+    router.visit('/dashboard/employees/import');
+};
+
+const handleDownloadTemplate = () => {
+    window.location.href = '/dashboard/employees/template';
+};
+
 const handleStatusToggle = (employee: Employee, newStatus: boolean) => {
     router.put(`/dashboard/employees/${employee.id}/toggle-status`, {
         status: newStatus,
@@ -209,10 +238,24 @@ const handleStatusToggle = (employee: Employee, newStatus: boolean) => {
                         <h2 class="text-lg font-semibold">Employees</h2>
                         <p class="text-sm text-muted-foreground">Manage your employees</p>
                     </div>
-                    <Button @click="handleCreate">
-                        <Plus class="mr-2 h-4 w-4" />
-                        Add Employee
-                    </Button>
+                    <div class="flex items-center gap-2">
+                        <Button variant="outline" @click="handleDownloadTemplate">
+                            <Download class="mr-2 h-4 w-4" />
+                            Template
+                        </Button>
+                        <Button variant="outline" @click="handleExport">
+                            <Download class="mr-2 h-4 w-4" />
+                            Export
+                        </Button>
+                        <Button variant="outline" @click="handleImport">
+                            <Upload class="mr-2 h-4 w-4" />
+                            Import
+                        </Button>
+                        <Button @click="handleCreate">
+                            <Plus class="mr-2 h-4 w-4" />
+                            Add Employee
+                        </Button>
+                    </div>
                 </div>
 
                 <!-- Filters -->

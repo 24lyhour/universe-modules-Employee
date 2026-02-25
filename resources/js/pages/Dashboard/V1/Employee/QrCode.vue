@@ -338,7 +338,7 @@ const handleExportPdf = () => {
                     <CardContent class="flex flex-col items-center space-y-6">
                         <!-- ID Badge Card -->
                         <div class="w-full max-w-md rounded-xl border-2 border-dashed p-4">
-                            <div class="flex gap-4 rounded-lg border bg-gradient-to-br from-slate-50 to-slate-100 p-4 shadow-sm">
+                            <div class="flex gap-4 rounded-lg border bg-linear-to-br from-slate-50 to-slate-100 p-4 shadow-sm">
                                 <!-- Employee Info -->
                                 <div class="flex flex-1 flex-col justify-center space-y-1">
                                     <p class="text-xs text-muted-foreground uppercase tracking-wider">

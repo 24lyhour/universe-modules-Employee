@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Employee\Http\Controllers\Dashboard\V1\EmployeeController;
+use Modules\Employee\Http\Controllers\Dashboard\V1\EmployeeImportExportController;
 use Modules\Employee\Http\Controllers\Dashboard\V1\EmployeeTypeController;
 use Modules\Employee\Http\Controllers\Dashboard\V1\AttendanceController;
 
@@ -28,6 +29,14 @@ Route::middleware(['auth', 'verified', 'auto.permission'])->prefix('dashboard')-
 
     // Departments AJAX endpoint
     Route::get('employees/departments', [EmployeeController::class, 'getDepartments'])->name('employees.departments');
+
+    // Export/Import routes (before parameterized routes)
+    Route::get('employees/export', [EmployeeImportExportController::class, 'export'])->name('employees.export');
+    Route::get('employees/import', [EmployeeImportExportController::class, 'showImport'])->name('employees.import');
+    Route::post('employees/import', [EmployeeImportExportController::class, 'import'])->name('employees.import.store');
+    Route::post('employees/import/preview', [EmployeeImportExportController::class, 'preview'])->name('employees.import.preview');
+    Route::get('employees/import/failed', [EmployeeImportExportController::class, 'downloadFailedRows'])->name('employees.import.failed');
+    Route::get('employees/template', [EmployeeImportExportController::class, 'downloadTemplate'])->name('employees.template');
 
     // Employees - CREATE routes first (before parameterized routes)
     Route::get('employees/create', [EmployeeController::class, 'create'])->name('employees.create');
