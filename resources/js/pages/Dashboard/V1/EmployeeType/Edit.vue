@@ -53,7 +53,7 @@ const isFormInvalid = createIsFormInvalid(getFormData);
 
 const handleSubmit = () => {
     validateAndSubmit(getFormData(), form, () => {
-        form.put(`/dashboard/employee-types/${props.employeeType.id}`, {
+        form.put(`/dashboard/employee-types/${props.employeeType.uuid}`, {
             onSuccess: () => {
                 toast.success('Employee type updated successfully.');
                 setTimeout(() => {

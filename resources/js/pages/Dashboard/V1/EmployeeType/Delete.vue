@@ -40,7 +40,7 @@ const handleConfirmedChange = (value: boolean | 'indeterminate') => {
 };
 
 const handleSubmit = () => {
-    form.delete(`/dashboard/employee-types/${props.employeeType.id}`, {
+    form.delete(`/dashboard/employee-types/${props.employeeType.uuid}`, {
         onSuccess: () => {
             toast.success('Employee type deleted successfully.');
             setTimeout(() => {

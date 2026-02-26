@@ -50,7 +50,7 @@ const getInitials = (name: string) => {
 };
 
 const handleSubmit = () => {
-    form.delete(`/dashboard/employees/${props.employee.id}`, {
+    form.delete(`/dashboard/employees/${props.employee.uuid}`, {
         onSuccess: () => {
             toast.success('Employee deleted successfully.');
             setTimeout(() => {

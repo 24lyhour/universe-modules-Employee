@@ -13,7 +13,7 @@ const props = defineProps<EmployeeShowProps>();
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
     { title: 'Employees', href: '/dashboard/employees' },
-    { title: props.employee.full_name, href: `/dashboard/employees/${props.employee.id}` },
+    { title: props.employee.full_name, href: `/dashboard/employees/${props.employee.uuid}` },
 ];
 
 const getInitials = (name: string) => {
@@ -63,12 +63,12 @@ const formatCurrency = (value: number | null) => {
                     </div>
                     <div class="flex items-center gap-2">
                         <Button variant="outline" as-child>
-                            <Link :href="`/dashboard/employees/${employee.id}/qr-badge`">
+                            <Link :href="`/dashboard/employees/${employee.uuid}/qr-badge`">
                                 <QrCode class="h-4 w-4 mr-2" /> QR Badge
                             </Link>
                         </Button>
                         <Button as-child>
-                            <Link :href="`/dashboard/employees/${employee.id}/edit`">
+                            <Link :href="`/dashboard/employees/${employee.uuid}/edit`">
                                 <Pencil class="h-4 w-4 mr-2" /> Edit
                             </Link>
                         </Button>

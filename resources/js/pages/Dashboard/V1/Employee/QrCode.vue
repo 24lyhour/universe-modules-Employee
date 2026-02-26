@@ -32,8 +32,8 @@ const props = defineProps<Props>();
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
     { title: 'Employees', href: '/dashboard/employees' },
-    { title: props.employee.full_name, href: `/dashboard/employees/${props.employee.id}` },
-    { title: 'QR Badge', href: `/dashboard/employees/${props.employee.id}/qr-badge` },
+    { title: props.employee.full_name, href: `/dashboard/employees/${props.employee.uuid}` },
+    { title: 'QR Badge', href: `/dashboard/employees/${props.employee.uuid}/qr-badge` },
 ];
 
 const qrCodeDataUrl = ref<string>('');
@@ -66,12 +66,12 @@ const generateQrCode = async () => {
 };
 
 const handleBack = () => {
-    router.visit(`/dashboard/employees/${props.employee.id}`);
+    router.visit(`/dashboard/employees/${props.employee.uuid}`);
 };
 
 const handleRegenerate = () => {
     isRegenerating.value = true;
-    router.post(`/dashboard/employees/${props.employee.id}/regenerate-qr`, {}, {
+    router.post(`/dashboard/employees/${props.employee.uuid}/regenerate-qr`, {}, {
         onFinish: () => {
             isRegenerating.value = false;
         },

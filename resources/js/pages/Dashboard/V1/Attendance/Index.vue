@@ -111,19 +111,19 @@ const actions: TableAction<Attendance>[] = [
     {
         label: 'View',
         icon: Eye,
-        onClick: (attendance) => router.visit(`/dashboard/attendances/${attendance.id}`),
+        onClick: (attendance) => router.visit(`/dashboard/attendances/${attendance.uuid}`),
     },
     {
         label: 'Edit',
         icon: Pencil,
-        onClick: (attendance) => router.visit(`/dashboard/attendances/${attendance.id}/edit`),
+        onClick: (attendance) => router.visit(`/dashboard/attendances/${attendance.uuid}/edit`),
     },
     {
         label: 'Delete',
         icon: Trash2,
         onClick: (attendance) => {
             if (confirm('Are you sure you want to delete this attendance record?')) {
-                router.delete(`/dashboard/attendances/${attendance.id}`);
+                router.delete(`/dashboard/attendances/${attendance.uuid}`);
             }
         },
         variant: 'destructive',

@@ -56,17 +56,17 @@ const actions: TableAction<EmployeeTypeModel>[] = [
     {
         label: 'View',
         icon: Eye,
-        onClick: (type) => router.visit(`/dashboard/employee-types/${type.id}`),
+        onClick: (type) => router.visit(`/dashboard/employee-types/${type.uuid}`),
     },
     {
         label: 'Edit',
         icon: Pencil,
-        onClick: (type) => router.visit(`/dashboard/employee-types/${type.id}/edit`),
+        onClick: (type) => router.visit(`/dashboard/employee-types/${type.uuid}/edit`),
     },
     {
         label: 'Delete',
         icon: Trash2,
-        onClick: (type) => router.visit(`/dashboard/employee-types/${type.id}/delete`),
+        onClick: (type) => router.visit(`/dashboard/employee-types/${type.uuid}/delete`),
         variant: 'destructive',
         separator: true,
     },
@@ -112,7 +112,7 @@ const handleCreate = () => {
 };
 
 const handleStatusToggle = (type: EmployeeTypeModel, newStatus: boolean) => {
-    router.put(`/dashboard/employee-types/${type.id}/toggle-status`, {
+    router.put(`/dashboard/employee-types/${type.uuid}/toggle-status`, {
         status: newStatus,
     }, {
         preserveState: true,

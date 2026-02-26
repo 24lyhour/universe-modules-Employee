@@ -17,8 +17,8 @@ const props = defineProps<EmployeeEditProps>();
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
     { title: 'Employees', href: '/dashboard/employees' },
-    { title: props.employee.full_name, href: `/dashboard/employees/${props.employee.id}` },
-    { title: 'Edit', href: `/dashboard/employees/${props.employee.id}/edit` },
+    { title: props.employee.full_name, href: `/dashboard/employees/${props.employee.uuid}` },
+    { title: 'Edit', href: `/dashboard/employees/${props.employee.uuid}/edit` },
 ];
 
 const departments = ref<DepartmentOption[]>(props.departments || []);
@@ -103,10 +103,10 @@ const handleSchoolChange = async (schoolId: number | null) => {
 
 const handleSubmit = () => {
     validateAndSubmit(getFormData(), form, () => {
-        form.put(`/dashboard/employees/${props.employee.id}`, {
+        form.put(`/dashboard/employees/${props.employee.uuid}`, {
             onSuccess: () => {
                 toast.success('Employee updated successfully.');
-                router.visit(`/dashboard/employees/${props.employee.id}`);
+                router.visit(`/dashboard/employees/${props.employee.uuid}`);
             },
         });
     });
@@ -143,7 +143,7 @@ const handleSubmit = () => {
                 <!-- Actions at Bottom -->
                 <div class="flex justify-end gap-3 pt-4">
                     <Button type="button" variant="outline" as-child>
-                        <Link :href="`/dashboard/employees/${employee.id}`">Cancel</Link>
+                        <Link :href="`/dashboard/employees/${employee.uuid}`">Cancel</Link>
                     </Button>
                     <Button type="submit" :disabled="isFormInvalid || form.processing">
                         {{ form.processing ? 'Saving...' : 'Save Changes' }}

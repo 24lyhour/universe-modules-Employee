@@ -13,7 +13,7 @@ const props = defineProps<EmployeeTypeShowProps>();
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
     { title: 'Employee Types', href: '/dashboard/employee-types' },
-    { title: props.employeeType.name, href: `/dashboard/employee-types/${props.employeeType.id}` },
+    { title: props.employeeType.name, href: `/dashboard/employee-types/${props.employeeType.uuid}` },
 ];
 
 const formatDate = (date: string | null) => {
@@ -52,7 +52,7 @@ const formatDate = (date: string | null) => {
                         </div>
                     </div>
                     <Button as-child>
-                        <Link :href="`/dashboard/employee-types/${employeeType.id}/edit`">
+                        <Link :href="`/dashboard/employee-types/${employeeType.uuid}/edit`">
                             <Pencil class="h-4 w-4 mr-2" /> Edit
                         </Link>
                     </Button>

@@ -92,4 +92,12 @@ class EmployeeType extends Model
     {
         return $query->where('school_id', $schoolId);
     }
+
+    /**
+     * Get the route key for the model.
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
+    }
 }

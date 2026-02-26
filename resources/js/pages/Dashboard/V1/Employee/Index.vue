@@ -90,17 +90,17 @@ const actions: TableAction<Employee>[] = [
     {
         label: 'View',
         icon: Eye,
-        onClick: (employee) => router.visit(`/dashboard/employees/${employee.id}`),
+        onClick: (employee) => router.visit(`/dashboard/employees/${employee.uuid}`),
     },
     {
         label: 'Edit',
         icon: Pencil,
-        onClick: (employee) => router.visit(`/dashboard/employees/${employee.id}/edit`),
+        onClick: (employee) => router.visit(`/dashboard/employees/${employee.uuid}/edit`),
     },
     {
         label: 'Delete',
         icon: Trash2,
-        onClick: (employee) => router.visit(`/dashboard/employees/${employee.id}/delete`),
+        onClick: (employee) => router.visit(`/dashboard/employees/${employee.uuid}/delete`),
         variant: 'destructive',
         separator: true,
     },
@@ -169,7 +169,7 @@ const handleDownloadTemplate = () => {
 };
 
 const handleStatusToggle = (employee: Employee, newStatus: boolean) => {
-    router.put(`/dashboard/employees/${employee.id}/toggle-status`, {
+    router.put(`/dashboard/employees/${employee.uuid}/toggle-status`, {
         status: newStatus,
     }, {
         preserveState: true,

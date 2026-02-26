@@ -14,7 +14,7 @@ const props = defineProps<AttendanceShowProps>();
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
     { title: 'Attendance', href: '/dashboard/attendances' },
-    { title: props.attendance.attendance_date_formatted, href: `/dashboard/attendances/${props.attendance.id}` },
+    { title: props.attendance.attendance_date_formatted, href: `/dashboard/attendances/${props.attendance.uuid}` },
 ];
 
 const getInitials = (name: string | null) => {
@@ -46,12 +46,12 @@ const handleBack = () => {
 };
 
 const handleEdit = () => {
-    router.visit(`/dashboard/attendances/${props.attendance.id}/edit`);
+    router.visit(`/dashboard/attendances/${props.attendance.uuid}/edit`);
 };
 
 const handleDelete = () => {
     if (confirm('Are you sure you want to delete this attendance record?')) {
-        router.delete(`/dashboard/attendances/${props.attendance.id}`);
+        router.delete(`/dashboard/attendances/${props.attendance.uuid}`);
     }
 };
 </script>

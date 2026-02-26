@@ -219,4 +219,12 @@ class Attendance extends Model
 
         return sprintf('%dh %dm', $hours, $minutes);
     }
+
+    /**
+     * Get the route key for the model.
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
+    }
 }

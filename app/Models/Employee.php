@@ -176,4 +176,12 @@ class Employee extends Model
     {
         return $this->belongsTo(EmployeeType::class, 'type_employee_id');
     }
+
+    /**
+     * Get the route key for the model.
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
+    }
 }
