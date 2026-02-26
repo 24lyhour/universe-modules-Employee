@@ -41,7 +41,10 @@ class EmployeesExport implements FromQuery, WithHeadings, WithMapping, ShouldAut
         }
 
         if (isset($this->filters['status']) && $this->filters['status'] !== 'all') {
-            $query->where('status', $this->filters['status']);
+            $status = filter_var($this->filters['status'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            if ($status !== null) {
+                $query->where('status', $status);
+            }
         }
 
         if (!empty($this->filters['employee_type']) && $this->filters['employee_type'] !== 'all') {

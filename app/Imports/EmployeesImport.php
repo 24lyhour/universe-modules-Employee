@@ -89,6 +89,27 @@ class EmployeesImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, W
             $rowNumber = $index + 2;
             $data = $this->normalizeRow($row->toArray());
 
+            // Resolve school name for preview
+            $schoolName = $data['school'] ?? null;
+            if ($schoolName) {
+                $school = School::withoutGlobalScopes()->where('name', $schoolName)->first();
+                if (!$school) {
+                    $schoolName = $schoolName . ' (not found)';
+                }
+            } elseif ($this->defaultSchoolId) {
+                $defaultSchool = School::withoutGlobalScopes()->find($this->defaultSchoolId);
+                $schoolName = $defaultSchool ? $defaultSchool->name . ' (default)' : null;
+            }
+
+            // Resolve department name for preview
+            $departmentName = $data['department'] ?? null;
+            if ($departmentName) {
+                $dept = Department::withoutGlobalScopes()->where('name', $departmentName)->first();
+                if (!$dept) {
+                    $departmentName = $departmentName . ' (not found)';
+                }
+            }
+
             $preview = [
                 'row_number' => $rowNumber,
                 'first_name' => $data['first_name'] ?? null,
@@ -96,8 +117,8 @@ class EmployeesImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, W
                 'email' => $data['email'] ?? null,
                 'phone_number' => $data['phone_number'] ?? null,
                 'gender' => $this->formatGenderDisplay($data['gender'] ?? null),
-                'school' => $data['school'] ?? null,
-                'department' => $data['department'] ?? null,
+                'school' => $schoolName,
+                'department' => $departmentName,
                 'job_title' => $data['job_title'] ?? null,
                 'employee_type' => $this->formatEmployeeTypeDisplay($data['employment_type'] ?? $data['employee_type'] ?? null),
                 'status' => 'ready',
@@ -117,6 +138,24 @@ class EmployeesImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, W
             if ($validator->fails()) {
                 $preview['status'] = 'error';
                 $preview['errors'] = $validator->errors()->all();
+            }
+
+            // Validate school if specified
+            if (!empty($data['school'])) {
+                $school = School::withoutGlobalScopes()->where('name', $data['school'])->first();
+                if (!$school) {
+                    $preview['status'] = 'error';
+                    $preview['errors'][] = "School '{$data['school']}' not found. Please check the school name matches exactly.";
+                }
+            }
+
+            // Validate department if specified
+            if (!empty($data['department'])) {
+                $dept = Department::withoutGlobalScopes()->where('name', $data['department'])->first();
+                if (!$dept) {
+                    $preview['status'] = 'error';
+                    $preview['errors'][] = "Department '{$data['department']}' not found. Please check the department name matches exactly.";
+                }
             }
 
             // Check for duplicate
@@ -143,14 +182,6 @@ class EmployeesImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, W
                 }
             }
 
-            // Check school exists
-            if (!empty($data['school'])) {
-                $school = School::withoutGlobalScopes()->where('name', 'like', "%{$data['school']}%")->first();
-                if (!$school) {
-                    $preview['warnings'][] = "School '{$data['school']}' not found, will use default";
-                }
-            }
-
             $this->previewData[] = $preview;
         }
     }
@@ -173,6 +204,24 @@ class EmployeesImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, W
         if ($validator->fails()) {
             $this->addFailedRow($rowNumber, $data, $validator->errors()->all());
             return;
+        }
+
+        // Validate school if specified
+        if (!empty($data['school'])) {
+            $school = School::withoutGlobalScopes()->where('name', $data['school'])->first();
+            if (!$school) {
+                $this->addFailedRow($rowNumber, $data, ["School '{$data['school']}' not found"]);
+                return;
+            }
+        }
+
+        // Validate department if specified
+        if (!empty($data['department'])) {
+            $dept = Department::withoutGlobalScopes()->where('name', $data['department'])->first();
+            if (!$dept) {
+                $this->addFailedRow($rowNumber, $data, ["Department '{$data['department']}' not found"]);
+                return;
+            }
         }
 
         // Handle duplicates
@@ -296,13 +345,18 @@ class EmployeesImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, W
      */
     protected function resolveSchoolId(array $data): ?int
     {
+        // First, check if a school name is provided in the Excel data
         if (!empty($data['school'])) {
-            $school = School::withoutGlobalScopes()->where('name', 'like', "%{$data['school']}%")->first();
+            $school = School::withoutGlobalScopes()
+                ->where('name', $data['school'])
+                ->first();
+
             if ($school) {
                 return $school->id;
             }
         }
 
+        // Fall back to default school if no school specified or not found
         if ($this->defaultSchoolId) {
             return $this->defaultSchoolId;
         }
@@ -322,10 +376,21 @@ class EmployeesImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, W
      */
     protected function resolveDepartmentId(array $data, ?int $schoolId): ?int
     {
-        if (!empty($data['department']) && $schoolId) {
+        if (!empty($data['department'])) {
+            // First try to find department by name within the school
+            if ($schoolId) {
+                $department = Department::withoutGlobalScopes()
+                    ->where('school_id', $schoolId)
+                    ->where('name', $data['department'])
+                    ->first();
+                if ($department) {
+                    return $department->id;
+                }
+            }
+
+            // If not found in school, try global search by name
             $department = Department::withoutGlobalScopes()
-                ->where('school_id', $schoolId)
-                ->where('name', 'like', "%{$data['department']}%")
+                ->where('name', $data['department'])
                 ->first();
             return $department?->id;
         }
@@ -339,7 +404,7 @@ class EmployeesImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, W
     {
         if (!empty($data['employee_type_name'])) {
             $employeeType = EmployeeType::withoutGlobalScopes()
-                ->where('name', 'like', "%{$data['employee_type_name']}%")
+                ->where('name', $data['employee_type_name'])
                 ->first();
             return $employeeType?->id;
         }
