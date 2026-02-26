@@ -36,10 +36,6 @@ watch(confirmed, () => {
 
 const canSubmit = computed(() => confirmed.value === true);
 
-const handleConfirmedChange = (value: boolean | 'indeterminate') => {
-    confirmed.value = value === true;
-};
-
 const getInitials = (name: string) => {
     return name
         .split(' ')
@@ -114,8 +110,7 @@ const handleCancel = () => {
             <div class="flex items-start space-x-3 rounded-lg border p-4">
                 <Checkbox
                     id="confirmed"
-                    :checked="confirmed"
-                    @update:checked="handleConfirmedChange"
+                    v-model="confirmed"
                 />
                 <div class="space-y-1">
                     <Label for="confirmed" class="cursor-pointer font-medium">
