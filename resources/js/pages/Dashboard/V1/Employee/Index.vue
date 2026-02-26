@@ -2,7 +2,7 @@
 import { computed, ref, watch } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { TableReusable, StatsCard } from '@/components/shared';
+import { TableReusable, StatsCard, ButtonGroup } from '@/components/shared';
 import type { TableColumn, TableAction, PaginationData } from '@/components/shared';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,7 +16,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Users, CheckCircle, XCircle, Search, Eye, Pencil, Trash2, Clock, CalendarDays, Download, Upload } from 'lucide-vue-next';
+import { Plus, Users, CheckCircle, XCircle, Search, Eye, Pencil, Trash2, Clock, CalendarDays, Download, Upload, Database, FileSpreadsheet } from 'lucide-vue-next';
 import type { BreadcrumbItem } from '@/types';
 import type { EmployeeIndexProps, Employee } from '@employee/types';
 
@@ -168,6 +168,10 @@ const handleDownloadTemplate = () => {
     window.location.href = '/dashboard/employees/template';
 };
 
+const handleTrash = () => {
+    router.visit('/dashboard/employees/trash');
+};
+
 const handleStatusToggle = (employee: Employee, newStatus: boolean) => {
     router.put(`/dashboard/employees/${employee.uuid}/toggle-status`, {
         status: newStatus,
@@ -239,18 +243,30 @@ const handleStatusToggle = (employee: Employee, newStatus: boolean) => {
                         <p class="text-sm text-muted-foreground">Manage your employees</p>
                     </div>
                     <div class="flex items-center gap-2">
-                        <Button variant="outline" @click="handleDownloadTemplate">
-                            <Download class="mr-2 h-4 w-4" />
-                            Template
-                        </Button>
-                        <Button variant="outline" @click="handleExport">
-                            <Download class="mr-2 h-4 w-4" />
-                            Export
-                        </Button>
-                        <Button variant="outline" @click="handleImport">
-                            <Upload class="mr-2 h-4 w-4" />
-                            Import
-                        </Button>
+                        <ButtonGroup>
+                            <Button variant="default">
+                                <Database class="mr-2 h-4 w-4" />
+                                All
+                            </Button>
+                            <Button variant="outline" @click="handleTrash">
+                                <Trash2 class="mr-2 h-4 w-4" />
+                                Trash
+                            </Button>
+                        </ButtonGroup>
+                        <ButtonGroup>
+                            <Button variant="outline" @click="handleExport">
+                                <Download class="mr-2 h-4 w-4" />
+                                Export
+                            </Button>
+                            <Button variant="outline" @click="handleImport">
+                                <Upload class="mr-2 h-4 w-4" />
+                                Import
+                            </Button>
+                            <Button variant="outline" @click="handleDownloadTemplate">
+                                <FileSpreadsheet class="mr-2 h-4 w-4" />
+                                Template
+                            </Button>
+                        </ButtonGroup>
                         <Button @click="handleCreate">
                             <Plus class="mr-2 h-4 w-4" />
                             Add Employee

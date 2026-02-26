@@ -5,6 +5,9 @@ use Modules\Employee\Http\Controllers\Dashboard\V1\EmployeeController;
 use Modules\Employee\Http\Controllers\Dashboard\V1\EmployeeImportExportController;
 use Modules\Employee\Http\Controllers\Dashboard\V1\EmployeeTypeController;
 use Modules\Employee\Http\Controllers\Dashboard\V1\AttendanceController;
+use Modules\Employee\Http\Controllers\Dashboard\V1\EmployeeTrashController;
+use Modules\Employee\Http\Controllers\Dashboard\V1\EmployeeTypeTrashController;
+use Modules\Employee\Http\Controllers\Dashboard\V1\AttendanceTrashController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,6 +29,28 @@ use Modules\Employee\Http\Controllers\Dashboard\V1\AttendanceController;
 */
 
 Route::middleware(['auth', 'verified', 'auto.permission'])->prefix('dashboard')->name('employee.')->group(function () {
+
+    // ==================== TRASH ROUTES ====================
+
+    // Employees Trash
+    Route::get('employees/trash', [EmployeeTrashController::class, 'index'])->name('employees.trash.index');
+    Route::put('employees/{uuid}/restore', [EmployeeTrashController::class, 'restore'])->name('employees.trash.restore');
+    Route::delete('employees/{uuid}/force-delete', [EmployeeTrashController::class, 'forceDelete'])->name('employees.trash.force-delete');
+    Route::delete('employees/trash/empty', [EmployeeTrashController::class, 'empty'])->name('employees.trash.empty');
+
+    // Employee Types Trash
+    Route::get('employee-types/trash', [EmployeeTypeTrashController::class, 'index'])->name('employee-types.trash.index');
+    Route::put('employee-types/{uuid}/restore', [EmployeeTypeTrashController::class, 'restore'])->name('employee-types.trash.restore');
+    Route::delete('employee-types/{uuid}/force-delete', [EmployeeTypeTrashController::class, 'forceDelete'])->name('employee-types.trash.force-delete');
+    Route::delete('employee-types/trash/empty', [EmployeeTypeTrashController::class, 'empty'])->name('employee-types.trash.empty');
+
+    // Attendances Trash
+    Route::get('attendances/trash', [AttendanceTrashController::class, 'index'])->name('attendances.trash.index');
+    Route::put('attendances/{uuid}/restore', [AttendanceTrashController::class, 'restore'])->name('attendances.trash.restore');
+    Route::delete('attendances/{uuid}/force-delete', [AttendanceTrashController::class, 'forceDelete'])->name('attendances.trash.force-delete');
+    Route::delete('attendances/trash/empty', [AttendanceTrashController::class, 'empty'])->name('attendances.trash.empty');
+
+    // ==================== CRUD ROUTES ====================
 
     // Departments AJAX endpoint
     Route::get('employees/departments', [EmployeeController::class, 'getDepartments'])->name('employees.departments');

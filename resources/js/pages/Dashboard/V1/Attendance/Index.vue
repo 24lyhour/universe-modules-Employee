@@ -2,7 +2,7 @@
 import { computed, ref, watch } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { TableReusable, StatsCard } from '@/components/shared';
+import { TableReusable, StatsCard, ButtonGroup } from '@/components/shared';
 import type { TableColumn, TableAction, PaginationData } from '@/components/shared';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,6 +27,7 @@ import {
     Trash2,
     QrCode,
     CalendarDays,
+    Database,
 } from 'lucide-vue-next';
 import type { BreadcrumbItem } from '@/types';
 import type { AttendanceIndexProps, Attendance } from '@employee/types';
@@ -177,6 +178,10 @@ const handleCreate = () => {
 const handleOpenScanner = () => {
     router.visit('/dashboard/attendances/scanner');
 };
+
+const handleTrash = () => {
+    router.visit('/dashboard/attendances/trash');
+};
 </script>
 
 <template>
@@ -224,7 +229,17 @@ const handleOpenScanner = () => {
                         <h2 class="text-lg font-semibold">Attendance Records</h2>
                         <p class="text-sm text-muted-foreground">Track employee attendance</p>
                     </div>
-                    <div class="flex gap-2">
+                    <div class="flex items-center gap-2">
+                        <ButtonGroup>
+                            <Button variant="default">
+                                <Database class="mr-2 h-4 w-4" />
+                                All
+                            </Button>
+                            <Button variant="outline" @click="handleTrash">
+                                <Trash2 class="mr-2 h-4 w-4" />
+                                Trash
+                            </Button>
+                        </ButtonGroup>
                         <Button variant="outline" @click="handleOpenScanner">
                             <QrCode class="mr-2 h-4 w-4" />
                             QR Scanner

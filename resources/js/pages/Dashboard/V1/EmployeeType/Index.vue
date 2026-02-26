@@ -2,7 +2,7 @@
 import { computed, ref, watch } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { TableReusable, StatsCard } from '@/components/shared';
+import { TableReusable, StatsCard, ButtonGroup } from '@/components/shared';
 import type { TableColumn, TableAction, PaginationData } from '@/components/shared';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,7 +15,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Tags, CheckCircle, XCircle, Search, Eye, Pencil, Trash2 } from 'lucide-vue-next';
+import { Plus, Tags, CheckCircle, XCircle, Search, Eye, Pencil, Trash2, Database } from 'lucide-vue-next';
 import type { BreadcrumbItem } from '@/types';
 import type { EmployeeTypeIndexProps, EmployeeTypeModel } from '@employee/types';
 
@@ -111,6 +111,10 @@ const handleCreate = () => {
     router.visit('/dashboard/employee-types/create');
 };
 
+const handleTrash = () => {
+    router.visit('/dashboard/employee-types/trash');
+};
+
 const handleStatusToggle = (type: EmployeeTypeModel, newStatus: boolean) => {
     router.put(`/dashboard/employee-types/${type.uuid}/toggle-status`, {
         status: newStatus,
@@ -154,10 +158,22 @@ const handleStatusToggle = (type: EmployeeTypeModel, newStatus: boolean) => {
                         <h2 class="text-lg font-semibold">Employee Types</h2>
                         <p class="text-sm text-muted-foreground">Manage employee type categories</p>
                     </div>
-                    <Button @click="handleCreate">
-                        <Plus class="mr-2 h-4 w-4" />
-                        Add Type
-                    </Button>
+                    <div class="flex items-center gap-2">
+                        <ButtonGroup>
+                            <Button variant="default">
+                                <Database class="mr-2 h-4 w-4" />
+                                All
+                            </Button>
+                            <Button variant="outline" @click="handleTrash">
+                                <Trash2 class="mr-2 h-4 w-4" />
+                                Trash
+                            </Button>
+                        </ButtonGroup>
+                        <Button @click="handleCreate">
+                            <Plus class="mr-2 h-4 w-4" />
+                            Add Type
+                        </Button>
+                    </div>
                 </div>
 
                 <!-- Filters -->
