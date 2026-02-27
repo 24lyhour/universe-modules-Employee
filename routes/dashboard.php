@@ -37,18 +37,24 @@ Route::middleware(['auth', 'verified', 'auto.permission'])->prefix('dashboard')-
     Route::put('employees/{uuid}/restore', [EmployeeTrashController::class, 'restore'])->name('employees.trash.restore');
     Route::delete('employees/{uuid}/force-delete', [EmployeeTrashController::class, 'forceDelete'])->name('employees.trash.force-delete');
     Route::delete('employees/trash/empty', [EmployeeTrashController::class, 'empty'])->name('employees.trash.empty');
+    Route::put('employees/trash/bulk-restore', [EmployeeTrashController::class, 'bulkRestore'])->name('employees.trash.bulk-restore');
+    Route::delete('employees/trash/bulk-force-delete', [EmployeeTrashController::class, 'bulkForceDelete'])->name('employees.trash.bulk-force-delete');
 
     // Employee Types Trash
     Route::get('employee-types/trash', [EmployeeTypeTrashController::class, 'index'])->name('employee-types.trash.index');
     Route::put('employee-types/{uuid}/restore', [EmployeeTypeTrashController::class, 'restore'])->name('employee-types.trash.restore');
     Route::delete('employee-types/{uuid}/force-delete', [EmployeeTypeTrashController::class, 'forceDelete'])->name('employee-types.trash.force-delete');
     Route::delete('employee-types/trash/empty', [EmployeeTypeTrashController::class, 'empty'])->name('employee-types.trash.empty');
+    Route::put('employee-types/trash/bulk-restore', [EmployeeTypeTrashController::class, 'bulkRestore'])->name('employee-types.trash.bulk-restore');
+    Route::delete('employee-types/trash/bulk-force-delete', [EmployeeTypeTrashController::class, 'bulkForceDelete'])->name('employee-types.trash.bulk-force-delete');
 
     // Attendances Trash
     Route::get('attendances/trash', [AttendanceTrashController::class, 'index'])->name('attendances.trash.index');
     Route::put('attendances/{uuid}/restore', [AttendanceTrashController::class, 'restore'])->name('attendances.trash.restore');
     Route::delete('attendances/{uuid}/force-delete', [AttendanceTrashController::class, 'forceDelete'])->name('attendances.trash.force-delete');
     Route::delete('attendances/trash/empty', [AttendanceTrashController::class, 'empty'])->name('attendances.trash.empty');
+    Route::put('attendances/trash/bulk-restore', [AttendanceTrashController::class, 'bulkRestore'])->name('attendances.trash.bulk-restore');
+    Route::delete('attendances/trash/bulk-force-delete', [AttendanceTrashController::class, 'bulkForceDelete'])->name('attendances.trash.bulk-force-delete');
 
     // ==================== CRUD ROUTES ====================
 
@@ -64,6 +70,8 @@ Route::middleware(['auth', 'verified', 'auto.permission'])->prefix('dashboard')-
     Route::get('employees/template', [EmployeeImportExportController::class, 'downloadTemplate'])->name('employees.template');
 
     // Employees - CREATE routes first (before parameterized routes)
+    Route::get('employees/bulk-delete', [EmployeeController::class, 'confirmBulkDelete'])->name('employees.bulk-delete.confirm');
+    Route::delete('employees/bulk-delete', [EmployeeController::class, 'bulkDelete'])->name('employees.bulk-delete');
     Route::get('employees/create', [EmployeeController::class, 'create'])->name('employees.create');
     Route::post('employees', [EmployeeController::class, 'store'])->name('employees.store');
     Route::get('employees', [EmployeeController::class, 'index'])->name('employees.index');
@@ -78,6 +86,8 @@ Route::middleware(['auth', 'verified', 'auto.permission'])->prefix('dashboard')-
     Route::delete('employees/{employee}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
 
     // Employee Types - CREATE routes first
+    Route::get('employee-types/bulk-delete', [EmployeeTypeController::class, 'confirmBulkDelete'])->name('employee-types.bulk-delete.confirm');
+    Route::delete('employee-types/bulk-delete', [EmployeeTypeController::class, 'bulkDelete'])->name('employee-types.bulk-delete');
     Route::get('employee-types/create', [EmployeeTypeController::class, 'create'])->name('employee-types.create');
     Route::post('employee-types', [EmployeeTypeController::class, 'store'])->name('employee-types.store');
     Route::get('employee-types', [EmployeeTypeController::class, 'index'])->name('employee-types.index');
@@ -97,6 +107,8 @@ Route::middleware(['auth', 'verified', 'auto.permission'])->prefix('dashboard')-
     });
 
     // Attendance CRUD - CREATE routes first
+    Route::get('attendances/bulk-delete', [AttendanceController::class, 'confirmBulkDelete'])->name('attendances.bulk-delete.confirm');
+    Route::delete('attendances/bulk-delete', [AttendanceController::class, 'bulkDelete'])->name('attendances.bulk-delete');
     Route::get('attendances/create', [AttendanceController::class, 'create'])->name('attendances.create');
     Route::post('attendances', [AttendanceController::class, 'store'])->name('attendances.store');
     Route::get('attendances', [AttendanceController::class, 'index'])->name('attendances.index');

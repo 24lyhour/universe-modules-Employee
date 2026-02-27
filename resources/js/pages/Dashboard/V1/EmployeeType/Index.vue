@@ -29,6 +29,18 @@ const breadcrumbs: BreadcrumbItem[] = [
 const search = ref(props.filters.search || '');
 const statusFilter = ref(props.filters.status || 'all');
 
+// Selection state
+const selectedUuids = ref<(string | number)[]>([]);
+
+// Bulk delete handler
+const openBulkDeleteDialog = () => {
+    const params = new URLSearchParams();
+    selectedUuids.value.forEach((uuid) => {
+        params.append('uuids[]', String(uuid));
+    });
+    router.visit(`/dashboard/employee-types/bulk-delete?${params.toString()}`);
+};
+
 const columns: TableColumn<EmployeeTypeModel>[] = [
     {
         key: 'name',
@@ -201,14 +213,23 @@ const handleStatusToggle = (type: EmployeeTypeModel, newStatus: boolean) => {
 
                 <!-- Table -->
                 <TableReusable
+                    v-model:selected="selectedUuids"
                     :data="props.employeeTypes.data"
                     :columns="columns"
                     :actions="actions"
                     :pagination="pagination"
                     :searchable="false"
+                    :selectable="true"
+                    select-key="uuid"
                     @page-change="handlePageChange"
                     @per-page-change="handlePerPageChange"
                 >
+                    <template #bulk-actions>
+                        <Button variant="destructive" size="sm" @click="openBulkDeleteDialog">
+                            <Trash2 class="mr-2 h-4 w-4" />
+                            Delete Selected
+                        </Button>
+                    </template>
                     <template #cell-name="{ item }">
                         <div class="font-medium">{{ item.name }}</div>
                     </template>

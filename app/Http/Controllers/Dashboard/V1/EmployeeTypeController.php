@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use Momentum\Modal\Modal;
+use Modules\Employee\Actions\Dashboard\V1\EmployeeType\BulkDeleteEmployeeTypesAction;
 use Modules\Employee\Actions\Dashboard\V1\EmployeeType\CreateEmployeeTypeAction;
 use Modules\Employee\Actions\Dashboard\V1\EmployeeType\DeleteEmployeeTypeAction;
 use Modules\Employee\Actions\Dashboard\V1\EmployeeType\GetEmployeeTypeEditDataAction;
@@ -15,6 +16,7 @@ use Modules\Employee\Actions\Dashboard\V1\EmployeeType\GetEmployeeTypeIndexDataA
 use Modules\Employee\Actions\Dashboard\V1\EmployeeType\GetEmployeeTypeShowDataAction;
 use Modules\Employee\Actions\Dashboard\V1\EmployeeType\ToggleEmployeeTypeStatusAction;
 use Modules\Employee\Actions\Dashboard\V1\EmployeeType\UpdateEmployeeTypeAction;
+use Modules\Employee\Http\Requests\Dashboard\V1\BulkDeleteEmployeeTypesRequest;
 use Modules\Employee\Http\Requests\Dashboard\V1\StoreEmployeeTypeRequest;
 use Modules\Employee\Http\Requests\Dashboard\V1\UpdateEmployeeTypeRequest;
 use Modules\Employee\Http\Resources\Dashboard\V1\EmployeeTypeResource;
@@ -30,6 +32,7 @@ class EmployeeTypeController extends Controller
         protected UpdateEmployeeTypeAction $updateAction,
         protected DeleteEmployeeTypeAction $deleteAction,
         protected ToggleEmployeeTypeStatusAction $toggleStatusAction,
+        protected BulkDeleteEmployeeTypesAction $bulkDeleteAction,
     ) {}
 
     /**
@@ -135,5 +138,37 @@ class EmployeeTypeController extends Controller
         return redirect()
             ->back()
             ->with('success', "Employee type {$status} successfully.");
+    }
+
+    /**
+     * Show bulk delete confirmation modal.
+     */
+    public function confirmBulkDelete(Request $request): Modal
+    {
+        $uuids = $request->input('uuids', []);
+
+        $employeeTypes = EmployeeType::whereIn('uuid', $uuids)->withCount('employees')->get();
+
+        return Inertia::modal('employee::Dashboard/V1/EmployeeType/BulkDelete', [
+            'employeeTypes' => EmployeeTypeResource::collection($employeeTypes)->resolve(),
+        ])->baseRoute('employee.employee-types.index');
+    }
+
+    /**
+     * Bulk delete employee types.
+     */
+    public function bulkDelete(BulkDeleteEmployeeTypesRequest $request): RedirectResponse
+    {
+        $result = $this->bulkDeleteAction->execute($request->validated('uuids'));
+
+        $message = "{$result['deleted']} employee type(s) deleted successfully.";
+
+        if ($result['failed'] > 0) {
+            $message .= " {$result['failed']} employee type(s) could not be found.";
+        }
+
+        return redirect()
+            ->route('employee.employee-types.index')
+            ->with('success', $message);
     }
 }

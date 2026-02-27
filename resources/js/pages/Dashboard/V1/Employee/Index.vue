@@ -34,6 +34,18 @@ const schoolFilter = ref(props.filters.school_id || 'all');
 const dateFrom = ref(props.filters.date_from || '');
 const dateTo = ref(props.filters.date_to || '');
 
+// Selection state
+const selectedUuids = ref<(string | number)[]>([]);
+
+// Bulk delete handler
+const openBulkDeleteDialog = () => {
+    const params = new URLSearchParams();
+    selectedUuids.value.forEach((uuid) => {
+        params.append('uuids[]', String(uuid));
+    });
+    router.visit(`/dashboard/employees/bulk-delete?${params.toString()}`);
+};
+
 const getInitials = (name: string) => {
     return name
         .split(' ')
@@ -341,14 +353,23 @@ const handleStatusToggle = (employee: Employee, newStatus: boolean) => {
 
                 <!-- Table -->
                 <TableReusable
+                    v-model:selected="selectedUuids"
                     :data="props.employees.data"
                     :columns="columns"
                     :actions="actions"
                     :pagination="pagination"
                     :searchable="false"
+                    :selectable="true"
+                    select-key="uuid"
                     @page-change="handlePageChange"
                     @per-page-change="handlePerPageChange"
                 >
+                    <template #bulk-actions>
+                        <Button variant="destructive" size="sm" @click="openBulkDeleteDialog">
+                            <Trash2 class="mr-2 h-4 w-4" />
+                            Delete Selected
+                        </Button>
+                    </template>
                     <template #cell-employee="{ item }">
                         <div class="flex items-center gap-3">
                             <Avatar class="h-9 w-9">

@@ -3,15 +3,19 @@
 namespace Modules\Employee\Http\Controllers\Dashboard\V1;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use Momentum\Modal\Modal;
+use Modules\Employee\Actions\Dashboard\V1\Attendance\BulkDeleteAttendancesAction;
 use Modules\Employee\Actions\Dashboard\V1\Attendance\GetAttendanceIndexDataAction;
 use Modules\Employee\Actions\Dashboard\V1\Attendance\GetAttendanceShowDataAction;
 use Modules\Employee\Actions\Dashboard\V1\Attendance\CreateManualAttendanceAction;
 use Modules\Employee\Actions\Dashboard\V1\Attendance\UpdateAttendanceAction;
 use Modules\Employee\Actions\Dashboard\V1\Attendance\ProcessQrScanAction;
 use Modules\Employee\Actions\Dashboard\V1\Attendance\GenerateQrCodeAction;
+use Modules\Employee\Http\Requests\Dashboard\V1\BulkDeleteAttendancesRequest;
 use Modules\Employee\Http\Requests\Dashboard\V1\StoreAttendanceRequest;
 use Modules\Employee\Http\Requests\Dashboard\V1\UpdateAttendanceRequest;
 use Modules\Employee\Http\Resources\Dashboard\V1\AttendanceResource;
@@ -29,6 +33,7 @@ class AttendanceController extends Controller
         private UpdateAttendanceAction $updateAction,
         private ProcessQrScanAction $qrScanAction,
         private GenerateQrCodeAction $generateQrAction,
+        private BulkDeleteAttendancesAction $bulkDeleteAction,
     ) {}
 
     /**
@@ -139,6 +144,38 @@ class AttendanceController extends Controller
         return redirect()
             ->route('employee.attendances.index')
             ->with('success', 'Attendance record deleted successfully.');
+    }
+
+    /**
+     * Show bulk delete confirmation modal.
+     */
+    public function confirmBulkDelete(Request $request): Modal
+    {
+        $uuids = $request->input('uuids', []);
+
+        $attendances = Attendance::whereIn('uuid', $uuids)->with('employee')->get();
+
+        return Inertia::modal('employee::Dashboard/V1/Attendance/BulkDelete', [
+            'attendances' => AttendanceResource::collection($attendances)->resolve(),
+        ])->baseRoute('employee.attendances.index');
+    }
+
+    /**
+     * Bulk delete attendances.
+     */
+    public function bulkDelete(BulkDeleteAttendancesRequest $request): RedirectResponse
+    {
+        $result = $this->bulkDeleteAction->execute($request->validated('uuids'));
+
+        $message = "{$result['deleted']} attendance record(s) deleted successfully.";
+
+        if ($result['failed'] > 0) {
+            $message .= " {$result['failed']} record(s) could not be found.";
+        }
+
+        return redirect()
+            ->route('employee.attendances.index')
+            ->with('success', $message);
     }
 
     /**

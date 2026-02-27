@@ -9,6 +9,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Momentum\Modal\Modal;
 use Modules\Employee\Actions\Dashboard\V1\Attendance\GenerateQrCodeAction;
+use Modules\Employee\Actions\Dashboard\V1\BulkDeleteEmployeesAction;
 use Modules\Employee\Actions\Dashboard\V1\CreateEmployeeAction;
 use Modules\Employee\Actions\Dashboard\V1\DeleteEmployeeAction;
 use Modules\Employee\Actions\Dashboard\V1\GetEmployeeCreateDataAction;
@@ -17,6 +18,7 @@ use Modules\Employee\Actions\Dashboard\V1\GetEmployeeIndexDataAction;
 use Modules\Employee\Actions\Dashboard\V1\GetEmployeeShowDataAction;
 use Modules\Employee\Actions\Dashboard\V1\ToggleEmployeeStatusAction;
 use Modules\Employee\Actions\Dashboard\V1\UpdateEmployeeAction;
+use Modules\Employee\Http\Requests\Dashboard\V1\BulkDeleteEmployeesRequest;
 use Modules\Employee\Http\Requests\Dashboard\V1\StoreEmployeeRequest;
 use Modules\Employee\Http\Requests\Dashboard\V1\UpdateEmployeeRequest;
 use Modules\Employee\Http\Resources\Dashboard\V1\EmployeeResource;
@@ -37,6 +39,7 @@ class EmployeeController extends Controller
         protected UpdateEmployeeAction $updateAction,
         protected DeleteEmployeeAction $deleteAction,
         protected ToggleEmployeeStatusAction $toggleStatusAction,
+        protected BulkDeleteEmployeesAction $bulkDeleteAction,
     ) {}
 
     /**
@@ -208,5 +211,37 @@ class EmployeeController extends Controller
         return redirect()
             ->back()
             ->with('success', 'QR code regenerated successfully.');
+    }
+
+    /**
+     * Show bulk delete confirmation modal.
+     */
+    public function confirmBulkDelete(Request $request): Modal
+    {
+        $uuids = $request->input('uuids', []);
+
+        $employees = Employee::whereIn('uuid', $uuids)->get();
+
+        return Inertia::modal('employee::Dashboard/V1/Employee/BulkDelete', [
+            'employees' => EmployeeResource::collection($employees)->resolve(),
+        ])->baseRoute('employee.employees.index');
+    }
+
+    /**
+     * Bulk delete employees.
+     */
+    public function bulkDelete(BulkDeleteEmployeesRequest $request): RedirectResponse
+    {
+        $result = $this->bulkDeleteAction->execute($request->validated('uuids'));
+
+        $message = "{$result['deleted']} employee(s) deleted successfully.";
+
+        if ($result['failed'] > 0) {
+            $message .= " {$result['failed']} employee(s) could not be found.";
+        }
+
+        return redirect()
+            ->route('employee.employees.index')
+            ->with('success', $message);
     }
 }
