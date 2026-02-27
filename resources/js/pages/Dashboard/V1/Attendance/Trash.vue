@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { TrashTable, ButtonGroup } from '@/components/shared';
 import { Button } from '@/components/ui/button';
-import { Database, Trash2 } from 'lucide-vue-next';
+import { Database, Trash2, RotateCcw } from 'lucide-vue-next';
 import type { BreadcrumbItem } from '@/types';
 import type { TrashPaginationData, TrashConfigLocal, TrashConfig } from '@/types/trash';
 
@@ -17,6 +18,8 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+const selectedUuids = ref<(string | number)[]>([]);
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
@@ -50,6 +53,29 @@ const handleSearch = (query: string) => {
         per_page: props.trashItems.meta?.per_page || 10,
     }, { preserveState: true });
 };
+
+const handleBulkRestore = () => {
+    router.put('/dashboard/attendances/trash/bulk-restore', {
+        uuids: selectedUuids.value,
+    }, {
+        preserveState: false,
+        onSuccess: () => {
+            selectedUuids.value = [];
+        },
+    });
+};
+
+const handleBulkForceDelete = () => {
+    if (confirm(`Are you sure you want to permanently delete ${selectedUuids.value.length} item(s)? This action cannot be undone.`)) {
+        router.delete('/dashboard/attendances/trash/bulk-force-delete', {
+            data: { uuids: selectedUuids.value },
+            preserveState: false,
+            onSuccess: () => {
+                selectedUuids.value = [];
+            },
+        });
+    }
+};
 </script>
 
 <template>
@@ -79,15 +105,29 @@ const handleSearch = (query: string) => {
 
             <!-- Trash Table -->
             <TrashTable
+                v-model:selected="selectedUuids"
                 :items="trashItems.data"
                 :config="trashConfig"
                 :pagination="trashItems.meta"
                 :show-type="false"
+                :selectable="true"
+                select-key="uuid"
                 empty-message="No deleted attendance records found."
                 empty-trash-route="/dashboard/attendances/trash/empty"
                 @page-change="handlePageChange"
                 @search="handleSearch"
-            />
+            >
+                <template #bulk-actions>
+                    <Button variant="outline" size="sm" @click="handleBulkRestore">
+                        <RotateCcw class="mr-2 h-4 w-4" />
+                        Restore Selected
+                    </Button>
+                    <Button variant="destructive" size="sm" @click="handleBulkForceDelete">
+                        <Trash2 class="mr-2 h-4 w-4" />
+                        Delete Permanently
+                    </Button>
+                </template>
+            </TrashTable>
         </div>
     </AppLayout>
 </template>

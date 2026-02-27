@@ -45,6 +45,7 @@ const employeeFilter = ref(props.filters.employee_id?.toString() || 'all');
 const departmentFilter = ref(props.filters.department_id?.toString() || 'all');
 const dateFrom = ref(props.filters.date_from || '');
 const dateTo = ref(props.filters.date_to || '');
+const selectedUuids = ref<(string | number)[]>([]);
 
 const getInitials = (name: string | null) => {
     if (!name) return '?';
@@ -182,6 +183,14 @@ const handleOpenScanner = () => {
 const handleTrash = () => {
     router.visit('/dashboard/attendances/trash');
 };
+
+const openBulkDeleteDialog = () => {
+    const params = new URLSearchParams();
+    selectedUuids.value.forEach((uuid) => {
+        params.append('uuids[]', String(uuid));
+    });
+    router.visit(`/dashboard/attendances/bulk-delete?${params.toString()}`);
+};
 </script>
 
 <template>
@@ -308,14 +317,23 @@ const handleTrash = () => {
 
                 <!-- Table -->
                 <TableReusable
+                    v-model:selected="selectedUuids"
                     :data="props.attendances.data"
                     :columns="columns"
                     :actions="actions"
                     :pagination="pagination"
                     :searchable="false"
+                    :selectable="true"
+                    select-key="uuid"
                     @page-change="handlePageChange"
                     @per-page-change="handlePerPageChange"
                 >
+                    <template #bulk-actions>
+                        <Button variant="destructive" size="sm" @click="openBulkDeleteDialog">
+                            <Trash2 class="mr-2 h-4 w-4" />
+                            Delete Selected
+                        </Button>
+                    </template>
                     <template #cell-employee="{ item }">
                         <div class="flex items-center gap-3">
                             <Avatar class="h-9 w-9">
