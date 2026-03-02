@@ -6,7 +6,7 @@ import { computed, watch } from 'vue';
 import { toast } from 'vue-sonner';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import TiptapEditor from '@/components/TiptapEditor.vue';
 import { Switch } from '@/components/ui/switch';
 import { employeeTypeSchema } from '@employee/validation/employeeTypeSchema';
 import { useFormValidation } from '@/composables/useFormValidation';
@@ -113,12 +113,11 @@ const isActive = computed({
             <!-- Description -->
             <div class="space-y-2">
                 <Label for="description">Description</Label>
-                <Textarea
-                    id="description"
+                <TiptapEditor
                     v-model="form.description"
-                    placeholder="Enter type description"
-                    rows="3"
-                    :class="{ 'border-destructive': form.errors.description }"
+                    placeholder="Enter type description..."
+                    min-height="120px"
+                    max-height="250px"
                 />
                 <p v-if="form.errors.description" class="text-xs text-destructive">
                     {{ form.errors.description }}
