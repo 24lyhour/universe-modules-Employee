@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import TiptapEditor from '@/components/TiptapEditor.vue';
 import { Switch } from '@/components/ui/switch';
 import type { EmployeeTypeFormData } from '@employee/types';
 
@@ -59,12 +59,11 @@ const isActive = computed({
                         <!-- Description -->
                         <div class="space-y-2">
                             <Label for="description">Description</Label>
-                            <Textarea
-                                id="description"
+                            <TiptapEditor
                                 v-model="props.form.description"
-                                placeholder="Enter type description"
-                                rows="4"
-                                :class="{ 'border-destructive': props.form.errors.description }"
+                                placeholder="Enter type description..."
+                                min-height="120px"
+                                max-height="250px"
                             />
                             <p v-if="props.form.errors.description" class="text-xs text-destructive">
                                 {{ props.form.errors.description }}

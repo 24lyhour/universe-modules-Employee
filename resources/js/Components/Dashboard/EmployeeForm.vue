@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import TiptapEditor from '@/components/TiptapEditor.vue';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -244,11 +244,11 @@ const genderOptions = [
                     <!-- Current Address (Full Width) -->
                     <div class="space-y-2">
                         <Label for="current_address">Current Address</Label>
-                        <Textarea
-                            id="current_address"
+                        <TiptapEditor
                             v-model="props.form.current_address"
-                            placeholder="Street address, City, State, ZIP Code"
-                            rows="2"
+                            placeholder="Street address, City, State, ZIP Code..."
+                            min-height="80px"
+                            max-height="150px"
                         />
                         <p v-if="props.form.errors.current_address" class="text-xs text-destructive">
                             {{ props.form.errors.current_address }}
