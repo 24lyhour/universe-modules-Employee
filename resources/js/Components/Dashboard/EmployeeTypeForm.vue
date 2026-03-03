@@ -62,8 +62,8 @@ const isActive = computed({
                             <TiptapEditor
                                 v-model="props.form.description"
                                 placeholder="Enter type description..."
-                                min-height="120px"
-                                max-height="250px"
+                                min-height="250px"
+                                max-height="400px"
                             />
                             <p v-if="props.form.errors.description" class="text-xs text-destructive">
                                 {{ props.form.errors.description }}

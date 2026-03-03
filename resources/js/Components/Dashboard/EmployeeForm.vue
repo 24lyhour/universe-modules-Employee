@@ -247,8 +247,8 @@ const genderOptions = [
                         <TiptapEditor
                             v-model="props.form.current_address"
                             placeholder="Street address, City, State, ZIP Code..."
-                            min-height="80px"
-                            max-height="150px"
+                            min-height="100px"
+                            max-height="250px"
                         />
                         <p v-if="props.form.errors.current_address" class="text-xs text-destructive">
                             {{ props.form.errors.current_address }}
