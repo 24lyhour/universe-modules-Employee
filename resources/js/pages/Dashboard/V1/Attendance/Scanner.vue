@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import LocationPicker from '@/components/shared/LocationPicker.vue';
 import {
     Select,
     SelectContent,
@@ -25,10 +26,29 @@ import {
     Clock,
     RefreshCw,
     Users,
+    MapPin,
+    AlertTriangle,
+    ExternalLink,
+    Map,
 } from 'lucide-vue-next';
 import type { BreadcrumbItem } from '@/types';
 import type { AttendanceScannerProps } from '@employee/types';
 import axios from 'axios';
+
+// Types for location and device info
+interface GeoLocation {
+    latitude: number | null;
+    longitude: number | null;
+    accuracy: number | null;
+    error: string | null;
+}
+
+interface DeviceInfo {
+    browser: string;
+    os: string;
+    device_type: string;
+    user_agent: string;
+}
 
 const props = defineProps<AttendanceScannerProps>();
 
@@ -45,6 +65,139 @@ const locationId = ref<string>('');
 const qrCode = ref('');
 const isScanning = ref(false);
 const isProcessing = ref(false);
+const isGettingLocation = ref(false);
+
+// GPS Location state
+const geoLocation = ref<GeoLocation>({
+    latitude: null,
+    longitude: null,
+    accuracy: null,
+    error: null,
+});
+
+// Get user's timezone
+const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+// Device info detection
+const getDeviceInfo = (): DeviceInfo => {
+    const ua = navigator.userAgent;
+    let browser = 'Unknown';
+    let os = 'Unknown';
+    let device_type = 'desktop';
+
+    // Detect browser
+    if (ua.includes('Firefox')) {
+        browser = 'Firefox';
+    } else if (ua.includes('Chrome') && !ua.includes('Edg')) {
+        browser = 'Chrome';
+    } else if (ua.includes('Safari') && !ua.includes('Chrome')) {
+        browser = 'Safari';
+    } else if (ua.includes('Edg')) {
+        browser = 'Edge';
+    } else if (ua.includes('Opera') || ua.includes('OPR')) {
+        browser = 'Opera';
+    }
+
+    // Detect OS
+    if (ua.includes('Windows')) {
+        os = 'Windows';
+    } else if (ua.includes('Mac OS')) {
+        os = 'macOS';
+    } else if (ua.includes('Linux')) {
+        os = 'Linux';
+    } else if (ua.includes('Android')) {
+        os = 'Android';
+    } else if (ua.includes('iOS') || ua.includes('iPhone') || ua.includes('iPad')) {
+        os = 'iOS';
+    }
+
+    // Detect device type
+    if (/Mobi|Android|iPhone|iPad|iPod/i.test(ua)) {
+        device_type = /iPad/i.test(ua) ? 'tablet' : 'mobile';
+    }
+
+    return {
+        browser,
+        os,
+        device_type,
+        user_agent: ua,
+    };
+};
+
+// Get current GPS location
+const getCurrentLocation = (): Promise<GeoLocation> => {
+    return new Promise((resolve) => {
+        if (!navigator.geolocation) {
+            resolve({
+                latitude: null,
+                longitude: null,
+                accuracy: null,
+                error: 'Geolocation is not supported by this browser.',
+            });
+            return;
+        }
+
+        isGettingLocation.value = true;
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                isGettingLocation.value = false;
+                resolve({
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                    accuracy: position.coords.accuracy,
+                    error: null,
+                });
+            },
+            (error) => {
+                isGettingLocation.value = false;
+                let errorMessage = 'Unable to get location.';
+                switch (error.code) {
+                    case error.PERMISSION_DENIED:
+                        errorMessage = 'Location permission denied.';
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        errorMessage = 'Location information unavailable.';
+                        break;
+                    case error.TIMEOUT:
+                        errorMessage = 'Location request timed out.';
+                        break;
+                }
+                resolve({
+                    latitude: null,
+                    longitude: null,
+                    accuracy: null,
+                    error: errorMessage,
+                });
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 60000, // Cache location for 1 minute
+            }
+        );
+    });
+};
+
+// Refresh location
+const refreshLocation = async () => {
+    geoLocation.value = await getCurrentLocation();
+};
+
+// Generate Google Maps URL
+const googleMapsUrl = computed(() => {
+    if (!geoLocation.value.latitude || !geoLocation.value.longitude) {
+        return null;
+    }
+    return `https://www.google.com/maps?q=${geoLocation.value.latitude},${geoLocation.value.longitude}`;
+});
+
+// Open Google Maps in a new tab
+const openGoogleMaps = () => {
+    if (googleMapsUrl.value) {
+        window.open(googleMapsUrl.value, '_blank');
+    }
+};
 const scanResult = ref<{
     success: boolean;
     message: string;
@@ -136,12 +289,25 @@ const processScan = async () => {
     isProcessing.value = true;
     scanResult.value = null;
 
+    // Get fresh location before scanning
+    const location = await getCurrentLocation();
+    geoLocation.value = location;
+
+    // Collect device info
+    const deviceInfo = getDeviceInfo();
+
     try {
         const response = await axios.post('/dashboard/attendances/scan', {
             qr_code: qrCode.value.trim(),
             scan_type: scanType.value,
             location_type: locationType.value,
             location_id: locationId.value ? parseInt(locationId.value) : null,
+            // GPS data for AttendanceScan
+            latitude: location.latitude,
+            longitude: location.longitude,
+            accuracy: location.accuracy,
+            timezone: userTimezone,
+            device_info: deviceInfo,
         });
 
         scanResult.value = response.data;
@@ -191,8 +357,10 @@ const clearResult = () => {
 // Lifecycle
 let refreshInterval: ReturnType<typeof setInterval>;
 
-onMounted(() => {
+onMounted(async () => {
     fetchTodaySummary();
+    // Get initial location
+    geoLocation.value = await getCurrentLocation();
     // Auto-refresh every 30 seconds
     refreshInterval = setInterval(fetchTodaySummary, 30000);
 });
@@ -323,6 +491,72 @@ onUnmounted(() => {
                             </div>
                         </div>
 
+                        <!-- GPS Location Status -->
+                        <div class="rounded-lg border p-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <MapPin
+                                        :class="[
+                                            'h-4 w-4',
+                                            geoLocation.latitude ? 'text-green-500' : 'text-yellow-500'
+                                        ]"
+                                    />
+                                    <span class="text-sm font-medium">GPS Location</span>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <Button
+                                        v-if="geoLocation.latitude"
+                                        variant="ghost"
+                                        size="sm"
+                                        @click="openGoogleMaps"
+                                        title="View on Google Maps"
+                                    >
+                                        <Map class="h-3 w-3 text-blue-500" />
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        @click="refreshLocation"
+                                        :disabled="isGettingLocation"
+                                        title="Refresh location"
+                                    >
+                                        <RefreshCw
+                                            :class="[
+                                                'h-3 w-3',
+                                                isGettingLocation ? 'animate-spin' : ''
+                                            ]"
+                                        />
+                                    </Button>
+                                </div>
+                            </div>
+                            <div v-if="geoLocation.latitude" class="mt-2 space-y-2">
+                                <div class="text-xs text-muted-foreground">
+                                    <p>
+                                        Coordinates: {{ geoLocation.latitude?.toFixed(6) }}, {{ geoLocation.longitude?.toFixed(6) }}
+                                    </p>
+                                    <p>Accuracy: {{ geoLocation.accuracy?.toFixed(0) }}m | Timezone: {{ userTimezone }}</p>
+                                </div>
+                                <!-- Google Maps Preview Link -->
+                                <a
+                                    :href="googleMapsUrl || '#'"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-700 hover:underline"
+                                >
+                                    <Map class="h-3 w-3" />
+                                    View on Google Maps
+                                    <ExternalLink class="h-3 w-3" />
+                                </a>
+                            </div>
+                            <div v-else-if="geoLocation.error" class="mt-2 flex items-center gap-1 text-xs text-yellow-600">
+                                <AlertTriangle class="h-3 w-3" />
+                                {{ geoLocation.error }}
+                            </div>
+                            <div v-else-if="isGettingLocation" class="mt-2 text-xs text-muted-foreground">
+                                Getting location...
+                            </div>
+                        </div>
+
                         <!-- QR Code Input -->
                         <div class="space-y-2">
                             <Label>Employee QR Code / ID</Label>
@@ -376,6 +610,26 @@ onUnmounted(() => {
                                                     - {{ scanResult.data.employee.department }}
                                                 </span>
                                             </p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Scan Location with Google Maps -->
+                                    <div v-if="scanResult.success && geoLocation.latitude" class="mt-3 rounded-md bg-muted/50 p-2">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center gap-2 text-xs text-muted-foreground">
+                                                <MapPin class="h-3 w-3 text-green-500" />
+                                                <span>Scanned at: {{ geoLocation.latitude?.toFixed(6) }}, {{ geoLocation.longitude?.toFixed(6) }}</span>
+                                            </div>
+                                            <a
+                                                :href="googleMapsUrl || '#'"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                class="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 hover:underline"
+                                            >
+                                                <Map class="h-3 w-3" />
+                                                Map
+                                                <ExternalLink class="h-2.5 w-2.5" />
+                                            </a>
                                         </div>
                                     </div>
                                 </div>

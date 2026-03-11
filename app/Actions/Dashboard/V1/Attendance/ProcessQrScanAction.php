@@ -5,6 +5,7 @@ namespace Modules\Employee\Actions\Dashboard\V1\Attendance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Modules\Employee\Models\Attendance;
+use Modules\Employee\Models\AttendanceScan;
 use Modules\Employee\Models\Employee;
 use Modules\School\Models\Department;
 use Modules\School\Models\Classroom;
@@ -265,6 +266,15 @@ class ProcessQrScanAction
             $attendance = Attendance::create($attendanceData);
         }
 
+        // Create AttendanceScan record for check-in
+        $this->createAttendanceScan(
+            $attendance,
+            AttendanceScan::TYPE_CHECK_IN,
+            $data,
+            $locationType,
+            $locationId
+        );
+
         $actionType = $locationType === 'classroom' ? 'Classroom' : 'Department';
 
         return [
@@ -273,7 +283,7 @@ class ProcessQrScanAction
             'action' => 'check_in',
             'data' => [
                 'employee' => $this->formatEmployeeData($employee),
-                'attendance' => $attendance->fresh(['employee', 'department', 'classroom']),
+                'attendance' => $attendance->fresh(['employee', 'department', 'classroom', 'scans']),
                 'status' => $status,
                 'location_type' => $locationType,
                 'location_name' => $finalLocationName,
@@ -325,6 +335,15 @@ class ProcessQrScanAction
             'check_out_longitude' => $data['longitude'] ?? null,
         ]);
 
+        // Create AttendanceScan record for check-out
+        $this->createAttendanceScan(
+            $attendance,
+            AttendanceScan::TYPE_CHECK_OUT,
+            $data,
+            $locationType,
+            $locationId
+        );
+
         $workHours = $attendance->fresh()->getFormattedWorkHours();
 
         return [
@@ -333,7 +352,7 @@ class ProcessQrScanAction
             'action' => 'check_out',
             'data' => [
                 'employee' => $this->formatEmployeeData($employee),
-                'attendance' => $attendance->fresh(['employee', 'department', 'classroom']),
+                'attendance' => $attendance->fresh(['employee', 'department', 'classroom', 'scans']),
                 'work_hours' => $attendance->fresh()->work_hours,
                 'location_type' => $locationType,
                 'location_name' => $finalLocationName,
@@ -416,5 +435,32 @@ class ProcessQrScanAction
             'department' => $employee->department?->name,
             'job_title' => $employee->job_title,
         ];
+    }
+
+    /**
+     * Create an AttendanceScan record with GPS and device info.
+     */
+    private function createAttendanceScan(
+        Attendance $attendance,
+        string $scanType,
+        array $data,
+        string $locationType,
+        ?int $locationId
+    ): AttendanceScan {
+        return AttendanceScan::create([
+            'attendance_id' => $attendance->id,
+            'scan_type' => $scanType,
+            'scanned_at' => now(),
+            'timezone' => $data['timezone'] ?? null,
+            'latitude' => $data['latitude'] ?? null,
+            'longitude' => $data['longitude'] ?? null,
+            'accuracy' => $data['accuracy'] ?? null,
+            'scan_method' => AttendanceScan::METHOD_QR_SCAN,
+            'device_info' => $data['device_info'] ?? null,
+            'ip_address' => $data['ip_address'] ?? null,
+            'location_type' => $locationType,
+            'location_id' => $locationId,
+            'is_verified' => true,
+        ]);
     }
 }

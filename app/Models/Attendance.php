@@ -6,6 +6,8 @@ use App\Traits\BelongsToSchool;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use Modules\School\Models\School;
@@ -135,6 +137,34 @@ class Attendance extends Model
     public function classroom(): BelongsTo
     {
         return $this->belongsTo(Classroom::class);
+    }
+
+    /**
+     * Get all scans for this attendance.
+     */
+    public function scans(): HasMany
+    {
+        return $this->hasMany(AttendanceScan::class)->orderBy('scanned_at');
+    }
+
+    /**
+     * Get the check-in scan.
+     */
+    public function checkInScan(): HasOne
+    {
+        return $this->hasOne(AttendanceScan::class)
+            ->where('scan_type', AttendanceScan::TYPE_CHECK_IN)
+            ->latest('scanned_at');
+    }
+
+    /**
+     * Get the check-out scan.
+     */
+    public function checkOutScan(): HasOne
+    {
+        return $this->hasOne(AttendanceScan::class)
+            ->where('scan_type', AttendanceScan::TYPE_CHECK_OUT)
+            ->latest('scanned_at');
     }
 
     /**

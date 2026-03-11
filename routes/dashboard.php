@@ -5,6 +5,7 @@ use Modules\Employee\Http\Controllers\Dashboard\V1\EmployeeController;
 use Modules\Employee\Http\Controllers\Dashboard\V1\EmployeeImportExportController;
 use Modules\Employee\Http\Controllers\Dashboard\V1\EmployeeTypeController;
 use Modules\Employee\Http\Controllers\Dashboard\V1\AttendanceController;
+use Modules\Employee\Http\Controllers\Dashboard\V1\LocationController;
 use Modules\Employee\Http\Controllers\Dashboard\V1\EmployeeTrashController;
 use Modules\Employee\Http\Controllers\Dashboard\V1\EmployeeTypeTrashController;
 use Modules\Employee\Http\Controllers\Dashboard\V1\AttendanceTrashController;
@@ -98,6 +99,17 @@ Route::middleware(['auth', 'verified', 'auto.permission'])->prefix('dashboard')-
     Route::put('employee-types/{employee_type}/toggle-status', [EmployeeTypeController::class, 'toggleStatus'])->name('employee-types.toggle-status');
     Route::get('employee-types/{employee_type}/delete', [EmployeeTypeController::class, 'confirmDelete'])->name('employee-types.confirm-delete');
     Route::delete('employee-types/{employee_type}', [EmployeeTypeController::class, 'destroy'])->name('employee-types.destroy');
+
+    // Locations CRUD (for geofence management)
+    Route::get('locations/create', [LocationController::class, 'create'])->name('locations.create');
+    Route::post('locations', [LocationController::class, 'store'])->name('locations.store');
+    Route::get('locations', [LocationController::class, 'index'])->name('locations.index');
+    Route::get('locations/{location}', [LocationController::class, 'show'])->name('locations.show');
+    Route::get('locations/{location}/edit', [LocationController::class, 'edit'])->name('locations.edit');
+    Route::put('locations/{location}', [LocationController::class, 'update'])->name('locations.update');
+    Route::put('locations/{location}/schedule', [LocationController::class, 'updateSchedule'])->name('locations.update-schedule');
+    Route::put('locations/{location}/toggle-status', [LocationController::class, 'toggleStatus'])->name('locations.toggle-status');
+    Route::delete('locations/{location}', [LocationController::class, 'destroy'])->name('locations.destroy');
 
     // Attendance - Scanner (special permission: scan_qr)
     Route::middleware('permission:attendances.scan_qr')->group(function () {

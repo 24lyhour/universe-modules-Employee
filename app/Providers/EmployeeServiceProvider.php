@@ -81,16 +81,31 @@ class EmployeeServiceProvider extends ServiceProvider
                     'employee.attendances.*',
                     'ClipboardCheck'
                 );
+            }
 
+            if (\Route::has('employee.attendances.scanner')) {
                 MenuService::addSubmenuItem(
                     'primary',
                     'employee',
                     __('QR Scanner'),
                     route('employee.attendances.scanner'),
                     40,
-                    'attendances.view_any',
+                    'attendances.scan_qr',
                     'employee.attendances.scanner',
                     'QrCode'
+                );
+            }
+
+            if (\Route::has('employee.locations.index')) {
+                MenuService::addSubmenuItem(
+                    'primary',
+                    'employee',
+                    __('Scan Locations'),
+                    route('employee.locations.index'),
+                    50,
+                    'locations.view_any',
+                    'employee.locations.*',
+                    'MapPin'
                 );
             }
         });

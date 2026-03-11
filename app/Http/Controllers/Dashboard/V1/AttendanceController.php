@@ -217,8 +217,15 @@ class AttendanceController extends Controller
             'scan_type' => 'required|in:check_in,check_out',
             'location_type' => 'nullable|in:department,classroom',
             'location_id' => 'nullable|integer',
-            'latitude' => 'nullable|numeric',
-            'longitude' => 'nullable|numeric',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
+            'accuracy' => 'nullable|numeric|min:0',
+            'timezone' => 'nullable|string|max:50',
+            'device_info' => 'nullable|array',
+            'device_info.browser' => 'nullable|string',
+            'device_info.os' => 'nullable|string',
+            'device_info.device_type' => 'nullable|string',
+            'device_info.user_agent' => 'nullable|string',
         ]);
 
         $result = $this->qrScanAction->execute([
@@ -228,7 +235,9 @@ class AttendanceController extends Controller
             'location_id' => $request->location_id,
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
-            'device_info' => $request->header('User-Agent'),
+            'accuracy' => $request->accuracy,
+            'timezone' => $request->timezone,
+            'device_info' => $request->device_info ?? ['user_agent' => $request->header('User-Agent')],
             'ip_address' => $request->ip(),
         ]);
 
