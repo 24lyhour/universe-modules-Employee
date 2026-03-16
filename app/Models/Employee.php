@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use App\Models\User;
 use Modules\School\Models\School;
 use Modules\School\Models\Department;
 use Modules\School\Models\Course;
@@ -32,6 +33,7 @@ class Employee extends Model
      */
     protected $fillable = [
         'uuid',
+        'user_id',
         'employee_code',
         'first_name',
         'last_name',
@@ -102,6 +104,14 @@ class Employee extends Model
         return Attribute::make(
             get: fn () => trim($this->first_name . ' ' . $this->last_name),
         );
+    }
+
+    /**
+     * Get the user associated with the employee.
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     /**

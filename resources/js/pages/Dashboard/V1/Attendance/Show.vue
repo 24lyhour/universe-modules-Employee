@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowLeft, Pencil, Trash2, Clock, MapPin, Smartphone } from 'lucide-vue-next';
+import { ArrowLeft, Pencil, Trash2, Clock, MapPin, Smartphone, User, Mail, Navigation, ShieldCheck, ShieldX, ExternalLink } from 'lucide-vue-next';
 import type { BreadcrumbItem } from '@/types';
 import type { AttendanceShowProps } from '@employee/types';
 
@@ -14,7 +14,7 @@ const props = defineProps<AttendanceShowProps>();
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
     { title: 'Attendance', href: '/dashboard/attendances' },
-    { title: props.attendance.attendance_date_formatted, href: `/dashboard/attendances/${props.attendance.uuid}` },
+    { title: props.attendance.attendance_date_formatted || 'Details', href: `/dashboard/attendances/${props.attendance.uuid}` },
 ];
 
 const getInitials = (name: string | null) => {
@@ -58,7 +58,7 @@ const handleDelete = () => {
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
-        <Head :title="`Attendance - ${attendance.attendance_date_formatted}`" />
+        <Head :title="`Attendance - ${attendance.attendance_date_formatted || 'Details'}`" />
 
         <div class="flex h-full flex-1 flex-col gap-6 p-6">
             <!-- Header -->
@@ -76,9 +76,13 @@ const handleDelete = () => {
                             <AvatarFallback>{{ getInitials(attendance.employee_name) }}</AvatarFallback>
                         </Avatar>
                         <div>
-                            <h1 class="text-2xl font-bold">{{ attendance.employee_name }}</h1>
+                            <h1 class="text-2xl font-bold">{{ attendance.employee_name || 'No Employee Linked' }}</h1>
                             <p class="text-sm text-muted-foreground">
-                                {{ attendance.employee_code }} - {{ attendance.attendance_date_formatted }}
+                                {{ attendance.employee_code || 'N/A' }} - {{ attendance.attendance_date_formatted || 'No Date' }}
+                            </p>
+                            <p v-if="attendance.user_email" class="text-xs text-muted-foreground flex items-center gap-1">
+                                <Mail class="h-3 w-3" />
+                                {{ attendance.user_email }}
                             </p>
                         </div>
                     </div>
@@ -171,6 +175,46 @@ const handleDelete = () => {
                     </CardContent>
                 </Card>
 
+                <!-- Employee Information -->
+                <Card v-if="attendance.employee_id">
+                    <CardHeader>
+                        <CardTitle class="flex items-center gap-2">
+                            <User class="h-5 w-5" />
+                            Employee Information
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent class="space-y-4">
+                        <div class="flex justify-between">
+                            <span class="text-muted-foreground">Full Name</span>
+                            <span class="font-medium">{{ attendance.employee_name || '-' }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-muted-foreground">Employee Code</span>
+                            <span class="font-medium">{{ attendance.employee_code || '-' }}</span>
+                        </div>
+                        <div v-if="attendance.employee_job_title" class="flex justify-between">
+                            <span class="text-muted-foreground">Job Title</span>
+                            <span class="font-medium">{{ attendance.employee_job_title }}</span>
+                        </div>
+                        <div v-if="attendance.employee_department" class="flex justify-between">
+                            <span class="text-muted-foreground">Department</span>
+                            <span class="font-medium">{{ attendance.employee_department }}</span>
+                        </div>
+                        <div v-if="attendance.employee_email" class="flex justify-between">
+                            <span class="text-muted-foreground">Email</span>
+                            <span class="font-medium">{{ attendance.employee_email }}</span>
+                        </div>
+                        <div v-if="attendance.employee_phone" class="flex justify-between">
+                            <span class="text-muted-foreground">Phone</span>
+                            <span class="font-medium">{{ attendance.employee_phone }}</span>
+                        </div>
+                        <div v-if="attendance.user_name" class="flex justify-between">
+                            <span class="text-muted-foreground">User Account</span>
+                            <span class="font-medium">{{ attendance.user_name }}</span>
+                        </div>
+                    </CardContent>
+                </Card>
+
                 <!-- Device Info -->
                 <Card v-if="attendance.device_info || attendance.ip_address">
                     <CardHeader>
@@ -187,6 +231,58 @@ const handleDelete = () => {
                         <div v-if="attendance.device_info">
                             <span class="text-muted-foreground">Device</span>
                             <p class="mt-1 text-sm">{{ attendance.device_info }}</p>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <!-- GPS Coordinates -->
+                <Card v-if="attendance.check_in_coordinates || attendance.check_out_coordinates">
+                    <CardHeader>
+                        <CardTitle class="flex items-center gap-2">
+                            <Navigation class="h-5 w-5" />
+                            GPS Coordinates
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent class="space-y-4">
+                        <div v-if="attendance.check_in_coordinates" class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-muted-foreground flex items-center gap-2">
+                                    <ShieldCheck class="h-4 w-4 text-green-500" />
+                                    Check-in Location
+                                </span>
+                                <a
+                                    :href="`https://www.google.com/maps?q=${attendance.check_in_coordinates.lat},${attendance.check_in_coordinates.lng}`"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline"
+                                >
+                                    View on Map
+                                    <ExternalLink class="h-3 w-3" />
+                                </a>
+                            </div>
+                            <p class="text-sm font-mono">
+                                {{ attendance.check_in_coordinates.lat }}, {{ attendance.check_in_coordinates.lng }}
+                            </p>
+                        </div>
+                        <div v-if="attendance.check_out_coordinates" class="space-y-2 pt-2 border-t">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-muted-foreground flex items-center gap-2">
+                                    <ShieldX class="h-4 w-4 text-purple-500" />
+                                    Check-out Location
+                                </span>
+                                <a
+                                    :href="`https://www.google.com/maps?q=${attendance.check_out_coordinates.lat},${attendance.check_out_coordinates.lng}`"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline"
+                                >
+                                    View on Map
+                                    <ExternalLink class="h-3 w-3" />
+                                </a>
+                            </div>
+                            <p class="text-sm font-mono">
+                                {{ attendance.check_out_coordinates.lat }}, {{ attendance.check_out_coordinates.lng }}
+                            </p>
                         </div>
                     </CardContent>
                 </Card>

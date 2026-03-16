@@ -11,6 +11,7 @@ use Momentum\Modal\Modal;
 use Modules\Employee\Actions\Dashboard\V1\Attendance\BulkDeleteAttendancesAction;
 use Modules\Employee\Actions\Dashboard\V1\Attendance\GetAttendanceIndexDataAction;
 use Modules\Employee\Actions\Dashboard\V1\Attendance\GetAttendanceShowDataAction;
+use Modules\Employee\Actions\Dashboard\V1\Attendance\GetAttendanceAnalyticsAction;
 use Modules\Employee\Actions\Dashboard\V1\Attendance\CreateManualAttendanceAction;
 use Modules\Employee\Actions\Dashboard\V1\Attendance\UpdateAttendanceAction;
 use Modules\Employee\Actions\Dashboard\V1\Attendance\ProcessQrScanAction;
@@ -29,6 +30,7 @@ class AttendanceController extends Controller
     public function __construct(
         private GetAttendanceIndexDataAction $indexAction,
         private GetAttendanceShowDataAction $showAction,
+        private GetAttendanceAnalyticsAction $analyticsAction,
         private CreateManualAttendanceAction $createAction,
         private UpdateAttendanceAction $updateAction,
         private ProcessQrScanAction $qrScanAction,
@@ -103,7 +105,7 @@ class AttendanceController extends Controller
         $data = $this->showAction->execute($attendance);
 
         return Inertia::render('employee::Dashboard/V1/Attendance/Show', [
-            'attendance' => new AttendanceResource($data['attendance']),
+            'attendance' => (new AttendanceResource($data['attendance']))->toArray(request()),
             'statuses' => $data['statuses'],
             'methods' => $data['methods'],
         ]);
@@ -114,10 +116,10 @@ class AttendanceController extends Controller
      */
     public function edit(Attendance $attendance): Response
     {
-        $attendance->load(['employee', 'department', 'classroom']);
+        $attendance->load(['employee.user', 'department', 'classroom']);
 
         return Inertia::render('employee::Dashboard/V1/Attendance/Edit', [
-            'attendance' => new AttendanceResource($attendance),
+            'attendance' => (new AttendanceResource($attendance))->toArray(request()),
             'statuses' => Attendance::getStatuses(),
         ]);
     }
@@ -280,6 +282,45 @@ class AttendanceController extends Controller
         return response()->json([
             'success' => true,
             'data' => $result,
+        ]);
+    }
+
+    /**
+     * Display attendance analytics dashboard.
+     */
+    public function analytics(Request $request): Response
+    {
+        $filters = [
+            'start_date' => $request->input('start_date'),
+            'end_date' => $request->input('end_date'),
+            'department_id' => $request->input('department_id'),
+            'employee_id' => $request->input('employee_id'),
+        ];
+
+        $data = $this->analyticsAction->execute($filters);
+
+        $departments = Department::where('status', true)
+            ->select('id', 'name')
+            ->orderBy('name')
+            ->get()
+            ->map(fn ($d) => [
+                'value' => $d->id,
+                'label' => $d->name,
+            ]);
+
+        $employees = Employee::active()
+            ->select('id', 'first_name', 'last_name', 'employee_code')
+            ->orderBy('first_name')
+            ->get()
+            ->map(fn ($e) => [
+                'value' => $e->id,
+                'label' => $e->full_name . ' (' . $e->employee_code . ')',
+            ]);
+
+        return Inertia::render('employee::Dashboard/V1/Attendance/Analytics', [
+            'analytics' => $data,
+            'departmentOptions' => $departments,
+            'employeeOptions' => $employees,
         ]);
     }
 

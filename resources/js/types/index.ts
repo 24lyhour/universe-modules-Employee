@@ -67,6 +67,37 @@ export interface EmployeeAttendanceStats {
     date_to: string;
 }
 
+export interface EmployeeAttendanceStatsPeriod {
+    total: number;
+    present: number;
+    late: number;
+    absent?: number;
+    on_leave?: number;
+    work_hours: number;
+    work_hours_formatted: string;
+}
+
+export interface RecentAttendance {
+    uuid: string;
+    date: string | null;
+    status: string;
+    status_label: string;
+    check_in: string | null;
+    check_out: string | null;
+    work_hours: string;
+}
+
+export interface EmployeeDetailedAttendanceStats {
+    this_month: EmployeeAttendanceStatsPeriod;
+    this_year: EmployeeAttendanceStatsPeriod;
+    all_time: {
+        total: number;
+        work_hours: number;
+        work_hours_formatted: string;
+    };
+    recent: RecentAttendance[];
+}
+
 export interface PaginationMeta {
     current_page: number;
     last_page: number;
@@ -143,6 +174,7 @@ export interface EmployeeIndexProps {
 
 export interface EmployeeShowProps {
     employee: Employee;
+    attendanceStats: EmployeeDetailedAttendanceStats;
 }
 
 export interface EmployeeCreateProps {
@@ -227,6 +259,13 @@ export interface Attendance {
     employee_name: string | null;
     employee_code: string | null;
     employee_avatar: string | null;
+    employee_email: string | null;
+    employee_phone: string | null;
+    employee_job_title: string | null;
+    employee_department: string | null;
+    user_id: number | null;
+    user_name: string | null;
+    user_email: string | null;
     school_id: number | null;
     school_name: string | null;
     department_id: number | null;

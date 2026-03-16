@@ -30,6 +30,10 @@ import {
     AlertTriangle,
     ExternalLink,
     Map,
+    ShieldCheck,
+    ShieldX,
+    ShieldAlert,
+    Navigation,
 } from 'lucide-vue-next';
 import type { BreadcrumbItem } from '@/types';
 import type { AttendanceScannerProps } from '@employee/types';
@@ -198,9 +202,34 @@ const openGoogleMaps = () => {
         window.open(googleMapsUrl.value, '_blank');
     }
 };
+interface GeofenceVerification {
+    is_within: boolean;
+    verified: boolean;
+    has_location: boolean;
+    distance: number | null;
+    distance_formatted: string | null;
+    radius: number;
+    geofence_type: string;
+    enforce: boolean;
+    location_data?: {
+        id: number;
+        name: string;
+        latitude: number;
+        longitude: number;
+    };
+    employee_location?: {
+        latitude: number;
+        longitude: number;
+    };
+    message: string;
+    status: 'verified' | 'outside_geofence' | 'no_location';
+}
+
 const scanResult = ref<{
     success: boolean;
     message: string;
+    geofence_blocked?: boolean;
+    action?: 'check_in' | 'check_out';
     data?: {
         employee?: {
             id: number;
@@ -216,6 +245,8 @@ const scanResult = ref<{
             status: string;
             work_hours?: number;
         };
+        geofence?: GeofenceVerification;
+        location_name?: string;
     };
 } | null>(null);
 
@@ -610,6 +641,58 @@ onUnmounted(() => {
                                                     - {{ scanResult.data.employee.department }}
                                                 </span>
                                             </p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Geofence Verification Status -->
+                                    <div v-if="scanResult.data?.geofence" class="mt-3 rounded-md p-3" :class="[
+                                        scanResult.data.geofence.is_within
+                                            ? 'bg-green-50 border border-green-200 dark:bg-green-950 dark:border-green-800'
+                                            : scanResult.data.geofence.status === 'no_location'
+                                                ? 'bg-yellow-50 border border-yellow-200 dark:bg-yellow-950 dark:border-yellow-800'
+                                                : 'bg-red-50 border border-red-200 dark:bg-red-950 dark:border-red-800'
+                                    ]">
+                                        <div class="flex items-start gap-2">
+                                            <ShieldCheck v-if="scanResult.data.geofence.is_within" class="h-5 w-5 text-green-600 shrink-0" />
+                                            <ShieldAlert v-else-if="scanResult.data.geofence.status === 'no_location'" class="h-5 w-5 text-yellow-600 shrink-0" />
+                                            <ShieldX v-else class="h-5 w-5 text-red-600 shrink-0" />
+                                            <div class="flex-1">
+                                                <p class="text-sm font-medium" :class="[
+                                                    scanResult.data.geofence.is_within ? 'text-green-700 dark:text-green-400' :
+                                                    scanResult.data.geofence.status === 'no_location' ? 'text-yellow-700 dark:text-yellow-400' :
+                                                    'text-red-700 dark:text-red-400'
+                                                ]">
+                                                    {{ scanResult.data.geofence.is_within ? 'Location Verified' :
+                                                       scanResult.data.geofence.status === 'no_location' ? 'GPS Not Available' :
+                                                       'Outside Allowed Area' }}
+                                                </p>
+                                                <p class="text-xs text-muted-foreground mt-1">
+                                                    {{ scanResult.data.geofence.message }}
+                                                </p>
+                                                <div v-if="scanResult.data.geofence.distance_formatted" class="flex items-center gap-2 mt-2 text-xs">
+                                                    <Navigation class="h-3 w-3" />
+                                                    <span>Distance: {{ scanResult.data.geofence.distance_formatted }}</span>
+                                                    <span class="text-muted-foreground">
+                                                        (max {{ scanResult.data.geofence.radius }}m)
+                                                    </span>
+                                                </div>
+                                                <div v-if="scanResult.data.geofence.location_data" class="text-xs text-muted-foreground mt-1">
+                                                    <span>Location: {{ scanResult.data.geofence.location_data.name }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Geofence Blocked Warning -->
+                                    <div v-if="scanResult.geofence_blocked" class="mt-3 rounded-md bg-red-100 border border-red-300 p-3 dark:bg-red-950 dark:border-red-800">
+                                        <div class="flex items-center gap-2">
+                                            <ShieldX class="h-5 w-5 text-red-600" />
+                                            <div>
+                                                <p class="text-sm font-medium text-red-700 dark:text-red-400">Scan Blocked by Geofence</p>
+                                                <p class="text-xs text-red-600 dark:text-red-500">
+                                                    You must be within the designated area to record attendance.
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
 

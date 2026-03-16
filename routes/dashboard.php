@@ -118,6 +118,9 @@ Route::middleware(['auth', 'verified', 'auto.permission'])->prefix('dashboard')-
         Route::get('attendances/today-summary', [AttendanceController::class, 'todaySummary'])->name('attendances.today-summary');
     });
 
+    // Attendance Analytics
+    Route::get('attendances/analytics', [AttendanceController::class, 'analytics'])->name('attendances.analytics');
+
     // Attendance CRUD - CREATE routes first
     Route::get('attendances/bulk-delete', [AttendanceController::class, 'confirmBulkDelete'])->name('attendances.bulk-delete.confirm');
     Route::delete('attendances/bulk-delete', [AttendanceController::class, 'bulkDelete'])->name('attendances.bulk-delete');

@@ -73,7 +73,10 @@ class ProcessQrScanAction
         $locationType = $qrData['type']; // 'classroom' or 'department'
         $locationId = $qrData['classroom_id'] ?? $qrData['department_id'] ?? null;
 
-        // Validate the location exists
+        // Validate the location exists and get geofence settings
+        $department = null;
+        $geofenceVerification = null;
+
         if ($locationType === 'classroom') {
             $classroom = Classroom::find($locationId);
             if (!$classroom) {
@@ -86,6 +89,8 @@ class ProcessQrScanAction
             $locationName = $classroom->name . ' (' . ($classroom->department?->name ?? 'N/A') . ')';
             $departmentId = $classroom->department_id;
             $classroomId = $classroom->id;
+            // Get department for geofence check
+            $department = $classroom->department;
         } else {
             $department = Department::find($locationId);
             if (!$department) {
@@ -100,6 +105,28 @@ class ProcessQrScanAction
             $classroomId = null;
         }
 
+        // Verify geofence if department has it configured
+        if ($department && $department->hasGeofence()) {
+            $geofenceVerification = $this->verifyGeofence(
+                $department,
+                $data['latitude'] ?? null,
+                $data['longitude'] ?? null
+            );
+
+            // If geofence enforcement is on and employee is outside, block the scan
+            if ($department->enforce_geofence && !$geofenceVerification['is_within']) {
+                return [
+                    'success' => false,
+                    'message' => $geofenceVerification['message'],
+                    'geofence_blocked' => true,
+                    'data' => [
+                        'employee' => $this->formatEmployeeData($employee),
+                        'geofence' => $geofenceVerification,
+                    ],
+                ];
+            }
+        }
+
         $today = today();
         $now = now();
 
@@ -110,7 +137,7 @@ class ProcessQrScanAction
 
         // Smart check-in/check-out: if no attendance or no check-in, do check-in. If checked in but not out, do check-out.
         if (!$attendance || !$attendance->check_in_time) {
-            return $this->processCheckIn(
+            $result = $this->processCheckIn(
                 $employee,
                 $attendance,
                 $data,
@@ -120,17 +147,19 @@ class ProcessQrScanAction
                 $locationId,
                 $locationName,
                 $departmentId,
-                $classroomId
+                $classroomId,
+                $geofenceVerification
             );
         } elseif (!$attendance->check_out_time) {
-            return $this->processCheckOut(
+            $result = $this->processCheckOut(
                 $employee,
                 $attendance,
                 $data,
                 $now,
                 $locationType,
                 $locationId,
-                $locationName
+                $locationName,
+                $geofenceVerification
             );
         } else {
             return [
@@ -140,9 +169,17 @@ class ProcessQrScanAction
                 'data' => [
                     'employee' => $this->formatEmployeeData($employee),
                     'attendance' => $attendance,
+                    'geofence' => $geofenceVerification,
                 ],
             ];
         }
+
+        // Add geofence verification to successful result
+        if ($geofenceVerification) {
+            $result['data']['geofence'] = $geofenceVerification;
+        }
+
+        return $result;
     }
 
     /**
@@ -223,7 +260,8 @@ class ProcessQrScanAction
         ?int $locationId,
         ?string $locationName = null,
         ?int $departmentId = null,
-        ?int $classroomId = null
+        ?int $classroomId = null,
+        ?array $geofenceVerification = null
     ): array {
         if ($attendance && $attendance->check_in_time) {
             return [
@@ -266,13 +304,14 @@ class ProcessQrScanAction
             $attendance = Attendance::create($attendanceData);
         }
 
-        // Create AttendanceScan record for check-in
+        // Create AttendanceScan record for check-in with geofence data
         $this->createAttendanceScan(
             $attendance,
             AttendanceScan::TYPE_CHECK_IN,
             $data,
             $locationType,
-            $locationId
+            $locationId,
+            $geofenceVerification
         );
 
         $actionType = $locationType === 'classroom' ? 'Classroom' : 'Department';
@@ -298,7 +337,8 @@ class ProcessQrScanAction
         $now,
         string $locationType,
         ?int $locationId,
-        ?string $locationName = null
+        ?string $locationName = null,
+        ?array $geofenceVerification = null
     ): array {
         if (!$attendance || !$attendance->check_in_time) {
             return [
@@ -335,13 +375,14 @@ class ProcessQrScanAction
             'check_out_longitude' => $data['longitude'] ?? null,
         ]);
 
-        // Create AttendanceScan record for check-out
+        // Create AttendanceScan record for check-out with geofence data
         $this->createAttendanceScan(
             $attendance,
             AttendanceScan::TYPE_CHECK_OUT,
             $data,
             $locationType,
-            $locationId
+            $locationId,
+            $geofenceVerification
         );
 
         $workHours = $attendance->fresh()->getFormattedWorkHours();
@@ -438,16 +479,17 @@ class ProcessQrScanAction
     }
 
     /**
-     * Create an AttendanceScan record with GPS and device info.
+     * Create an AttendanceScan record with GPS, device info, and geofence verification.
      */
     private function createAttendanceScan(
         Attendance $attendance,
         string $scanType,
         array $data,
         string $locationType,
-        ?int $locationId
+        ?int $locationId,
+        ?array $geofenceVerification = null
     ): AttendanceScan {
-        return AttendanceScan::create([
+        $scanData = [
             'attendance_id' => $attendance->id,
             'scan_type' => $scanType,
             'scanned_at' => now(),
@@ -461,6 +503,125 @@ class ProcessQrScanAction
             'location_type' => $locationType,
             'location_id' => $locationId,
             'is_verified' => true,
-        ]);
+        ];
+
+        // Add geofence verification data if available
+        if ($geofenceVerification) {
+            $scanData['within_geofence'] = $geofenceVerification['is_within'] ?? false;
+            $scanData['distance_from_location'] = $geofenceVerification['distance'] ?? null;
+            $scanData['verification_status'] = $geofenceVerification['status'] ?? 'no_location';
+            $scanData['verification_note'] = $geofenceVerification['message'] ?? null;
+
+            // Link to Location model if available
+            if (isset($geofenceVerification['location_data']['id'])) {
+                $scanData['designated_location_id'] = $geofenceVerification['location_data']['id'];
+            }
+        }
+
+        return AttendanceScan::create($scanData);
+    }
+
+    /**
+     * Verify if employee's GPS location is within department's geofence.
+     *
+     * Uses the linked Location model for comprehensive geofence verification.
+     * Supports circle, polygon, and dynamic geofence types.
+     */
+    private function verifyGeofence(Department $department, ?float $latitude, ?float $longitude): array
+    {
+        // Load location relationship if not already loaded
+        $department->loadMissing('location');
+
+        // Use Location's verifyLocation method if linked
+        $location = $department->location;
+
+        if ($location) {
+            $verification = $location->verifyLocation($latitude, $longitude);
+
+            // Format distance
+            $distance = $verification['distance_meters'] ?? null;
+            $distanceFormatted = null;
+            if ($distance !== null) {
+                $distanceFormatted = $distance < 1000
+                    ? round($distance) . 'm'
+                    : round($distance / 1000, 2) . 'km';
+            }
+
+            return [
+                'is_within' => $verification['within_geofence'],
+                'verified' => $verification['verified'],
+                'has_location' => $latitude !== null && $longitude !== null,
+                'distance' => $distance,
+                'distance_formatted' => $distanceFormatted,
+                'radius' => $verification['geofence_radius'] ?? $location->geofence_radius,
+                'geofence_type' => $verification['geofence_type'] ?? $location->geofence_type,
+                'enforce' => $location->enforce_geofence,
+                'location_data' => [
+                    'id' => $location->id,
+                    'name' => $location->name,
+                    'latitude' => (float) $location->latitude,
+                    'longitude' => (float) $location->longitude,
+                ],
+                'employee_location' => $latitude !== null ? [
+                    'latitude' => $latitude,
+                    'longitude' => $longitude,
+                ] : null,
+                'message' => $verification['message'],
+                'status' => $verification['within_geofence'] ? 'verified' : ($latitude === null ? 'no_location' : 'outside_geofence'),
+            ];
+        }
+
+        // Fallback to Department's direct geofence fields (backwards compatibility)
+        if ($latitude === null || $longitude === null) {
+            return [
+                'is_within' => false,
+                'verified' => !$department->enforce_geofence,
+                'has_location' => false,
+                'distance' => null,
+                'radius' => $department->geofence_radius,
+                'geofence_type' => 'circle',
+                'enforce' => $department->enforce_geofence,
+                'location_data' => [
+                    'latitude' => $department->latitude,
+                    'longitude' => $department->longitude,
+                ],
+                'message' => 'Location data not available. Please enable GPS.',
+                'status' => 'no_location',
+            ];
+        }
+
+        // Use Department's isWithinGeofence method
+        $result = $department->isWithinGeofence($latitude, $longitude);
+        $distance = $result['distance_meters'] ?? null;
+        $distanceFormatted = null;
+
+        if ($distance !== null) {
+            $distanceFormatted = $distance < 1000
+                ? round($distance) . 'm'
+                : round($distance / 1000, 2) . 'km';
+        }
+
+        return [
+            'is_within' => $result['within_geofence'] ?? false,
+            'verified' => $result['verified'] ?? false,
+            'has_location' => true,
+            'distance' => $distance,
+            'distance_formatted' => $distanceFormatted,
+            'radius' => $result['geofence_radius'] ?? $department->geofence_radius,
+            'geofence_type' => $result['geofence_type'] ?? 'circle',
+            'enforce' => $department->enforce_geofence,
+            'location_data' => [
+                'latitude' => $department->latitude,
+                'longitude' => $department->longitude,
+            ],
+            'employee_location' => [
+                'latitude' => $latitude,
+                'longitude' => $longitude,
+            ],
+            'message' => $result['message'] ?? ($result['within_geofence']
+                ? "Location verified ({$distanceFormatted} from center)"
+                : "You are {$distanceFormatted} away from the allowed area (max {$department->geofence_radius}m)"),
+            'status' => $result['within_geofence'] ? 'verified' : 'outside_geofence',
+        ];
     }
 }

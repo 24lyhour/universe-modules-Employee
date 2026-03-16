@@ -56,6 +56,8 @@ import {
     CheckCircle,
     XCircle,
     Building2,
+    ChevronLeft,
+    ChevronRight,
 } from 'lucide-vue-next';
 import type { BreadcrumbItem } from '@/types';
 
@@ -146,6 +148,20 @@ const scheduleEnabled = ref(false);
 const operatingHours = ref<Record<string, { enabled: boolean; start: string; end: string }>>({ ...defaultOperatingHours });
 
 const locations = computed(() => props.locationsList.data || []);
+const pagination = computed(() => props.locationsList.meta);
+
+// Pagination handlers
+const goToPage = (page: number) => {
+    router.get('/dashboard/locations', {
+        page,
+        search: searchQuery.value || undefined,
+        type: typeFilter.value !== 'all' ? typeFilter.value : undefined,
+        status: statusFilter.value !== 'all' ? statusFilter.value : undefined,
+    }, {
+        preserveState: true,
+        preserveScroll: true,
+    });
+};
 
 // Stats computed properties
 const stats = computed(() => {
@@ -570,6 +586,54 @@ const handleStatusToggle = (location: Location, newStatus: boolean) => {
                             View Map
                         </Button>
                     </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div v-if="pagination && pagination.last_page > 1" class="flex items-center justify-between border-t pt-4">
+                <p class="text-sm text-muted-foreground">
+                    Showing {{ ((pagination.current_page - 1) * pagination.per_page) + 1 }}
+                    to {{ Math.min(pagination.current_page * pagination.per_page, pagination.total) }}
+                    of {{ pagination.total }} locations
+                </p>
+                <div class="flex items-center gap-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        :disabled="pagination.current_page === 1"
+                        @click="goToPage(pagination.current_page - 1)"
+                    >
+                        <ChevronLeft class="h-4 w-4 mr-1" />
+                        Previous
+                    </Button>
+                    <div class="flex items-center gap-1">
+                        <template v-for="page in pagination.last_page" :key="page">
+                            <Button
+                                v-if="page === 1 || page === pagination.last_page || (page >= pagination.current_page - 1 && page <= pagination.current_page + 1)"
+                                :variant="page === pagination.current_page ? 'default' : 'outline'"
+                                size="sm"
+                                class="w-9"
+                                @click="goToPage(page)"
+                            >
+                                {{ page }}
+                            </Button>
+                            <span
+                                v-else-if="page === pagination.current_page - 2 || page === pagination.current_page + 2"
+                                class="px-2 text-muted-foreground"
+                            >
+                                ...
+                            </span>
+                        </template>
+                    </div>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        :disabled="pagination.current_page === pagination.last_page"
+                        @click="goToPage(pagination.current_page + 1)"
+                    >
+                        Next
+                        <ChevronRight class="h-4 w-4 ml-1" />
+                    </Button>
                 </div>
             </div>
 

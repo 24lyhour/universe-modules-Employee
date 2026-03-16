@@ -3,8 +3,25 @@ import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowLeft, Pencil, Mail, Phone, MapPin, Building2, Calendar, Award, Banknote, QrCode } from 'lucide-vue-next';
+import {
+    ArrowLeft,
+    Pencil,
+    Mail,
+    Phone,
+    MapPin,
+    Building2,
+    Calendar,
+    Award,
+    Banknote,
+    QrCode,
+    Clock,
+    CheckCircle,
+    AlertTriangle,
+    XCircle,
+    TrendingUp,
+} from 'lucide-vue-next';
 import type { BreadcrumbItem } from '@/types';
 import type { EmployeeShowProps } from '@employee/types';
 
@@ -28,6 +45,20 @@ const formatDate = (date: string | null) => {
 const formatCurrency = (value: number | null) => {
     if (value === null) return '-';
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+};
+
+const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructive' | 'outline' => {
+    switch (status) {
+        case 'present':
+            return 'default';
+        case 'late':
+        case 'early_leave':
+            return 'secondary';
+        case 'absent':
+            return 'destructive';
+        default:
+            return 'outline';
+    }
 };
 </script>
 
@@ -208,6 +239,150 @@ const formatCurrency = (value: number | null) => {
                             class="max-h-48 rounded-lg border shadow-sm object-contain hover:shadow-md transition-shadow"
                         />
                     </a>
+                </div>
+            </div>
+
+            <!-- Attendance Statistics -->
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-lg font-semibold">Attendance Statistics</h2>
+                    <Button variant="outline" size="sm" as-child>
+                        <Link href="/dashboard/attendances/analytics">
+                            <TrendingUp class="h-4 w-4 mr-2" /> View Analytics
+                        </Link>
+                    </Button>
+                </div>
+
+                <!-- This Month Stats -->
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    <Card>
+                        <CardContent class="pt-6">
+                            <div class="flex items-center gap-3">
+                                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                                    <Calendar class="h-5 w-5 text-primary" />
+                                </div>
+                                <div>
+                                    <p class="text-2xl font-bold">{{ attendanceStats.this_month.total }}</p>
+                                    <p class="text-xs text-muted-foreground">Total Days</p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardContent class="pt-6">
+                            <div class="flex items-center gap-3">
+                                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-green-500/10">
+                                    <CheckCircle class="h-5 w-5 text-green-500" />
+                                </div>
+                                <div>
+                                    <p class="text-2xl font-bold text-green-600">{{ attendanceStats.this_month.present }}</p>
+                                    <p class="text-xs text-muted-foreground">Present</p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardContent class="pt-6">
+                            <div class="flex items-center gap-3">
+                                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-yellow-500/10">
+                                    <AlertTriangle class="h-5 w-5 text-yellow-500" />
+                                </div>
+                                <div>
+                                    <p class="text-2xl font-bold text-yellow-600">{{ attendanceStats.this_month.late }}</p>
+                                    <p class="text-xs text-muted-foreground">Late</p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardContent class="pt-6">
+                            <div class="flex items-center gap-3">
+                                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-red-500/10">
+                                    <XCircle class="h-5 w-5 text-red-500" />
+                                </div>
+                                <div>
+                                    <p class="text-2xl font-bold text-red-600">{{ attendanceStats.this_month.absent }}</p>
+                                    <p class="text-xs text-muted-foreground">Absent</p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardContent class="pt-6">
+                            <div class="flex items-center gap-3">
+                                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500/10">
+                                    <Clock class="h-5 w-5 text-blue-500" />
+                                </div>
+                                <div>
+                                    <p class="text-2xl font-bold">{{ attendanceStats.this_month.work_hours_formatted }}</p>
+                                    <p class="text-xs text-muted-foreground">Work Hours</p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                <!-- Summary Cards -->
+                <div class="grid md:grid-cols-2 gap-4">
+                    <!-- Year & All Time Summary -->
+                    <Card>
+                        <CardHeader class="pb-3">
+                            <CardTitle class="text-base">Summary</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between py-2 border-b">
+                                    <span class="text-sm text-muted-foreground">This Year Total</span>
+                                    <span class="font-semibold">{{ attendanceStats.this_year.total }} days</span>
+                                </div>
+                                <div class="flex items-center justify-between py-2 border-b">
+                                    <span class="text-sm text-muted-foreground">This Year Work Hours</span>
+                                    <span class="font-semibold">{{ attendanceStats.this_year.work_hours_formatted }}</span>
+                                </div>
+                                <div class="flex items-center justify-between py-2 border-b">
+                                    <span class="text-sm text-muted-foreground">All Time Total</span>
+                                    <span class="font-semibold">{{ attendanceStats.all_time.total }} days</span>
+                                </div>
+                                <div class="flex items-center justify-between py-2">
+                                    <span class="text-sm text-muted-foreground">All Time Work Hours</span>
+                                    <span class="font-semibold">{{ attendanceStats.all_time.work_hours_formatted }}</span>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <!-- Recent Attendance -->
+                    <Card>
+                        <CardHeader class="pb-3">
+                            <CardTitle class="text-base">Recent Attendance</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div class="space-y-2">
+                                <div
+                                    v-for="record in attendanceStats.recent"
+                                    :key="record.uuid"
+                                    class="flex items-center justify-between py-2 border-b last:border-0"
+                                >
+                                    <Link
+                                        :href="`/dashboard/attendances/${record.uuid}`"
+                                        class="flex items-center gap-3 hover:text-primary transition-colors"
+                                    >
+                                        <span class="text-sm">{{ record.date }}</span>
+                                        <Badge :variant="getStatusVariant(record.status)" class="text-xs">
+                                            {{ record.status_label }}
+                                        </Badge>
+                                    </Link>
+                                    <div class="text-sm text-muted-foreground">
+                                        <span v-if="record.check_in">{{ record.check_in }}</span>
+                                        <span v-if="record.check_in && record.check_out"> - {{ record.check_out }}</span>
+                                    </div>
+                                </div>
+                                <div v-if="attendanceStats.recent.length === 0" class="text-center py-4 text-muted-foreground text-sm">
+                                    No attendance records yet
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
             </div>
         </div>

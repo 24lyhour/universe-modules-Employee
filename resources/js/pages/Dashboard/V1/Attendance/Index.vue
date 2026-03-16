@@ -28,6 +28,7 @@ import {
     QrCode,
     CalendarDays,
     Database,
+    BarChart3,
 } from 'lucide-vue-next';
 import type { BreadcrumbItem } from '@/types';
 import type { AttendanceIndexProps, Attendance } from '@employee/types';
@@ -180,6 +181,10 @@ const handleOpenScanner = () => {
     router.visit('/dashboard/attendances/scanner');
 };
 
+const handleAnalytics = () => {
+    router.visit('/dashboard/attendances/analytics');
+};
+
 const handleTrash = () => {
     router.visit('/dashboard/attendances/trash');
 };
@@ -249,6 +254,10 @@ const openBulkDeleteDialog = () => {
                                 Trash
                             </Button>
                         </ButtonGroup>
+                        <Button variant="outline" @click="handleAnalytics">
+                            <BarChart3 class="mr-2 h-4 w-4" />
+                            Analytics
+                        </Button>
                         <Button variant="outline" @click="handleOpenScanner">
                             <QrCode class="mr-2 h-4 w-4" />
                             QR Scanner

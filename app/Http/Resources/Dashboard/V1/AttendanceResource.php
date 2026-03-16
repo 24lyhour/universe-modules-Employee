@@ -22,6 +22,15 @@ class AttendanceResource extends JsonResource
             'employee_name' => $this->employee?->full_name,
             'employee_code' => $this->employee?->employee_code,
             'employee_avatar' => $this->employee?->avatar_url,
+            'employee_email' => $this->employee?->email,
+            'employee_phone' => $this->employee?->phone_number,
+            'employee_job_title' => $this->employee?->job_title,
+            'employee_department' => $this->employee?->department?->name,
+
+            // User info (linked user account)
+            'user_id' => $this->employee?->user_id,
+            'user_name' => $this->employee?->user?->name,
+            'user_email' => $this->employee?->user?->email,
 
             // Location info
             'school_id' => $this->school_id,

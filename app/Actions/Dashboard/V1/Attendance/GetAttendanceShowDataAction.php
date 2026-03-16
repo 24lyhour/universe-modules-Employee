@@ -8,7 +8,7 @@ class GetAttendanceShowDataAction
 {
     public function execute(Attendance $attendance): array
     {
-        $attendance->load(['employee', 'school', 'department', 'classroom']);
+        $attendance->load(['employee.user', 'school', 'department', 'classroom']);
 
         return [
             'attendance' => $attendance,
