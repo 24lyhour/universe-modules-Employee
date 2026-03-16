@@ -6,6 +6,8 @@ use Modules\Employee\Http\Controllers\Dashboard\V1\EmployeeImportExportControlle
 use Modules\Employee\Http\Controllers\Dashboard\V1\EmployeeTypeController;
 use Modules\Employee\Http\Controllers\Dashboard\V1\AttendanceController;
 use Modules\Employee\Http\Controllers\Dashboard\V1\LocationController;
+use Modules\Employee\Http\Controllers\Dashboard\V1\EmployeeExperienceController;
+use Modules\Employee\Http\Controllers\Dashboard\V1\PermissionRequestController;
 use Modules\Employee\Http\Controllers\Dashboard\V1\EmployeeTrashController;
 use Modules\Employee\Http\Controllers\Dashboard\V1\EmployeeTypeTrashController;
 use Modules\Employee\Http\Controllers\Dashboard\V1\AttendanceTrashController;
@@ -132,6 +134,28 @@ Route::middleware(['auth', 'verified', 'auto.permission'])->prefix('dashboard')-
     Route::put('attendances/{attendance}', [AttendanceController::class, 'update'])->name('attendances.update');
     Route::patch('attendances/{attendance}', [AttendanceController::class, 'update']);
     Route::delete('attendances/{attendance}', [AttendanceController::class, 'destroy'])->name('attendances.destroy');
+
+    // Employee Experiences CRUD
+    Route::get('experiences/create', [EmployeeExperienceController::class, 'create'])->name('experiences.create');
+    Route::post('experiences', [EmployeeExperienceController::class, 'store'])->name('experiences.store');
+    Route::get('experiences', [EmployeeExperienceController::class, 'index'])->name('experiences.index');
+    Route::get('experiences/{experience}', [EmployeeExperienceController::class, 'show'])->name('experiences.show');
+    Route::get('experiences/{experience}/edit', [EmployeeExperienceController::class, 'edit'])->name('experiences.edit');
+    Route::put('experiences/{experience}', [EmployeeExperienceController::class, 'update'])->name('experiences.update');
+    Route::get('experiences/{experience}/delete', [EmployeeExperienceController::class, 'confirmDelete'])->name('experiences.confirm-delete');
+    Route::delete('experiences/{experience}', [EmployeeExperienceController::class, 'destroy'])->name('experiences.destroy');
+
+    // Permission Requests CRUD
+    Route::get('permission-requests/create', [PermissionRequestController::class, 'create'])->name('permission-requests.create');
+    Route::post('permission-requests', [PermissionRequestController::class, 'store'])->name('permission-requests.store');
+    Route::get('permission-requests', [PermissionRequestController::class, 'index'])->name('permission-requests.index');
+    Route::get('permission-requests/{permission_request}', [PermissionRequestController::class, 'show'])->name('permission-requests.show');
+    Route::get('permission-requests/{permission_request}/edit', [PermissionRequestController::class, 'edit'])->name('permission-requests.edit');
+    Route::put('permission-requests/{permission_request}', [PermissionRequestController::class, 'update'])->name('permission-requests.update');
+    Route::get('permission-requests/{permission_request}/delete', [PermissionRequestController::class, 'confirmDelete'])->name('permission-requests.confirm-delete');
+    Route::delete('permission-requests/{permission_request}', [PermissionRequestController::class, 'destroy'])->name('permission-requests.destroy');
+    Route::get('permission-requests/{permission_request}/review', [PermissionRequestController::class, 'showReview'])->name('permission-requests.review');
+    Route::post('permission-requests/{permission_request}/review', [PermissionRequestController::class, 'review'])->name('permission-requests.review.submit');
 
     // QR Code Generation
     Route::get('employees/{employee}/qr-code', [AttendanceController::class, 'generateEmployeeQr'])->name('employees.qr-code');

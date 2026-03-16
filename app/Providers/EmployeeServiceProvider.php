@@ -108,6 +108,19 @@ class EmployeeServiceProvider extends ServiceProvider
                     'MapPin'
                 );
             }
+
+            if (\Route::has('employee.permission-requests.index')) {
+                MenuService::addSubmenuItem(
+                    'primary',
+                    'employee',
+                    __('Permission Requests'),
+                    route('employee.permission-requests.index'),
+                    60,
+                    'permission_requests.view_any',
+                    'employee.permission-requests.*',
+                    'FileText'
+                );
+            }
         });
     }
 

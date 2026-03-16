@@ -361,3 +361,114 @@ export interface AttendanceScannerProps {
     departmentOptions: SelectOption[];
     classroomOptions: SelectOption[];
 }
+
+// Employee Option for selects
+export interface EmployeeOption {
+    id: number;
+    uuid?: string;
+    full_name: string;
+    employee_code: string;
+    avatar_url?: string | null;
+}
+
+// Permission Request Types
+export type PermissionRequestType = 'leave' | 'overtime' | 'remote' | 'early_leave' | 'late_arrival' | 'other';
+export type PermissionRequestStatus = 'pending' | 'approved' | 'rejected';
+
+export interface PermissionRequest {
+    id: number;
+    uuid: string;
+    employee_id: number;
+    type: PermissionRequestType;
+    type_label: string;
+    type_description: string;
+    reason: string;
+    from_date: string;
+    to_date: string;
+    total_days: number;
+    request_date: string;
+    request_date_formatted: string;
+    status: PermissionRequestStatus;
+    status_label: string;
+    reviewed_by: number | null;
+    reviewed_at: string | null;
+    reviewed_at_formatted: string | null;
+    review_note: string | null;
+    rejected_status: boolean;
+    rejected_reason: string | null;
+    employee?: {
+        id: number;
+        uuid: string;
+        full_name: string;
+        employee_code: string;
+        avatar_url: string | null;
+    };
+    reviewer?: {
+        id: number;
+        name: string;
+    };
+    created_at: string;
+    updated_at: string;
+}
+
+export interface PermissionRequestStats {
+    total: number;
+    pending: number;
+    approved: number;
+    rejected: number;
+}
+
+export interface PermissionRequestFilters {
+    search?: string;
+    employee_id?: number;
+    type?: string;
+    status?: string;
+    date_from?: string;
+    date_to?: string;
+}
+
+export interface PermissionRequestFormData {
+    employee_id: number | null;
+    type: PermissionRequestType;
+    reason: string;
+    from_date: string;
+    to_date: string;
+}
+
+export interface PermissionRequestIndexProps {
+    permissionRequests: PaginatedResponse<PermissionRequest>;
+    filters: PermissionRequestFilters;
+    stats: PermissionRequestStats;
+    employees: EmployeeOption[];
+    types: Record<PermissionRequestType, string>;
+    typeDescriptions: Record<PermissionRequestType, string>;
+    statuses: Record<PermissionRequestStatus, string>;
+}
+
+export interface PermissionRequestCreateProps {
+    employees: EmployeeOption[];
+    types: Record<PermissionRequestType, string>;
+    typeDescriptions: Record<PermissionRequestType, string>;
+    selectedEmployeeId: number | null;
+}
+
+export interface PermissionRequestEditProps {
+    permissionRequest: PermissionRequest;
+    employees: EmployeeOption[];
+    types: Record<PermissionRequestType, string>;
+    typeDescriptions: Record<PermissionRequestType, string>;
+}
+
+export interface PermissionRequestShowProps {
+    permissionRequest: PermissionRequest;
+    types: Record<PermissionRequestType, string>;
+    statuses: Record<PermissionRequestStatus, string>;
+}
+
+export interface PermissionRequestDeleteProps {
+    permissionRequest: PermissionRequest;
+}
+
+export interface PermissionRequestReviewProps {
+    permissionRequest: PermissionRequest;
+}
