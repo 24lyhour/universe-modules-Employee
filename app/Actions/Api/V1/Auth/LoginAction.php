@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Employee\Actions\Api\V1;
+namespace Modules\Employee\Actions\Api\V1\Auth;
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;

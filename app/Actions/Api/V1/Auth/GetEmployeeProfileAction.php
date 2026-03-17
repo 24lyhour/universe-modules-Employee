@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Employee\Actions\Api\V1;
+namespace Modules\Employee\Actions\Api\V1\Auth;
 
 use App\Models\User;
 use Modules\Employee\Http\Resources\Api\V1\EmployeeResource;

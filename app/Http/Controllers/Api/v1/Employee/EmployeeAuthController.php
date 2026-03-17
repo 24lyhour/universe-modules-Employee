@@ -5,9 +5,9 @@ namespace Modules\Employee\Http\Controllers\Api\V1\Employee;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Modules\Employee\Actions\Api\V1\GetEmployeeProfileAction;
-use Modules\Employee\Actions\Api\V1\LoginAction;
-use Modules\Employee\Actions\Api\V1\LogoutAction;
+use Modules\Employee\Actions\Api\V1\Auth\GetEmployeeProfileAction;
+use Modules\Employee\Actions\Api\V1\Auth\LoginAction;
+use Modules\Employee\Actions\Api\V1\Auth\LogoutAction;
 use Modules\Employee\Http\Requests\Api\V1\Employee\LoginRequest;
 
 class EmployeeAuthController extends Controller

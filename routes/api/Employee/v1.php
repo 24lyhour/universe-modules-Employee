@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Employee\Http\Controllers\Api\V1\Employee\EmployeeAuthController;
+use Modules\Employee\Http\Controllers\Api\V1\Employee\AttendanceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,4 +30,14 @@ Route::middleware(['auth:sanctum'])->prefix('v1/employee')->group(function () {
         ->name('employee.auth.logout-all');
     Route::get('auth/me', [EmployeeAuthController::class, 'me'])
         ->name('employee.auth.me');
+
+    // Attendance
+    Route::get('attendance/today', [AttendanceController::class, 'today'])
+        ->name('employee.attendance.today');
+    Route::post('attendance/check-in', [AttendanceController::class, 'checkIn'])
+        ->name('employee.attendance.check-in');
+    Route::post('attendance/check-out', [AttendanceController::class, 'checkOut'])
+        ->name('employee.attendance.check-out');
+    Route::get('attendance/history', [AttendanceController::class, 'history'])
+        ->name('employee.attendance.history');
 });
