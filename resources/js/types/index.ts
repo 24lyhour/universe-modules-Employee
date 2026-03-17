@@ -472,3 +472,50 @@ export interface PermissionRequestDeleteProps {
 export interface PermissionRequestReviewProps {
     permissionRequest: PermissionRequest;
 }
+
+// Self-Service Attendance Types
+export interface SelfServiceEmployee {
+    id: number;
+    uuid: string;
+    full_name: string;
+    employee_code: string;
+    avatar_url: string | null;
+    job_title: string | null;
+    department_name: string | null;
+    employee_type_name: string | null;
+}
+
+export interface SelfServiceAttendance {
+    id: number;
+    uuid: string;
+    check_in_time: string | null;
+    check_out_time: string | null;
+    status: AttendanceStatus;
+    status_label: string;
+    work_hours: number | null;
+    work_hours_formatted: string;
+    check_in_location: string | null;
+    check_out_location: string | null;
+    notes: string | null;
+}
+
+export interface SelfServiceState {
+    canCheckIn: boolean;
+    canCheckOut: boolean;
+    isCompleted: boolean;
+}
+
+export interface SelfServiceConfig {
+    allowManualCheckIn: boolean;
+    requireLocation: boolean;
+    workStartTime: string;
+    workEndTime: string;
+    lateThresholdMinutes: number;
+}
+
+export interface SelfServiceProps {
+    employee: SelfServiceEmployee;
+    todayAttendance: SelfServiceAttendance | null;
+    state: SelfServiceState;
+    config: SelfServiceConfig;
+}

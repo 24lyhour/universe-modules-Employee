@@ -11,6 +11,7 @@ use Modules\Employee\Http\Controllers\Dashboard\V1\PermissionRequestController;
 use Modules\Employee\Http\Controllers\Dashboard\V1\EmployeeTrashController;
 use Modules\Employee\Http\Controllers\Dashboard\V1\EmployeeTypeTrashController;
 use Modules\Employee\Http\Controllers\Dashboard\V1\AttendanceTrashController;
+use Modules\Employee\Http\Controllers\Dashboard\V1\SelfServiceAttendanceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -112,6 +113,11 @@ Route::middleware(['auth', 'verified', 'auto.permission'])->prefix('dashboard')-
     Route::put('locations/{location}/schedule', [LocationController::class, 'updateSchedule'])->name('locations.update-schedule');
     Route::put('locations/{location}/toggle-status', [LocationController::class, 'toggleStatus'])->name('locations.toggle-status');
     Route::delete('locations/{location}', [LocationController::class, 'destroy'])->name('locations.destroy');
+
+    // Attendance - Self-Service (for employees to check-in/out themselves)
+    Route::get('attendances/self-service', [SelfServiceAttendanceController::class, 'index'])->name('attendances.self-service');
+    Route::post('attendances/self-service/check-in', [SelfServiceAttendanceController::class, 'checkIn'])->name('attendances.self-service.check-in');
+    Route::post('attendances/self-service/check-out', [SelfServiceAttendanceController::class, 'checkOut'])->name('attendances.self-service.check-out');
 
     // Attendance - Scanner (special permission: scan_qr)
     Route::middleware('permission:attendances.scan_qr')->group(function () {
