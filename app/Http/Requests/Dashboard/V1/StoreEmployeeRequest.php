@@ -14,7 +14,7 @@ class StoreEmployeeRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
+        $rules = [
             'employee_code' => ['nullable', 'string', 'max:50', 'unique:employees,employee_code'],
             'first_name' => ['required', 'string', 'max:100'],
             'last_name' => ['required', 'string', 'max:100'],
@@ -25,8 +25,9 @@ class StoreEmployeeRequest extends FormRequest
             'birth_place' => ['nullable', 'string', 'max:255'],
             'current_address' => ['nullable', 'string', 'max:500'],
             'school_id' => ['nullable', 'integer', 'exists:schools,id'],
-            'department_id' => ['nullable', 'integer', 'exists:departments,id'],
+            'department_id' => ['nullable', 'integer', 'exists:school_departments,id'],
             'position_id' => ['nullable', 'integer'],
+            'type_employee_id' => ['nullable', 'integer', 'exists:employee_types,id'],
             'job_title' => ['nullable', 'string', 'max:100'],
             'employee_type' => ['nullable', 'string', 'in:' . implode(',', array_keys(Employee::getEmployeeTypes()))],
             'salary' => ['nullable', 'numeric', 'min:0'],
@@ -38,7 +39,20 @@ class StoreEmployeeRequest extends FormRequest
             'certificate_code' => ['nullable', 'string', 'max:100'],
             'avatar_url' => ['nullable', 'string'],
             'status' => ['required', 'boolean'],
+
+            // Account creation fields
+            'create_account' => ['nullable', 'boolean'],
+            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            'password_confirmation' => ['nullable', 'string'],
         ];
+
+        // If creating account, email is required and must be unique in users table too
+        if ($this->boolean('create_account')) {
+            $rules['email'] = ['required', 'email', 'max:255', 'unique:employees,email', 'unique:users,email'];
+            $rules['password'] = ['required', 'string', 'min:8', 'confirmed'];
+        }
+
+        return $rules;
     }
 
     public function messages(): array
@@ -48,12 +62,16 @@ class StoreEmployeeRequest extends FormRequest
             'last_name.required' => 'Last name is required.',
             'email.email' => 'Please enter a valid email address.',
             'email.unique' => 'This email address is already in use.',
+            'email.required' => 'Email is required when creating an account.',
             'employee_code.unique' => 'This employee code is already in use.',
             'employee_type.in' => 'Invalid employee type selected.',
             'date_of_birth.before' => 'Date of birth must be in the past.',
             'probation_end_date.after' => 'Probation end date must be after probation start date.',
             'school_id.exists' => 'The selected school does not exist.',
             'department_id.exists' => 'The selected department does not exist.',
+            'password.required' => 'Password is required when creating an account.',
+            'password.min' => 'Password must be at least 8 characters.',
+            'password.confirmed' => 'Password confirmation does not match.',
         ];
     }
 }

@@ -3,6 +3,15 @@
 export type EmployeeType = 'full_time' | 'part_time' | 'contract' | 'intern';
 export type Gender = 'male' | 'female' | 'other';
 
+export interface EmployeeUser {
+    id: number;
+    name: string;
+    email: string;
+    email_verified_at: string | null;
+    created_at: string;
+    roles: string[];
+}
+
 export interface Employee {
     id: number;
     uuid: string;
@@ -39,6 +48,10 @@ export interface Employee {
     school_name: string | null;
     department_name: string | null;
     courses_count: number | null;
+    // User account data
+    user_id: number | null;
+    has_account: boolean;
+    user: EmployeeUser | null;
     // Attendance counts
     attendance_total: number | null;
     attendance_present: number | null;
@@ -147,6 +160,10 @@ export interface EmployeeFormData {
     certificate_code: string;
     avatar_url: string;
     status: boolean;
+    // Account creation fields
+    create_account?: boolean;
+    password?: string;
+    password_confirmation?: string;
 }
 
 export interface SchoolOption {

@@ -46,6 +46,17 @@ class EmployeeResource extends JsonResource
             'school_name' => $this->whenLoaded('school', fn() => $this->school?->name),
             'department_name' => $this->whenLoaded('department', fn() => $this->department?->name),
             'courses_count' => $this->whenCounted('courses'),
+            // User account data
+            'user_id' => $this->user_id,
+            'has_account' => $this->user_id !== null,
+            'user' => $this->whenLoaded('user', fn() => $this->user ? [
+                'id' => $this->user->id,
+                'name' => $this->user->name,
+                'email' => $this->user->email,
+                'email_verified_at' => $this->user->email_verified_at?->toIso8601String(),
+                'created_at' => $this->user->created_at?->toIso8601String(),
+                'roles' => method_exists($this->user, 'getRoleNames') ? $this->user->getRoleNames() : [],
+            ] : null),
             // Attendance counts (when loaded via withCount)
             'attendance_total' => $this->attendance_total ?? null,
             'attendance_present' => $this->attendance_present ?? null,

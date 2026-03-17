@@ -26,7 +26,7 @@ class UpdateEmployeeRequest extends FormRequest
             'birth_place' => ['nullable', 'string', 'max:255'],
             'current_address' => ['nullable', 'string', 'max:500'],
             'school_id' => ['nullable', 'integer', 'exists:schools,id'],
-            'department_id' => ['nullable', 'integer', 'exists:departments,id'],
+            'department_id' => ['nullable', 'integer', 'exists:school_departments,id'],
             'position_id' => ['nullable', 'integer'],
             'job_title' => ['nullable', 'string', 'max:100'],
             'employee_type' => ['nullable', 'string', 'in:' . implode(',', array_keys(Employee::getEmployeeTypes()))],

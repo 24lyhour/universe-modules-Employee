@@ -3,10 +3,11 @@
 use Illuminate\Support\Facades\Route;
 use Modules\Employee\Http\Controllers\Dashboard\V1\EmployeeController;
 use Modules\Employee\Http\Controllers\Dashboard\V1\EmployeeImportExportController;
+use Modules\Employee\Http\Controllers\Dashboard\V1\EmployeePasswordController;
 use Modules\Employee\Http\Controllers\Dashboard\V1\EmployeeTypeController;
 use Modules\Employee\Http\Controllers\Dashboard\V1\AttendanceController;
 use Modules\Employee\Http\Controllers\Dashboard\V1\LocationController;
-use Modules\Employee\Http\Controllers\Dashboard\V1\EmployeeExperienceController;
+// use Modules\Employee\Http\Controllers\Dashboard\V1\EmployeeExperienceController;
 use Modules\Employee\Http\Controllers\Dashboard\V1\PermissionRequestController;
 use Modules\Employee\Http\Controllers\Dashboard\V1\EmployeeTrashController;
 use Modules\Employee\Http\Controllers\Dashboard\V1\EmployeeTypeTrashController;
@@ -89,6 +90,12 @@ Route::middleware(['auth', 'verified', 'auto.permission'])->prefix('dashboard')-
     Route::get('employees/{employee}/delete', [EmployeeController::class, 'confirmDelete'])->name('employees.confirm-delete');
     Route::delete('employees/{employee}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
 
+    // Employee Password & Account Management (separate controller)
+    Route::get('employees/{employee}/change-password', [EmployeePasswordController::class, 'edit'])->name('employees.change-password');
+    Route::put('employees/{employee}/change-password', [EmployeePasswordController::class, 'update'])->name('employees.update-password');
+    Route::get('employees/{employee}/create-account', [EmployeePasswordController::class, 'showCreateAccount'])->name('employees.show-create-account');
+    Route::post('employees/{employee}/create-account', [EmployeePasswordController::class, 'createAccount'])->name('employees.create-account');
+
     // Employee Types - CREATE routes first
     Route::get('employee-types/bulk-delete', [EmployeeTypeController::class, 'confirmBulkDelete'])->name('employee-types.bulk-delete.confirm');
     Route::delete('employee-types/bulk-delete', [EmployeeTypeController::class, 'bulkDelete'])->name('employee-types.bulk-delete');
@@ -141,15 +148,15 @@ Route::middleware(['auth', 'verified', 'auto.permission'])->prefix('dashboard')-
     Route::patch('attendances/{attendance}', [AttendanceController::class, 'update']);
     Route::delete('attendances/{attendance}', [AttendanceController::class, 'destroy'])->name('attendances.destroy');
 
-    // Employee Experiences CRUD
-    Route::get('experiences/create', [EmployeeExperienceController::class, 'create'])->name('experiences.create');
-    Route::post('experiences', [EmployeeExperienceController::class, 'store'])->name('experiences.store');
-    Route::get('experiences', [EmployeeExperienceController::class, 'index'])->name('experiences.index');
-    Route::get('experiences/{experience}', [EmployeeExperienceController::class, 'show'])->name('experiences.show');
-    Route::get('experiences/{experience}/edit', [EmployeeExperienceController::class, 'edit'])->name('experiences.edit');
-    Route::put('experiences/{experience}', [EmployeeExperienceController::class, 'update'])->name('experiences.update');
-    Route::get('experiences/{experience}/delete', [EmployeeExperienceController::class, 'confirmDelete'])->name('experiences.confirm-delete');
-    Route::delete('experiences/{experience}', [EmployeeExperienceController::class, 'destroy'])->name('experiences.destroy');
+    // Employee Experiences CRUD (TODO: Create EmployeeExperienceController)
+    // Route::get('experiences/create', [EmployeeExperienceController::class, 'create'])->name('experiences.create');
+    // Route::post('experiences', [EmployeeExperienceController::class, 'store'])->name('experiences.store');
+    // Route::get('experiences', [EmployeeExperienceController::class, 'index'])->name('experiences.index');
+    // Route::get('experiences/{experience}', [EmployeeExperienceController::class, 'show'])->name('experiences.show');
+    // Route::get('experiences/{experience}/edit', [EmployeeExperienceController::class, 'edit'])->name('experiences.edit');
+    // Route::put('experiences/{experience}', [EmployeeExperienceController::class, 'update'])->name('experiences.update');
+    // Route::get('experiences/{experience}/delete', [EmployeeExperienceController::class, 'confirmDelete'])->name('experiences.confirm-delete');
+    // Route::delete('experiences/{experience}', [EmployeeExperienceController::class, 'destroy'])->name('experiences.destroy');
 
     // Permission Requests CRUD
     Route::get('permission-requests/create', [PermissionRequestController::class, 'create'])->name('permission-requests.create');
