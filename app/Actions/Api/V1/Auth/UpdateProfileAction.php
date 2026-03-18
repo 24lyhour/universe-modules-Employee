@@ -23,22 +23,38 @@ class UpdateProfileAction
             ];
         }
 
+        // Debug: Log received data
+        \Log::info('UpdateProfile data received:', [
+            'has_avatar' => isset($data['avatar']),
+            'avatar_type' => isset($data['avatar']) ? get_class($data['avatar']) : 'not set',
+            'data_keys' => array_keys($data),
+        ]);
+
         // Handle avatar upload
+        $avatarPath = null;
         if (isset($data['avatar']) && $data['avatar']) {
-            // Delete old avatar if exists
-            if ($employee->avatar && Storage::disk('public')->exists($employee->avatar)) {
-                Storage::disk('public')->delete($employee->avatar);
+            \Log::info('Avatar file info:', [
+                'original_name' => $data['avatar']->getClientOriginalName(),
+                'size' => $data['avatar']->getSize(),
+                'mime' => $data['avatar']->getMimeType(),
+            ]);
+
+            // Delete old avatar if exists (extract path from full URL)
+            if ($employee->avatar_url) {
+                $oldPath = str_replace(asset('storage/'), '', $employee->avatar_url);
+                if ($oldPath && Storage::disk('public')->exists($oldPath)) {
+                    Storage::disk('public')->delete($oldPath);
+                    \Log::info('Deleted old avatar:', ['path' => $oldPath]);
+                }
             }
 
             // Store new avatar
-            $path = $data['avatar']->store('employees/avatars', 'public');
-            $data['avatar'] = $path;
-        } else {
-            unset($data['avatar']);
+            $avatarPath = $data['avatar']->store('employees/avatars', 'public');
+            \Log::info('Avatar stored at:', ['path' => $avatarPath]);
         }
 
         // Update employee
-        $employee->update([
+        $updateData = [
             'first_name' => $data['first_name'] ?? $employee->first_name,
             'last_name' => $data['last_name'] ?? $employee->last_name,
             'phone_number' => $data['phone_number'] ?? $employee->phone_number,
@@ -46,8 +62,14 @@ class UpdateProfileAction
             'date_of_birth' => $data['date_of_birth'] ?? $employee->date_of_birth,
             'birth_place' => $data['birth_place'] ?? $employee->birth_place,
             'current_address' => $data['current_address'] ?? $employee->current_address,
-            'avatar' => $data['avatar'] ?? $employee->avatar,
-        ]);
+        ];
+
+        // If avatar was uploaded, save the full URL to avatar_url
+        if ($avatarPath) {
+            $updateData['avatar_url'] = asset('storage/' . $avatarPath);
+        }
+
+        $employee->update($updateData);
 
         // Refresh the model
         $employee->refresh();
