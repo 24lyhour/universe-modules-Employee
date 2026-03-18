@@ -121,6 +121,19 @@ class EmployeeServiceProvider extends ServiceProvider
                     'FileText'
                 );
             }
+
+            if (\Route::has('employee.attendances.self-service')) {
+                MenuService::addSubmenuItem(
+                    'primary',
+                    'employee',
+                    __('Self Service'),
+                    route('employee.attendances.self-service'),
+                    70,
+                    null, // No special permission - authenticated employees only
+                    'employee.attendances.self-service',
+                    'LogIn'
+                );
+            }
         });
     }
 

@@ -47,6 +47,10 @@ const form = useForm<EmployeeFormData>({
     certificate_code: '',
     avatar_url: '',
     status: true,
+    // Account fields
+    create_account: false,
+    password: '',
+    password_confirmation: '',
 });
 
 const { validateForm, validateAndSubmit, createIsFormInvalid } = useFormValidation(
@@ -67,6 +71,7 @@ const getFormData = () => ({
     school_id: form.school_id,
     department_id: form.department_id,
     position_id: form.position_id,
+    type_employee_id: form.type_employee_id,
     job_title: form.job_title || null,
     employee_type: form.employee_type,
     salary: form.salary,
@@ -78,6 +83,10 @@ const getFormData = () => ({
     certificate_code: form.certificate_code || null,
     avatar_url: form.avatar_url || null,
     status: form.status,
+    // Account fields
+    create_account: form.create_account,
+    password: form.password || null,
+    password_confirmation: form.password_confirmation || null,
 });
 
 watch([() => form.employee_code, () => form.first_name, () => form.last_name], () => {

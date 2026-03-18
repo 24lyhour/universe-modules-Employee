@@ -102,6 +102,19 @@ const isActive = computed({
     },
 });
 
+// Create account switch
+const createAccount = computed({
+    get: () => props.form.create_account ?? false,
+    set: (value: boolean) => {
+        props.form.create_account = value;
+        // Clear password fields when disabling account creation
+        if (!value) {
+            props.form.password = '';
+            props.form.password_confirmation = '';
+        }
+    },
+});
+
 const genderOptions = [
     { value: 'male', label: 'Male' },
     { value: 'female', label: 'Female' },
@@ -474,6 +487,54 @@ const genderOptions = [
                             </p>
                         </div>
                         <Switch v-model="isActive" />
+                    </div>
+                </CardContent>
+            </Card>
+
+            <!-- Account Settings Card (Only for Create mode) -->
+            <Card v-if="mode === 'create'">
+                <CardHeader class="pb-3">
+                    <CardTitle class="text-base">Account Settings</CardTitle>
+                </CardHeader>
+                <CardContent class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium">Create Login Account</p>
+                            <p class="text-xs text-muted-foreground">
+                                Allow employee to log in
+                            </p>
+                        </div>
+                        <Switch v-model="createAccount" />
+                    </div>
+
+                    <!-- Password Fields (shown when create_account is true) -->
+                    <div v-if="createAccount" class="space-y-4 border-t pt-4">
+                        <div class="space-y-2">
+                            <Label for="password">Password <span class="text-destructive">*</span></Label>
+                            <Input
+                                id="password"
+                                v-model="props.form.password"
+                                type="password"
+                                placeholder="Minimum 8 characters"
+                                autocomplete="new-password"
+                            />
+                            <p v-if="props.form.errors.password" class="text-xs text-destructive">
+                                {{ props.form.errors.password }}
+                            </p>
+                        </div>
+                        <div class="space-y-2">
+                            <Label for="password_confirmation">Confirm Password <span class="text-destructive">*</span></Label>
+                            <Input
+                                id="password_confirmation"
+                                v-model="props.form.password_confirmation"
+                                type="password"
+                                placeholder="Repeat password"
+                                autocomplete="new-password"
+                            />
+                        </div>
+                        <p class="text-xs text-muted-foreground">
+                            Employee will use their email to log in.
+                        </p>
                     </div>
                 </CardContent>
             </Card>

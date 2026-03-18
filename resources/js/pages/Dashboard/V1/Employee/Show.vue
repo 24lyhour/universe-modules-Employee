@@ -6,6 +6,13 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
     ArrowLeft,
     Pencil,
     Mail,
@@ -21,9 +28,13 @@ import {
     AlertTriangle,
     XCircle,
     TrendingUp,
+    Key,
+    MoreVertical,
+    UserPlus,
 } from 'lucide-vue-next';
 import type { BreadcrumbItem } from '@/types';
 import type { EmployeeShowProps } from '@employee/types';
+import Account from '@employee/Components/Dashboard/Account.vue';
 
 const props = defineProps<EmployeeShowProps>();
 
@@ -103,6 +114,41 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
                                 <Pencil class="h-4 w-4 mr-2" /> Edit
                             </Link>
                         </Button>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger as-child>
+                                <Button variant="outline" size="icon">
+                                    <MoreVertical class="h-4 w-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <!-- Has account: Show Change Password -->
+                                <DropdownMenuItem v-if="employee.has_account" as-child>
+                                    <Link :href="`/dashboard/employees/${employee.uuid}/change-password`" class="flex items-center cursor-pointer">
+                                        <Key class="h-4 w-4 mr-2" />
+                                        Change Password
+                                    </Link>
+                                </DropdownMenuItem>
+                                <!-- No account but has email or phone: Show Create Account -->
+                                <DropdownMenuItem v-else-if="employee.email || employee.phone_number" as-child>
+                                    <Link :href="`/dashboard/employees/${employee.uuid}/create-account`" class="flex items-center cursor-pointer">
+                                        <UserPlus class="h-4 w-4 mr-2" />
+                                        Create Account
+                                    </Link>
+                                </DropdownMenuItem>
+                                <!-- No account and no email/phone: Show disabled Create Account -->
+                                <DropdownMenuItem v-else disabled class="opacity-50">
+                                    <UserPlus class="h-4 w-4 mr-2" />
+                                    Create Account (No contact info)
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem as-child>
+                                    <Link :href="`/dashboard/employees/${employee.uuid}/delete`" class="flex items-center cursor-pointer text-destructive">
+                                        <XCircle class="h-4 w-4 mr-2" />
+                                        Delete
+                                    </Link>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 </div>
 
@@ -241,6 +287,16 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
                     </a>
                 </div>
             </div>
+
+            <!-- Account Status Component -->
+            <Account
+                :employee-uuid="employee.uuid"
+                :employee-name="employee.full_name"
+                :employee-email="employee.email"
+                :employee-phone="employee.phone_number"
+                :has-account="employee.has_account"
+                :user="employee.user"
+            />
 
             <!-- Attendance Statistics -->
             <div class="space-y-4">

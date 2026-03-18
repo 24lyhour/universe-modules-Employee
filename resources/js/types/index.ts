@@ -3,6 +3,15 @@
 export type EmployeeType = 'full_time' | 'part_time' | 'contract' | 'intern';
 export type Gender = 'male' | 'female' | 'other';
 
+export interface EmployeeUser {
+    id: number;
+    name: string;
+    email: string;
+    email_verified_at: string | null;
+    created_at: string;
+    roles: string[];
+}
+
 export interface Employee {
     id: number;
     uuid: string;
@@ -39,6 +48,10 @@ export interface Employee {
     school_name: string | null;
     department_name: string | null;
     courses_count: number | null;
+    // User account data
+    user_id: number | null;
+    has_account: boolean;
+    user: EmployeeUser | null;
     // Attendance counts
     attendance_total: number | null;
     attendance_present: number | null;
@@ -147,6 +160,10 @@ export interface EmployeeFormData {
     certificate_code: string;
     avatar_url: string;
     status: boolean;
+    // Account creation fields
+    create_account?: boolean;
+    password?: string;
+    password_confirmation?: string;
 }
 
 export interface SchoolOption {
@@ -471,4 +488,51 @@ export interface PermissionRequestDeleteProps {
 
 export interface PermissionRequestReviewProps {
     permissionRequest: PermissionRequest;
+}
+
+// Self-Service Attendance Types
+export interface SelfServiceEmployee {
+    id: number;
+    uuid: string;
+    full_name: string;
+    employee_code: string;
+    avatar_url: string | null;
+    job_title: string | null;
+    department_name: string | null;
+    employee_type_name: string | null;
+}
+
+export interface SelfServiceAttendance {
+    id: number;
+    uuid: string;
+    check_in_time: string | null;
+    check_out_time: string | null;
+    status: AttendanceStatus;
+    status_label: string;
+    work_hours: number | null;
+    work_hours_formatted: string;
+    check_in_location: string | null;
+    check_out_location: string | null;
+    notes: string | null;
+}
+
+export interface SelfServiceState {
+    canCheckIn: boolean;
+    canCheckOut: boolean;
+    isCompleted: boolean;
+}
+
+export interface SelfServiceConfig {
+    allowManualCheckIn: boolean;
+    requireLocation: boolean;
+    workStartTime: string;
+    workEndTime: string;
+    lateThresholdMinutes: number;
+}
+
+export interface SelfServiceProps {
+    employee: SelfServiceEmployee;
+    todayAttendance: SelfServiceAttendance | null;
+    state: SelfServiceState;
+    config: SelfServiceConfig;
 }

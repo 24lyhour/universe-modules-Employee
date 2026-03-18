@@ -12,7 +12,7 @@ class GetEmployeeShowDataAction
     public function execute(Employee $employee): array
     {
         // Load relationships so they appear in the resource
-        $employee->load(['school', 'department', 'employeeType']);
+        $employee->load(['school', 'department', 'employeeType', 'user']);
 
         // Get attendance statistics for this employee
         $attendanceStats = $this->getAttendanceStats($employee->id);

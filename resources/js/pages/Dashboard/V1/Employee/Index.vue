@@ -16,7 +16,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Users, CheckCircle, XCircle, Search, Eye, Pencil, Trash2, Clock, CalendarDays, Download, Upload, Database, FileSpreadsheet } from 'lucide-vue-next';
+import { Plus, Users, CheckCircle, XCircle, Search, Eye, Pencil, Trash2, Clock, CalendarDays, Download, Upload, Database, FileSpreadsheet, Key, UserPlus } from 'lucide-vue-next';
 import type { BreadcrumbItem } from '@/types';
 import type { EmployeeIndexProps, Employee } from '@employee/types';
 
@@ -55,11 +55,6 @@ const getInitials = (name: string) => {
         .slice(0, 2);
 };
 
-const formatGender = (gender: string | null): string => {
-    if (!gender) return '-';
-    return gender.charAt(0).toUpperCase() + gender.slice(1);
-};
-
 const columns: TableColumn<Employee>[] = [
     {
         key: 'employee',
@@ -72,19 +67,19 @@ const columns: TableColumn<Employee>[] = [
         render: (employee) => employee.employee_code,
     },
     {
-        key: 'gender',
-        label: 'Gender',
-        render: (employee) => formatGender(employee.gender),
+        key: 'email',
+        label: 'Email',
+        render: (employee) => employee.email || '-',
+    },
+    {
+        key: 'phone_number',
+        label: 'Phone',
+        render: (employee) => employee.phone_number || '-',
     },
     {
         key: 'employee_type_label',
         label: 'Type',
         render: (employee) => employee.employee_type_label || '-',
-    },
-    {
-        key: 'attendance',
-        label: 'Attendance',
-        render: (employee) => `${employee.attendance_present ?? 0}/${employee.attendance_total ?? 0}`,
     },
     {
         key: 'department_name',
@@ -110,11 +105,24 @@ const actions: TableAction<Employee>[] = [
         onClick: (employee) => router.visit(`/dashboard/employees/${employee.uuid}/edit`),
     },
     {
+        label: 'Change Password',
+        icon: Key,
+        onClick: (employee) => router.visit(`/dashboard/employees/${employee.uuid}/change-password`),
+        show: (employee) => employee.has_account,
+        separator: true,
+    },
+    {
+        label: 'Create Account',
+        icon: UserPlus,
+        onClick: (employee) => router.visit(`/dashboard/employees/${employee.uuid}/create-account`),
+        show: (employee) => !employee.has_account && (!!employee.email || !!employee.phone_number),
+        separator: true,
+    },
+    {
         label: 'Delete',
         icon: Trash2,
         onClick: (employee) => router.visit(`/dashboard/employees/${employee.uuid}/delete`),
         variant: 'destructive',
-        separator: true,
     },
 ];
 
