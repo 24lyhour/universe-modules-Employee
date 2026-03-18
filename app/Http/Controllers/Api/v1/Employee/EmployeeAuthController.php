@@ -8,7 +8,9 @@ use Illuminate\Http\Request;
 use Modules\Employee\Actions\Api\V1\Auth\GetEmployeeProfileAction;
 use Modules\Employee\Actions\Api\V1\Auth\LoginAction;
 use Modules\Employee\Actions\Api\V1\Auth\LogoutAction;
+use Modules\Employee\Actions\Api\V1\Auth\UpdateProfileAction;
 use Modules\Employee\Http\Requests\Api\V1\Employee\LoginRequest;
+use Modules\Employee\Http\Requests\Api\V1\Employee\UpdateProfileRequest;
 
 class EmployeeAuthController extends Controller
 {
@@ -48,6 +50,16 @@ class EmployeeAuthController extends Controller
     public function me(Request $request, GetEmployeeProfileAction $action): JsonResponse
     {
         $result = $action->execute($request->user());
+
+        return response()->json($result);
+    }
+
+    /**
+     * Update employee profile
+     */
+    public function updateProfile(UpdateProfileRequest $request, UpdateProfileAction $action): JsonResponse
+    {
+        $result = $action->execute($request->user(), $request->validated());
 
         return response()->json($result);
     }

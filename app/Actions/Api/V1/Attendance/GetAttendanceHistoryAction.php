@@ -73,10 +73,10 @@ class GetAttendanceHistoryAction
 
         return [
             'total_days' => $total,
-            'present' => $present,
-            'late' => $late,
-            'absent' => $absent,
-            'on_leave' => $onLeave,
+            'present_days' => $present,
+            'late_days' => $late,
+            'absent_days' => $absent,
+            'leave_days' => $onLeave,
             'total_work_hours' => round($totalWorkHours, 2),
             'average_work_hours' => $total > 0 ? round($totalWorkHours / $total, 2) : 0,
         ];
