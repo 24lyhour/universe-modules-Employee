@@ -31,12 +31,44 @@ import {
     Key,
     MoreVertical,
     UserPlus,
+    GraduationCap,
+    Languages,
+    Briefcase,
+    Users,
+    Heart,
 } from 'lucide-vue-next';
+import { computed } from 'vue';
 import type { BreadcrumbItem } from '@/types';
 import type { EmployeeShowProps } from '@employee/types';
 import Account from '@employee/Components/Dashboard/Account.vue';
 
 const props = defineProps<EmployeeShowProps>();
+
+// Family members that should always be shown
+const alwaysVisibleRelationships = ['father', 'mother', 'sibling'];
+// Family members that only show when married
+const marriedOnlyRelationships = ['spouse', 'child'];
+
+// Computed property to filter displayable family members based on marital status
+const displayableFamilyMembers = computed(() => {
+    if (!props.employee.family_members) return [];
+
+    const isMarried = props.employee.marital_status === 'married';
+
+    return props.employee.family_members.filter(member => {
+        if (alwaysVisibleRelationships.includes(member.relationship)) {
+            return true;
+        }
+        if (marriedOnlyRelationships.includes(member.relationship) && isMarried) {
+            return true;
+        }
+        return false;
+    });
+});
+
+const formatRelationship = (relationship: string) => {
+    return relationship.charAt(0).toUpperCase() + relationship.slice(1);
+};
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
@@ -91,7 +123,7 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
                 <!-- Profile Header -->
                 <div class="flex flex-col sm:flex-row items-start sm:items-center gap-6 p-6 border-b">
                     <Avatar class="h-20 w-20 ring-4 ring-background shadow-lg">
-                        <AvatarImage :src="employee.avatar_url || ''" :alt="employee.full_name" />
+                        <AvatarImage :src="employee.avatar_url || ''" :alt="employee.full_name" class="object-cover" />
                         <AvatarFallback class="text-2xl font-semibold bg-primary text-primary-foreground">{{ getInitials(employee.full_name) }}</AvatarFallback>
                     </Avatar>
                     <div class="flex-1">
@@ -243,6 +275,14 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
                                     <p class="text-xs text-muted-foreground">Birth Place</p>
                                     <p>{{ employee.birth_place || '-' }}</p>
                                 </div>
+                                <div>
+                                    <p class="text-xs text-muted-foreground">Ethnicity</p>
+                                    <p>{{ employee.ethnicity || '-' }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-muted-foreground">Marital Status</p>
+                                    <p>{{ employee.marital_status ? employee.marital_status.charAt(0).toUpperCase() + employee.marital_status.slice(1) : '-' }}</p>
+                                </div>
                             </div>
 
                             <div v-if="employee.certificate || employee.certificate_code" class="pt-3 border-t">
@@ -297,6 +337,181 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
                 :has-account="employee.has_account"
                 :user="employee.user"
             />
+
+            <!-- Family Members Section -->
+            <Card v-if="displayableFamilyMembers.length > 0">
+                <CardHeader class="pb-3">
+                    <CardTitle class="flex items-center gap-2 text-base">
+                        <Users class="h-4 w-4" />
+                        Family Members
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        <div
+                            v-for="member in displayableFamilyMembers"
+                            :key="member.id"
+                            class="rounded-lg border p-4 space-y-2"
+                        >
+                            <div class="flex items-center justify-between">
+                                <span class="font-medium">{{ member.name }}</span>
+                                <Badge variant="outline">{{ formatRelationship(member.relationship) }}</Badge>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 text-sm">
+                                <div v-if="member.gender">
+                                    <p class="text-xs text-muted-foreground">Gender</p>
+                                    <p>{{ member.gender.charAt(0).toUpperCase() + member.gender.slice(1) }}</p>
+                                </div>
+                                <div v-if="member.date_of_birth">
+                                    <p class="text-xs text-muted-foreground">Birth Date</p>
+                                    <p>{{ formatDate(member.date_of_birth) }}</p>
+                                </div>
+                                <div v-if="member.occupation">
+                                    <p class="text-xs text-muted-foreground">Occupation</p>
+                                    <p>{{ member.occupation }}</p>
+                                </div>
+                                <div v-if="member.phone_number">
+                                    <p class="text-xs text-muted-foreground">Phone</p>
+                                    <p>{{ member.phone_number }}</p>
+                                </div>
+                            </div>
+                            <div v-if="member.is_emergency_contact || member.is_dependent" class="flex gap-2 pt-1">
+                                <Badge v-if="member.is_emergency_contact" variant="secondary" class="text-xs">Emergency Contact</Badge>
+                                <Badge v-if="member.is_dependent" variant="outline" class="text-xs">Dependent</Badge>
+                            </div>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <!-- Academic Levels Section -->
+            <Card v-if="employee.academic_levels?.length">
+                <CardHeader class="pb-3">
+                    <CardTitle class="flex items-center gap-2 text-base">
+                        <GraduationCap class="h-4 w-4" />
+                        Academic Levels
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div
+                            v-for="level in employee.academic_levels"
+                            :key="level.id"
+                            class="rounded-lg border p-4 space-y-2"
+                        >
+                            <div class="flex items-center justify-between">
+                                <span class="font-medium">{{ level.institution }}</span>
+                                <Badge variant="outline">{{ level.level.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) }}</Badge>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 text-sm">
+                                <div v-if="level.field_of_study">
+                                    <p class="text-xs text-muted-foreground">Field of Study</p>
+                                    <p>{{ level.field_of_study }}</p>
+                                </div>
+                                <div v-if="level.degree">
+                                    <p class="text-xs text-muted-foreground">Degree</p>
+                                    <p>{{ level.degree }}</p>
+                                </div>
+                                <div v-if="level.start_date || level.end_date">
+                                    <p class="text-xs text-muted-foreground">Period</p>
+                                    <p>{{ formatDate(level.start_date) }} - {{ formatDate(level.end_date) }}</p>
+                                </div>
+                                <div v-if="level.gpa">
+                                    <p class="text-xs text-muted-foreground">GPA</p>
+                                    <p>{{ level.gpa }}</p>
+                                </div>
+                            </div>
+                            <div v-if="level.certificate" class="pt-1">
+                                <Badge variant="secondary" class="text-xs">{{ level.certificate }}</Badge>
+                            </div>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <!-- Foreign Languages Section -->
+            <Card v-if="employee.foreign_languages?.length">
+                <CardHeader class="pb-3">
+                    <CardTitle class="flex items-center gap-2 text-base">
+                        <Languages class="h-4 w-4" />
+                        Foreign Languages
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        <div
+                            v-for="lang in employee.foreign_languages"
+                            :key="lang.id"
+                            class="rounded-lg border p-4 space-y-2"
+                        >
+                            <div class="flex items-center justify-between">
+                                <span class="font-medium">{{ lang.language }}</span>
+                                <Badge variant="outline">{{ lang.proficiency.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) }}</Badge>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 text-sm">
+                                <div v-if="lang.certificate">
+                                    <p class="text-xs text-muted-foreground">Certificate</p>
+                                    <p>{{ lang.certificate }}</p>
+                                </div>
+                                <div v-if="lang.certificate_score">
+                                    <p class="text-xs text-muted-foreground">Score</p>
+                                    <p>{{ lang.certificate_score }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <!-- Job Experience Section -->
+            <Card v-if="employee.job_experiences?.length">
+                <CardHeader class="pb-3">
+                    <CardTitle class="flex items-center gap-2 text-base">
+                        <Briefcase class="h-4 w-4" />
+                        Job Experience
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div class="space-y-4">
+                        <div
+                            v-for="exp in employee.job_experiences"
+                            :key="exp.id"
+                            class="rounded-lg border p-4 space-y-2"
+                        >
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <span class="font-medium">{{ exp.position || 'Position' }}</span>
+                                    <p class="text-sm text-muted-foreground">{{ exp.company }}</p>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <Badge v-if="exp.employment_type" variant="outline">
+                                        {{ exp.employment_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) }}
+                                    </Badge>
+                                    <Badge v-if="exp.is_current" variant="default">Current</Badge>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+                                <div v-if="exp.province || exp.city">
+                                    <p class="text-xs text-muted-foreground">Location</p>
+                                    <p>{{ [exp.city, exp.province].filter(Boolean).join(', ') || '-' }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-muted-foreground">Period</p>
+                                    <p>{{ formatDate(exp.start_date) }} - {{ exp.is_current ? 'Present' : formatDate(exp.end_date) }}</p>
+                                </div>
+                                <div v-if="exp.responsibilities" class="col-span-2">
+                                    <p class="text-xs text-muted-foreground">Responsibilities</p>
+                                    <p>{{ exp.responsibilities }}</p>
+                                </div>
+                            </div>
+                            <div v-if="exp.reason_for_leaving && !exp.is_current" class="text-sm">
+                                <p class="text-xs text-muted-foreground">Reason for Leaving</p>
+                                <p>{{ exp.reason_for_leaving }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
 
             <!-- Attendance Statistics -->
             <div class="space-y-4">

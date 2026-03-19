@@ -29,8 +29,10 @@ const form = useForm<EmployeeFormData>({
     email: '',
     phone_number: '',
     gender: null,
+    marital_status: null,
     date_of_birth: '',
     birth_place: '',
+    ethnicity: '',
     current_address: '',
     school_id: null,
     department_id: null,
@@ -47,6 +49,14 @@ const form = useForm<EmployeeFormData>({
     certificate_code: '',
     avatar_url: '',
     status: true,
+    // Family members
+    family_members: [],
+    // Academic levels
+    academic_levels: [],
+    // Foreign languages
+    foreign_languages: [],
+    // Job experiences
+    job_experiences: [],
     // Account fields
     create_account: false,
     password: '',
@@ -65,8 +75,10 @@ const getFormData = () => ({
     email: form.email || null,
     phone_number: form.phone_number || null,
     gender: form.gender,
+    marital_status: form.marital_status,
     date_of_birth: form.date_of_birth || null,
     birth_place: form.birth_place || null,
+    ethnicity: form.ethnicity || null,
     current_address: form.current_address || null,
     school_id: form.school_id,
     department_id: form.department_id,
@@ -83,6 +95,14 @@ const getFormData = () => ({
     certificate_code: form.certificate_code || null,
     avatar_url: form.avatar_url || null,
     status: form.status,
+    // Family members
+    family_members: form.family_members,
+    // Academic levels
+    academic_levels: form.academic_levels,
+    // Foreign languages
+    foreign_languages: form.foreign_languages,
+    // Job experiences
+    job_experiences: form.job_experiences,
     // Account fields
     create_account: form.create_account,
     password: form.password || null,
@@ -150,6 +170,11 @@ const handleSubmit = () => {
                     :schools="props.schools"
                     :departments="departments"
                     :employee-types="props.employeeTypes"
+                    :marital-statuses="props.maritalStatuses"
+                    :relationship-types="props.relationshipTypes"
+                    :academic-levels="props.academicLevels"
+                    :language-proficiencies="props.languageProficiencies"
+                    :employment-types="props.employmentTypes"
                     @school-change="handleSchoolChange"
                 />
 

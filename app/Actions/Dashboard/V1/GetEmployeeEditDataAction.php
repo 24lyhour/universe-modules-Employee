@@ -2,6 +2,11 @@
 
 namespace Modules\Employee\Actions\Dashboard\V1;
 
+use Modules\Employee\Enums\FamilyRelationshipEnum;
+use Modules\Employee\Enums\MaritalStatusEnum;
+use Modules\Employee\Enums\AcademicLevelEnum;
+use Modules\Employee\Enums\LanguageProficiencyEnum;
+use Modules\Employee\Enums\EmploymentTypeEnum;
 use Modules\Employee\Http\Resources\Dashboard\V1\EmployeeResource;
 use Modules\Employee\Models\Employee;
 use Modules\School\Models\Department;
@@ -11,6 +16,8 @@ class GetEmployeeEditDataAction
 {
     public function execute(Employee $employee): array
     {
+        // Load relationships
+        $employee->load(['familyMembers', 'academicLevels', 'foreignLanguages', 'jobExperiences']);
         try {
             $schools = School::where('status', true)
                 ->select('id', 'name')
@@ -43,6 +50,11 @@ class GetEmployeeEditDataAction
             'schools' => $schools,
             'departments' => $departments,
             'employeeTypes' => $employeeTypes,
+            'maritalStatuses' => MaritalStatusEnum::options(),
+            'relationshipTypes' => FamilyRelationshipEnum::options(),
+            'academicLevels' => AcademicLevelEnum::options(),
+            'languageProficiencies' => LanguageProficiencyEnum::options(),
+            'employmentTypes' => EmploymentTypeEnum::options(),
         ];
     }
 }

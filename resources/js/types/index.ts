@@ -2,6 +2,135 @@
 
 export type EmployeeType = 'full_time' | 'part_time' | 'contract' | 'intern';
 export type Gender = 'male' | 'female' | 'other';
+export type MaritalStatus = 'single' | 'married';
+export type FamilyRelationship = 'spouse' | 'child' | 'father' | 'mother' | 'sibling';
+export type AcademicLevel = 'high_school' | 'vocational' | 'associate' | 'bachelor' | 'master' | 'doctorate' | 'other';
+export type LanguageProficiency = 'beginner' | 'elementary' | 'intermediate' | 'upper_intermediate' | 'advanced' | 'native';
+export type EmploymentType = 'full_time' | 'part_time' | 'contract' | 'freelance' | 'internship';
+
+// Family Member Types
+export interface FamilyMember {
+    id?: number;
+    uuid?: string;
+    _key?: number; // For Vue v-for tracking
+    relationship: FamilyRelationship;
+    name: string;
+    gender: Gender | null;
+    date_of_birth: string;
+    age: number | null;
+    occupation: string;
+    phone_number: string;
+    email: string;
+    address: string;
+    notes: string;
+    is_emergency_contact: boolean;
+    is_dependent: boolean;
+}
+
+export interface FamilyMemberFormData {
+    _key: number;
+    id?: number;
+    relationship: FamilyRelationship;
+    name: string;
+    gender: Gender | null;
+    date_of_birth: string;
+    age: number | null;
+    occupation: string;
+    phone_number: string;
+    email: string;
+    address: string;
+    notes: string;
+    is_emergency_contact: boolean;
+    is_dependent: boolean;
+}
+
+// Academic Level Types
+export interface AcademicLevelData {
+    id?: number;
+    uuid?: string;
+    _key?: number;
+    level: AcademicLevel;
+    institution: string;
+    field_of_study: string;
+    degree: string;
+    start_date: string;
+    end_date: string;
+    gpa: number | null;
+    certificate: string;
+    notes: string;
+}
+
+export interface AcademicLevelFormData {
+    _key: number;
+    id?: number;
+    level: AcademicLevel | null;
+    institution: string;
+    field_of_study: string;
+    degree: string;
+    start_date: string;
+    end_date: string;
+    gpa: number | null;
+    certificate: string;
+    notes: string;
+}
+
+// Foreign Language Types
+export interface ForeignLanguageData {
+    id?: number;
+    uuid?: string;
+    _key?: number;
+    language: string;
+    proficiency: LanguageProficiency;
+    certificate: string;
+    certificate_score: string;
+    notes: string;
+}
+
+export interface ForeignLanguageFormData {
+    _key: number;
+    id?: number;
+    language: string;
+    proficiency: LanguageProficiency | null;
+    certificate: string;
+    certificate_score: string;
+    notes: string;
+}
+
+// Job Experience Types
+export interface JobExperienceData {
+    id?: number;
+    uuid?: string;
+    _key?: number;
+    company: string;
+    position: string;
+    employment_type: EmploymentType | null;
+    province: string;
+    city: string;
+    start_date: string;
+    end_date: string;
+    is_current: boolean;
+    responsibilities: string;
+    achievements: string;
+    reason_for_leaving: string;
+    notes: string;
+}
+
+export interface JobExperienceFormData {
+    _key: number;
+    id?: number;
+    company: string;
+    position: string;
+    employment_type: EmploymentType | null;
+    province: string;
+    city: string;
+    start_date: string;
+    end_date: string;
+    is_current: boolean;
+    responsibilities: string;
+    achievements: string;
+    reason_for_leaving: string;
+    notes: string;
+}
 
 export interface EmployeeUser {
     id: number;
@@ -22,8 +151,10 @@ export interface Employee {
     email: string | null;
     phone_number: string | null;
     gender: Gender | null;
+    marital_status: MaritalStatus | null;
     date_of_birth: string | null;
     birth_place: string | null;
+    ethnicity: string | null;
     current_address: string | null;
     school_id: number | null;
     department_id: number | null;
@@ -58,6 +189,14 @@ export interface Employee {
     attendance_absent: number | null;
     attendance_late: number | null;
     attendance_on_leave: number | null;
+    // Family members
+    family_members: FamilyMember[] | null;
+    // Academic levels
+    academic_levels: AcademicLevelData[] | null;
+    // Foreign languages
+    foreign_languages: ForeignLanguageData[] | null;
+    // Job experiences
+    job_experiences: JobExperienceData[] | null;
     created_at: string;
     updated_at: string;
 }
@@ -142,8 +281,10 @@ export interface EmployeeFormData {
     email: string;
     phone_number: string;
     gender: Gender | null;
+    marital_status: MaritalStatus | null;
     date_of_birth: string;
     birth_place: string;
+    ethnicity: string;
     current_address: string;
     school_id: number | null;
     department_id: number | null;
@@ -160,10 +301,43 @@ export interface EmployeeFormData {
     certificate_code: string;
     avatar_url: string;
     status: boolean;
+    // Family members
+    family_members: FamilyMemberFormData[];
+    // Academic levels
+    academic_levels: AcademicLevelFormData[];
+    // Foreign languages
+    foreign_languages: ForeignLanguageFormData[];
+    // Job experiences
+    job_experiences: JobExperienceFormData[];
     // Account creation fields
     create_account?: boolean;
     password?: string;
     password_confirmation?: string;
+}
+
+export interface MaritalStatusOption {
+    value: MaritalStatus;
+    label: string;
+}
+
+export interface FamilyRelationshipOption {
+    value: FamilyRelationship;
+    label: string;
+}
+
+export interface AcademicLevelOption {
+    value: AcademicLevel;
+    label: string;
+}
+
+export interface LanguageProficiencyOption {
+    value: LanguageProficiency;
+    label: string;
+}
+
+export interface EmploymentTypeOption {
+    value: EmploymentType;
+    label: string;
 }
 
 export interface SchoolOption {
@@ -198,6 +372,11 @@ export interface EmployeeCreateProps {
     schools: SchoolOption[];
     departments: DepartmentOption[];
     employeeTypes: EmployeeTypeOption[];
+    maritalStatuses: MaritalStatusOption[];
+    relationshipTypes: FamilyRelationshipOption[];
+    academicLevels: AcademicLevelOption[];
+    languageProficiencies: LanguageProficiencyOption[];
+    employmentTypes: EmploymentTypeOption[];
     generatedCode: string;
 }
 
@@ -206,6 +385,11 @@ export interface EmployeeEditProps {
     schools: SchoolOption[];
     departments: DepartmentOption[];
     employeeTypes: EmployeeTypeOption[];
+    maritalStatuses: MaritalStatusOption[];
+    relationshipTypes: FamilyRelationshipOption[];
+    academicLevels: AcademicLevelOption[];
+    languageProficiencies: LanguageProficiencyOption[];
+    employmentTypes: EmploymentTypeOption[];
 }
 
 export interface EmployeeDeleteProps {

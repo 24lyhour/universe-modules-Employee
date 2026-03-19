@@ -15,6 +15,12 @@ use Modules\School\Models\School;
 use Modules\School\Models\Department;
 use Modules\School\Models\Course;
 use Modules\Employee\Models\EmployeeType;
+use Modules\Employee\Models\EmployeeFamilyMember;
+use Modules\Employee\Models\EmployeeAcademicLevel;
+use Modules\Employee\Models\EmployeeForeignLanguage;
+use Modules\Employee\Models\EmployeeJobExperience;
+use Modules\Employee\Enums\MaritalStatusEnum;
+use Modules\Employee\Enums\FamilyRelationshipEnum;
 
 class Employee extends Model
 {
@@ -40,8 +46,10 @@ class Employee extends Model
         'email',
         'phone_number',
         'gender',
+        'marital_status',
         'date_of_birth',
         'birth_place',
+        'ethnicity',
         'current_address',
         'school_id',
         'department_id',
@@ -73,6 +81,7 @@ class Employee extends Model
         'probation_end_date' => 'date',
         'salary' => 'decimal:2',
         'status' => 'boolean',
+        'marital_status' => MaritalStatusEnum::class,
     ];
 
     /**
@@ -144,6 +153,78 @@ class Employee extends Model
     public function attendances(): HasMany
     {
         return $this->hasMany(Attendance::class);
+    }
+
+    /**
+     * Get the family members of the employee.
+     */
+    public function familyMembers(): HasMany
+    {
+        return $this->hasMany(EmployeeFamilyMember::class);
+    }
+
+    /**
+     * Get the spouse of the employee.
+     */
+    public function spouse(): HasMany
+    {
+        return $this->familyMembers()->where('relationship', FamilyRelationshipEnum::SPOUSE);
+    }
+
+    /**
+     * Get the children of the employee.
+     */
+    public function children(): HasMany
+    {
+        return $this->familyMembers()->where('relationship', FamilyRelationshipEnum::CHILD);
+    }
+
+    /**
+     * Get the father of the employee.
+     */
+    public function father(): HasMany
+    {
+        return $this->familyMembers()->where('relationship', FamilyRelationshipEnum::FATHER);
+    }
+
+    /**
+     * Get the mother of the employee.
+     */
+    public function mother(): HasMany
+    {
+        return $this->familyMembers()->where('relationship', FamilyRelationshipEnum::MOTHER);
+    }
+
+    /**
+     * Get the siblings of the employee.
+     */
+    public function siblings(): HasMany
+    {
+        return $this->familyMembers()->where('relationship', FamilyRelationshipEnum::SIBLING);
+    }
+
+    /**
+     * Get the academic levels of the employee.
+     */
+    public function academicLevels(): HasMany
+    {
+        return $this->hasMany(EmployeeAcademicLevel::class);
+    }
+
+    /**
+     * Get the foreign languages of the employee.
+     */
+    public function foreignLanguages(): HasMany
+    {
+        return $this->hasMany(EmployeeForeignLanguage::class);
+    }
+
+    /**
+     * Get the job experiences of the employee.
+     */
+    public function jobExperiences(): HasMany
+    {
+        return $this->hasMany(EmployeeJobExperience::class);
     }
 
     /**

@@ -381,7 +381,7 @@ const handleStatusToggle = (employee: Employee, newStatus: boolean) => {
                     <template #cell-employee="{ item }">
                         <div class="flex items-center gap-3">
                             <Avatar class="h-9 w-9">
-                                <AvatarImage :src="item.avatar_url || ''" :alt="item.full_name" />
+                                <AvatarImage :src="item.avatar_url || ''" :alt="item.full_name" class="object-cover" />
                                 <AvatarFallback>{{ getInitials(item.full_name) }}</AvatarFallback>
                             </Avatar>
                             <div>

@@ -23,6 +23,66 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 const departments = ref<DepartmentOption[]>(props.departments || []);
 
+// Initialize family members with _key for Vue tracking
+const initializeFamilyMembers = () => {
+    if (!props.employee.family_members) return [];
+    return props.employee.family_members.map((member, index) => ({
+        ...member,
+        _key: index + 1,
+        date_of_birth: member.date_of_birth || '',
+        occupation: member.occupation || '',
+        phone_number: member.phone_number || '',
+        email: member.email || '',
+        address: member.address || '',
+        notes: member.notes || '',
+    }));
+};
+
+// Initialize academic levels with _key for Vue tracking
+const initializeAcademicLevels = () => {
+    if (!props.employee.academic_levels) return [];
+    return props.employee.academic_levels.map((level, index) => ({
+        ...level,
+        _key: index + 1,
+        field_of_study: level.field_of_study || '',
+        degree: level.degree || '',
+        start_date: level.start_date || '',
+        end_date: level.end_date || '',
+        certificate: level.certificate || '',
+        notes: level.notes || '',
+    }));
+};
+
+// Initialize foreign languages with _key for Vue tracking
+const initializeForeignLanguages = () => {
+    if (!props.employee.foreign_languages) return [];
+    return props.employee.foreign_languages.map((lang, index) => ({
+        ...lang,
+        _key: index + 1,
+        certificate: lang.certificate || '',
+        certificate_score: lang.certificate_score || '',
+        notes: lang.notes || '',
+    }));
+};
+
+// Initialize job experiences with _key for Vue tracking
+const initializeJobExperiences = () => {
+    if (!props.employee.job_experiences) return [];
+    return props.employee.job_experiences.map((exp, index) => ({
+        ...exp,
+        _key: index + 1,
+        position: exp.position || '',
+        province: exp.province || '',
+        city: exp.city || '',
+        start_date: exp.start_date || '',
+        end_date: exp.end_date || '',
+        responsibilities: exp.responsibilities || '',
+        achievements: exp.achievements || '',
+        reason_for_leaving: exp.reason_for_leaving || '',
+        notes: exp.notes || '',
+    }));
+};
+
 const form = useForm<EmployeeFormData>({
     employee_code: props.employee.employee_code,
     first_name: props.employee.first_name,
@@ -30,8 +90,10 @@ const form = useForm<EmployeeFormData>({
     email: props.employee.email || '',
     phone_number: props.employee.phone_number || '',
     gender: props.employee.gender,
+    marital_status: props.employee.marital_status,
     date_of_birth: props.employee.date_of_birth || '',
     birth_place: props.employee.birth_place || '',
+    ethnicity: props.employee.ethnicity || '',
     current_address: props.employee.current_address || '',
     school_id: props.employee.school_id,
     department_id: props.employee.department_id,
@@ -48,6 +110,10 @@ const form = useForm<EmployeeFormData>({
     certificate_code: props.employee.certificate_code || '',
     avatar_url: props.employee.avatar_url || '',
     status: props.employee.status,
+    family_members: initializeFamilyMembers(),
+    academic_levels: initializeAcademicLevels(),
+    foreign_languages: initializeForeignLanguages(),
+    job_experiences: initializeJobExperiences(),
 });
 
 const { validateForm, validateAndSubmit, createIsFormInvalid } = useFormValidation(
@@ -62,8 +128,10 @@ const getFormData = () => ({
     email: form.email || null,
     phone_number: form.phone_number || null,
     gender: form.gender,
+    marital_status: form.marital_status,
     date_of_birth: form.date_of_birth || null,
     birth_place: form.birth_place || null,
+    ethnicity: form.ethnicity || null,
     current_address: form.current_address || null,
     school_id: form.school_id,
     department_id: form.department_id,
@@ -79,6 +147,10 @@ const getFormData = () => ({
     certificate_code: form.certificate_code || null,
     avatar_url: form.avatar_url || null,
     status: form.status,
+    family_members: form.family_members,
+    academic_levels: form.academic_levels,
+    foreign_languages: form.foreign_languages,
+    job_experiences: form.job_experiences,
 });
 
 watch([() => form.first_name, () => form.last_name], () => validateForm(getFormData()));
@@ -137,6 +209,11 @@ const handleSubmit = () => {
                     :schools="props.schools"
                     :departments="departments"
                     :employee-types="props.employeeTypes"
+                    :marital-statuses="props.maritalStatuses"
+                    :relationship-types="props.relationshipTypes"
+                    :academic-levels="props.academicLevels"
+                    :language-proficiencies="props.languageProficiencies"
+                    :employment-types="props.employmentTypes"
                     @school-change="handleSchoolChange"
                 />
 

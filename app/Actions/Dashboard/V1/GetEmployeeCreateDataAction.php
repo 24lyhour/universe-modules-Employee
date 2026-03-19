@@ -2,6 +2,11 @@
 
 namespace Modules\Employee\Actions\Dashboard\V1;
 
+use Modules\Employee\Enums\FamilyRelationshipEnum;
+use Modules\Employee\Enums\MaritalStatusEnum;
+use Modules\Employee\Enums\AcademicLevelEnum;
+use Modules\Employee\Enums\LanguageProficiencyEnum;
+use Modules\Employee\Enums\EmploymentTypeEnum;
 use Modules\Employee\Models\Employee;
 use Modules\School\Models\Department;
 use Modules\School\Models\School;
@@ -42,6 +47,11 @@ class GetEmployeeCreateDataAction
             'schools' => $schools,
             'departments' => $departments,
             'employeeTypes' => $employeeTypes,
+            'maritalStatuses' => MaritalStatusEnum::options(),
+            'relationshipTypes' => FamilyRelationshipEnum::options(),
+            'academicLevels' => AcademicLevelEnum::options(),
+            'languageProficiencies' => LanguageProficiencyEnum::options(),
+            'employmentTypes' => EmploymentTypeEnum::options(),
         ];
     }
 }
