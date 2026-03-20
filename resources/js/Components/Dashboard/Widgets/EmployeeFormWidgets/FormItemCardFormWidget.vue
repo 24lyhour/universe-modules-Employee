@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useTranslation } from '@/composables/useTranslation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Trash2 } from 'lucide-vue-next';
@@ -13,6 +14,8 @@ defineProps<Props>();
 const emit = defineEmits<{
     remove: [];
 }>();
+
+const { __ } = useTranslation();
 </script>
 
 <template>
@@ -31,7 +34,7 @@ const emit = defineEmits<{
                 @click="emit('remove')"
             >
                 <Trash2 class="h-3.5 w-3.5" />
-                <span class="text-xs">Remove</span>
+                <span class="text-xs">{{ __('Remove') }}</span>
             </Button>
         </div>
         <slot />

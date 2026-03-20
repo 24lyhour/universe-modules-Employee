@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useTranslation } from '@/composables/useTranslation';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import TiptapEditor from '@/components/TiptapEditor.vue';
@@ -28,6 +29,8 @@ const props = withDefaults(defineProps<Props>(), {
         { value: 'married', label: 'Married' },
     ],
 });
+
+const { __ } = useTranslation();
 
 const genderOptions = [
     { value: 'male', label: 'Male' },
@@ -60,21 +63,21 @@ const selectedMaritalStatus = computed({
         <CardHeader class="pb-4">
             <CardTitle class="flex items-center gap-2 text-base">
                 <User class="h-4 w-4 text-primary" />
-                Basic Information
+                {{ __('Basic Information') }}
             </CardTitle>
-            <CardDescription>Personal details and contact information</CardDescription>
+            <CardDescription>{{ __('Personal details and contact information') }}</CardDescription>
         </CardHeader>
         <CardContent class="space-y-6">
             <!-- Identity Section -->
             <div class="space-y-4">
                 <div class="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                     <User class="h-4 w-4" />
-                    <span>Identity</span>
+                    <span>{{ __('Identity') }}</span>
                 </div>
                 <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 rounded-lg border bg-muted/30 p-4">
                     <!-- Employee Code -->
                     <div class="space-y-2">
-                        <Label for="employee_code" class="text-xs font-medium">Employee Code <span class="text-destructive">*</span></Label>
+                        <Label for="employee_code" class="text-xs font-medium">{{ __('Employee Code') }} <span class="text-destructive">*</span></Label>
                         <Input
                             id="employee_code"
                             v-model="form.employee_code"
@@ -90,7 +93,7 @@ const selectedMaritalStatus = computed({
 
                     <!-- First Name -->
                     <div class="space-y-2">
-                        <Label for="first_name" class="text-xs font-medium">First Name <span class="text-destructive">*</span></Label>
+                        <Label for="first_name" class="text-xs font-medium">{{ __('First Name') }} <span class="text-destructive">*</span></Label>
                         <Input id="first_name" v-model="form.first_name" type="text" placeholder="John" class="bg-background" />
                         <p v-if="form.errors.first_name" class="text-xs text-destructive">
                             {{ form.errors.first_name }}
@@ -99,7 +102,7 @@ const selectedMaritalStatus = computed({
 
                     <!-- Last Name -->
                     <div class="space-y-2">
-                        <Label for="last_name" class="text-xs font-medium">Last Name <span class="text-destructive">*</span></Label>
+                        <Label for="last_name" class="text-xs font-medium">{{ __('Last Name') }} <span class="text-destructive">*</span></Label>
                         <Input id="last_name" v-model="form.last_name" type="text" placeholder="Doe" class="bg-background" />
                         <p v-if="form.errors.last_name" class="text-xs text-destructive">
                             {{ form.errors.last_name }}
@@ -112,12 +115,12 @@ const selectedMaritalStatus = computed({
             <div class="space-y-4">
                 <div class="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                     <Mail class="h-4 w-4" />
-                    <span>Contact</span>
+                    <span>{{ __('Contact') }}</span>
                 </div>
                 <div class="grid gap-4 sm:grid-cols-2 rounded-lg border bg-muted/30 p-4">
                     <!-- Email -->
                     <div class="space-y-2">
-                        <Label for="email" class="text-xs font-medium">Email</Label>
+                        <Label for="email" class="text-xs font-medium">{{ __('Email') }}</Label>
                         <div class="relative">
                             <Mail class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input id="email" v-model="form.email" type="email" placeholder="john.doe@example.com" class="pl-10 bg-background" />
@@ -129,7 +132,7 @@ const selectedMaritalStatus = computed({
 
                     <!-- Phone Number -->
                     <div class="space-y-2">
-                        <Label for="phone_number" class="text-xs font-medium">Phone Number</Label>
+                        <Label for="phone_number" class="text-xs font-medium">{{ __('Phone Number') }}</Label>
                         <div class="relative">
                             <Phone class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input id="phone_number" v-model="form.phone_number" type="text" placeholder="+1 234 567 8900" class="pl-10 bg-background" />
@@ -145,19 +148,19 @@ const selectedMaritalStatus = computed({
             <div class="space-y-4">
                 <div class="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                     <Heart class="h-4 w-4" />
-                    <span>Personal Details</span>
+                    <span>{{ __('Personal Details') }}</span>
                 </div>
                 <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 rounded-lg border bg-muted/30 p-4">
                     <!-- Gender -->
                     <div class="space-y-2">
-                        <Label for="gender" class="text-xs font-medium">Gender</Label>
+                        <Label for="gender" class="text-xs font-medium">{{ __('Gender') }}</Label>
                         <Select v-model="selectedGender">
                             <SelectTrigger id="gender" class="bg-background">
-                                <SelectValue placeholder="Select gender" />
+                                <SelectValue :placeholder="__('Select gender')" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem v-for="opt in genderOptions" :key="opt.value" :value="opt.value">
-                                    {{ opt.label }}
+                                    {{ __(opt.label) }}
                                 </SelectItem>
                             </SelectContent>
                         </Select>
@@ -168,7 +171,7 @@ const selectedMaritalStatus = computed({
 
                     <!-- Date of Birth -->
                     <div class="space-y-2">
-                        <Label for="date_of_birth" class="text-xs font-medium">Date of Birth</Label>
+                        <Label for="date_of_birth" class="text-xs font-medium">{{ __('Date of Birth') }}</Label>
                         <div class="relative">
                             <Calendar class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                             <Input id="date_of_birth" v-model="form.date_of_birth" type="date" class="pl-10 bg-background" />
@@ -180,7 +183,7 @@ const selectedMaritalStatus = computed({
 
                     <!-- Birth Place -->
                     <div class="space-y-2">
-                        <Label for="birth_place" class="text-xs font-medium">Birth Place</Label>
+                        <Label for="birth_place" class="text-xs font-medium">{{ __('Birth Place') }}</Label>
                         <Input id="birth_place" v-model="form.birth_place" type="text" placeholder="City, Country" class="bg-background" />
                         <p v-if="form.errors.birth_place" class="text-xs text-destructive">
                             {{ form.errors.birth_place }}
@@ -189,14 +192,14 @@ const selectedMaritalStatus = computed({
 
                     <!-- Marital Status -->
                     <div class="space-y-2">
-                        <Label for="marital_status" class="text-xs font-medium">Marital Status</Label>
+                        <Label for="marital_status" class="text-xs font-medium">{{ __('Marital Status') }}</Label>
                         <Select v-model="selectedMaritalStatus">
                             <SelectTrigger id="marital_status" class="bg-background">
-                                <SelectValue placeholder="Select status" />
+                                <SelectValue :placeholder="__('Select status')" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem v-for="opt in maritalStatuses" :key="opt.value" :value="opt.value">
-                                    {{ opt.label }}
+                                    {{ __(opt.label) }}
                                 </SelectItem>
                             </SelectContent>
                         </Select>
@@ -207,8 +210,8 @@ const selectedMaritalStatus = computed({
 
                     <!-- Ethnicity -->
                     <div class="space-y-2">
-                        <Label for="ethnicity" class="text-xs font-medium">Ethnicity</Label>
-                        <Input id="ethnicity" v-model="form.ethnicity" type="text" placeholder="Ethnicity" class="bg-background" />
+                        <Label for="ethnicity" class="text-xs font-medium">{{ __('Ethnicity') }}</Label>
+                        <Input id="ethnicity" v-model="form.ethnicity" type="text" :placeholder="__('Ethnicity')" class="bg-background" />
                         <p v-if="form.errors.ethnicity" class="text-xs text-destructive">
                             {{ form.errors.ethnicity }}
                         </p>
@@ -220,11 +223,11 @@ const selectedMaritalStatus = computed({
             <div class="space-y-4">
                 <div class="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                     <MapPin class="h-4 w-4" />
-                    <span>Address</span>
+                    <span>{{ __('Address') }}</span>
                 </div>
                 <div class="rounded-lg border bg-muted/30 p-4">
                     <div class="space-y-2">
-                        <Label for="current_address" class="text-xs font-medium">Current Address</Label>
+                        <Label for="current_address" class="text-xs font-medium">{{ __('Current Address') }}</Label>
                         <TiptapEditor
                             v-model="form.current_address"
                             placeholder="Street address, City, State, ZIP Code..."

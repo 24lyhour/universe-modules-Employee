@@ -19,13 +19,16 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Users, CheckCircle, XCircle, Search, Eye, Pencil, Trash2, Clock, CalendarDays, Download, Upload, Database, FileSpreadsheet, Key, UserPlus } from 'lucide-vue-next';
 import type { BreadcrumbItem } from '@/types';
 import type { EmployeeIndexProps, Employee } from '@employee/types';
+import { useTranslation } from '@/composables/useTranslation';
+
+const { __ } = useTranslation();
 
 const props = defineProps<EmployeeIndexProps>();
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Dashboard', href: '/dashboard' },
-    { title: 'Employees', href: '/dashboard/employees' },
-];
+const breadcrumbs = computed<BreadcrumbItem[]>(() => [
+    { title: __('Dashboard'), href: '/dashboard' },
+    { title: __('Employees'), href: '/dashboard/employees' },
+]);
 
 const search = ref(props.filters.search || '');
 const statusFilter = ref(props.filters.status || 'all');
@@ -55,76 +58,76 @@ const getInitials = (name: string) => {
         .slice(0, 2);
 };
 
-const columns: TableColumn<Employee>[] = [
+const columns = computed<TableColumn<Employee>[]>(() => [
     {
         key: 'employee',
-        label: 'Employee',
+        label: __('Employee'),
         render: (employee) => employee.full_name,
     },
     {
         key: 'employee_code',
-        label: 'Code',
+        label: __('Code'),
         render: (employee) => employee.employee_code,
     },
     {
         key: 'email',
-        label: 'Email',
+        label: __('Email'),
         render: (employee) => employee.email || '-',
     },
     {
         key: 'phone_number',
-        label: 'Phone',
+        label: __('Phone'),
         render: (employee) => employee.phone_number || '-',
     },
     {
         key: 'employee_type_label',
-        label: 'Type',
+        label: __('Type'),
         render: (employee) => employee.employee_type_label || '-',
     },
     {
         key: 'department_name',
-        label: 'Department',
+        label: __('Department'),
         render: (employee) => employee.department_name || '-',
     },
     {
         key: 'status',
-        label: 'Status',
-        render: (employee) => employee.status ? 'Active' : 'Inactive',
+        label: __('Status'),
+        render: (employee) => employee.status ? __('Active') : __('Inactive'),
     },
-];
+]);
 
-const actions: TableAction<Employee>[] = [
+const actions = computed<TableAction<Employee>[]>(() => [
     {
-        label: 'View',
+        label: __('View'),
         icon: Eye,
         onClick: (employee) => router.visit(`/dashboard/employees/${employee.uuid}`),
     },
     {
-        label: 'Edit',
+        label: __('Edit'),
         icon: Pencil,
         onClick: (employee) => router.visit(`/dashboard/employees/${employee.uuid}/edit`),
     },
     {
-        label: 'Change Password',
+        label: __('Change Password'),
         icon: Key,
         onClick: (employee) => router.visit(`/dashboard/employees/${employee.uuid}/change-password`),
         show: (employee) => employee.has_account,
         separator: true,
     },
     {
-        label: 'Create Account',
+        label: __('Create Account'),
         icon: UserPlus,
         onClick: (employee) => router.visit(`/dashboard/employees/${employee.uuid}/create-account`),
         show: (employee) => !employee.has_account && (!!employee.email || !!employee.phone_number),
         separator: true,
     },
     {
-        label: 'Delete',
+        label: __('Delete'),
         icon: Trash2,
         onClick: (employee) => router.visit(`/dashboard/employees/${employee.uuid}/delete`),
         variant: 'destructive',
     },
-];
+]);
 
 const pagination = computed<PaginationData>(() => ({
     current_page: props.employees.meta.current_page,
@@ -210,18 +213,18 @@ const handleStatusToggle = (employee: Employee, newStatus: boolean) => {
             <!-- Employee Stats -->
             <div class="grid gap-4 md:grid-cols-3">
                 <StatsCard
-                    title="Total Employees"
+                    :title="__('Total Employees')"
                     :value="props.stats.total"
                     :icon="Users"
                 />
                 <StatsCard
-                    title="Active"
+                    :title="__('Active')"
                     :value="props.stats.active"
                     :icon="CheckCircle"
                     variant="success"
                 />
                 <StatsCard
-                    title="Inactive"
+                    :title="__('Inactive')"
                     :value="props.stats.inactive"
                     :icon="XCircle"
                     variant="warning"
@@ -231,25 +234,25 @@ const handleStatusToggle = (employee: Employee, newStatus: boolean) => {
             <!-- Attendance Stats -->
             <div class="grid gap-4 md:grid-cols-4">
                 <StatsCard
-                    title="Present"
+                    :title="__('Present')"
                     :value="props.attendanceStats.present"
                     :icon="CheckCircle"
                     variant="success"
                 />
                 <StatsCard
-                    title="Absent"
+                    :title="__('Absent')"
                     :value="props.attendanceStats.absent"
                     :icon="XCircle"
                     variant="destructive"
                 />
                 <StatsCard
-                    title="Late"
+                    :title="__('Late')"
                     :value="props.attendanceStats.late"
                     :icon="Clock"
                     variant="warning"
                 />
                 <StatsCard
-                    title="On Leave"
+                    :title="__('On Leave')"
                     :value="props.attendanceStats.on_leave"
                     :icon="CalendarDays"
                 />
@@ -259,37 +262,37 @@ const handleStatusToggle = (employee: Employee, newStatus: boolean) => {
             <div class="flex flex-col gap-4">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h2 class="text-lg font-semibold">Employees</h2>
-                        <p class="text-sm text-muted-foreground">Manage your employees</p>
+                        <h2 class="text-lg font-semibold">{{ __('Employees') }}</h2>
+                        <p class="text-sm text-muted-foreground">{{ __('Manage your employees') }}</p>
                     </div>
                     <div class="flex items-center gap-2">
                         <ButtonGroup>
                             <Button variant="default">
                                 <Database class="mr-2 h-4 w-4" />
-                                All
+                                {{ __('All') }}
                             </Button>
                             <Button variant="outline" @click="handleTrash">
                                 <Trash2 class="mr-2 h-4 w-4" />
-                                Trash
+                                {{ __('Trash') }}
                             </Button>
                         </ButtonGroup>
                         <ButtonGroup>
                             <Button variant="outline" @click="handleExport">
                                 <Download class="mr-2 h-4 w-4" />
-                                Export
+                                {{ __('Export') }}
                             </Button>
                             <Button variant="outline" @click="handleImport">
                                 <Upload class="mr-2 h-4 w-4" />
-                                Import
+                                {{ __('Import') }}
                             </Button>
                             <Button variant="outline" @click="handleDownloadTemplate">
                                 <FileSpreadsheet class="mr-2 h-4 w-4" />
-                                Template
+                                {{ __('Template') }}
                             </Button>
                         </ButtonGroup>
                         <Button @click="handleCreate">
                             <Plus class="mr-2 h-4 w-4" />
-                            Add Employee
+                            {{ __('Add Employee') }}
                         </Button>
                     </div>
                 </div>
@@ -300,39 +303,39 @@ const handleStatusToggle = (employee: Employee, newStatus: boolean) => {
                         <Search class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
                             v-model="search"
-                            placeholder="Search employees..."
+                            :placeholder="__('Search employees...')"
                             class="pl-9"
                             @keyup.enter="handleSearch"
                         />
                     </div>
                     <Select v-model="statusFilter">
                         <SelectTrigger class="w-[150px]">
-                            <SelectValue placeholder="Status" />
+                            <SelectValue :placeholder="__('Status')" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">All Status</SelectItem>
-                            <SelectItem value="1">Active</SelectItem>
-                            <SelectItem value="0">Inactive</SelectItem>
+                            <SelectItem value="all">{{ __('All Status') }}</SelectItem>
+                            <SelectItem value="1">{{ __('Active') }}</SelectItem>
+                            <SelectItem value="0">{{ __('Inactive') }}</SelectItem>
                         </SelectContent>
                     </Select>
                     <Select v-model="employeeTypeFilter">
                         <SelectTrigger class="w-[150px]">
-                            <SelectValue placeholder="Type" />
+                            <SelectValue :placeholder="__('Type')" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">All Types</SelectItem>
-                            <SelectItem value="full_time">Full Time</SelectItem>
-                            <SelectItem value="part_time">Part Time</SelectItem>
-                            <SelectItem value="contract">Contract</SelectItem>
-                            <SelectItem value="intern">Intern</SelectItem>
+                            <SelectItem value="all">{{ __('All Types') }}</SelectItem>
+                            <SelectItem value="full_time">{{ __('Full Time') }}</SelectItem>
+                            <SelectItem value="part_time">{{ __('Part Time') }}</SelectItem>
+                            <SelectItem value="contract">{{ __('Contract') }}</SelectItem>
+                            <SelectItem value="intern">{{ __('Intern') }}</SelectItem>
                         </SelectContent>
                     </Select>
                     <Select v-model="schoolFilter">
                         <SelectTrigger class="w-[180px]">
-                            <SelectValue placeholder="School" />
+                            <SelectValue :placeholder="__('School')" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">All Schools</SelectItem>
+                            <SelectItem value="all">{{ __('All Schools') }}</SelectItem>
                             <SelectItem
                                 v-for="school in props.schools"
                                 :key="school.id"
@@ -375,7 +378,7 @@ const handleStatusToggle = (employee: Employee, newStatus: boolean) => {
                     <template #bulk-actions>
                         <Button variant="destructive" size="sm" @click="openBulkDeleteDialog">
                             <Trash2 class="mr-2 h-4 w-4" />
-                            Delete Selected
+                            {{ __('Delete Selected') }}
                         </Button>
                     </template>
                     <template #cell-employee="{ item }">

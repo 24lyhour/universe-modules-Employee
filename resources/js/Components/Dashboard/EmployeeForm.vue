@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { useTranslation } from '@/composables/useTranslation';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -74,6 +75,8 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
     schoolChange: [schoolId: number | null];
 }>();
+
+const { __ } = useTranslation();
 
 const genderOptions = [
     { value: 'male', label: 'Male' },
@@ -212,9 +215,9 @@ const getEmploymentType = (item: JobExperienceFormData) => computed({
                         <div class="flex items-center justify-between">
                             <div class="space-y-1">
                                 <CardTitle class="flex items-center gap-2 text-base">
-                                    <Users class="h-4 w-4 text-primary" /> Family Information
+                                    <Users class="h-4 w-4 text-primary" /> {{ __('Family Information') }}
                                 </CardTitle>
-                                <CardDescription>Parents, siblings, spouse, and children details</CardDescription>
+                                <CardDescription>{{ __('Parents, siblings, spouse, and children details') }}</CardDescription>
                             </div>
                             <CollapsibleTrigger as-child>
                                 <Button variant="ghost" size="icon" class="h-8 w-8">
@@ -225,20 +228,20 @@ const getEmploymentType = (item: JobExperienceFormData) => computed({
                     </CardHeader>
                     <CollapsibleContent>
                         <CardContent class="space-y-6 pt-0">
-                            <FamilySubSection title="Father" add-label="Add Father" :show-add-button="canAddMore('father')" empty-message="No father information added." :is-empty="getFamilyMembersByRelationship('father').length === 0" @add="addFamilyMember('father')">
-                                <FamilyMemberCard v-for="m in getFamilyMembersByRelationship('father')" :key="m._key" :member="m" title="Father Details" :gender-options="genderOptions" @remove="removeFamilyMember(getMemberIndex(m))" />
+                            <FamilySubSection :title="__('Father')" :add-label="__('Add Father')" :show-add-button="canAddMore('father')" :empty-message="__('No father information added.')" :is-empty="getFamilyMembersByRelationship('father').length === 0" @add="addFamilyMember('father')">
+                                <FamilyMemberCard v-for="m in getFamilyMembersByRelationship('father')" :key="m._key" :member="m" :title="__('Father Details')" :gender-options="genderOptions" @remove="removeFamilyMember(getMemberIndex(m))" />
                             </FamilySubSection>
-                            <FamilySubSection title="Mother" add-label="Add Mother" :show-add-button="canAddMore('mother')" empty-message="No mother information added." :is-empty="getFamilyMembersByRelationship('mother').length === 0" @add="addFamilyMember('mother')">
-                                <FamilyMemberCard v-for="m in getFamilyMembersByRelationship('mother')" :key="m._key" :member="m" title="Mother Details" :gender-options="genderOptions" @remove="removeFamilyMember(getMemberIndex(m))" />
+                            <FamilySubSection :title="__('Mother')" :add-label="__('Add Mother')" :show-add-button="canAddMore('mother')" :empty-message="__('No mother information added.')" :is-empty="getFamilyMembersByRelationship('mother').length === 0" @add="addFamilyMember('mother')">
+                                <FamilyMemberCard v-for="m in getFamilyMembersByRelationship('mother')" :key="m._key" :member="m" :title="__('Mother Details')" :gender-options="genderOptions" @remove="removeFamilyMember(getMemberIndex(m))" />
                             </FamilySubSection>
-                            <FamilySubSection title="Siblings" add-label="Add Sibling" empty-message="No siblings added yet." :is-empty="getFamilyMembersByRelationship('sibling').length === 0" @add="addFamilyMember('sibling')">
-                                <FamilyMemberCard v-for="(m, i) in getFamilyMembersByRelationship('sibling')" :key="m._key" :member="m" title="Sibling" :index="i" show-gender :gender-options="genderOptions" @remove="removeFamilyMember(getMemberIndex(m))" />
+                            <FamilySubSection :title="__('Siblings')" :add-label="__('Add Sibling')" :empty-message="__('No siblings added yet.')" :is-empty="getFamilyMembersByRelationship('sibling').length === 0" @add="addFamilyMember('sibling')">
+                                <FamilyMemberCard v-for="(m, i) in getFamilyMembersByRelationship('sibling')" :key="m._key" :member="m" :title="__('Sibling')" :index="i" show-gender :gender-options="genderOptions" @remove="removeFamilyMember(getMemberIndex(m))" />
                             </FamilySubSection>
-                            <FamilySubSection v-if="isMarried" title="Spouse" add-label="Add Spouse" :show-add-button="canAddMore('spouse')" empty-message="" :is-empty="false" has-border-top @add="addFamilyMember('spouse')">
-                                <FamilyMemberCard v-for="m in getFamilyMembersByRelationship('spouse')" :key="m._key" :member="m" title="Spouse Details" show-gender show-email show-dependent :gender-options="genderOptions" @remove="removeFamilyMember(getMemberIndex(m))" />
+                            <FamilySubSection v-if="isMarried" :title="__('Spouse')" :add-label="__('Add Spouse')" :show-add-button="canAddMore('spouse')" empty-message="" :is-empty="false" has-border-top @add="addFamilyMember('spouse')">
+                                <FamilyMemberCard v-for="m in getFamilyMembersByRelationship('spouse')" :key="m._key" :member="m" :title="__('Spouse Details')" show-gender show-email show-dependent :gender-options="genderOptions" @remove="removeFamilyMember(getMemberIndex(m))" />
                             </FamilySubSection>
-                            <FamilySubSection v-if="isMarried" title="Children" add-label="Add Child" empty-message="No children added yet." :is-empty="getFamilyMembersByRelationship('child').length === 0" @add="addFamilyMember('child')">
-                                <FamilyMemberCard v-for="(m, i) in getFamilyMembersByRelationship('child')" :key="m._key" :member="m" title="Child" :index="i" show-gender show-dependent :gender-options="genderOptions" @remove="removeFamilyMember(getMemberIndex(m))" />
+                            <FamilySubSection v-if="isMarried" :title="__('Children')" :add-label="__('Add Child')" :empty-message="__('No children added yet.')" :is-empty="getFamilyMembersByRelationship('child').length === 0" @add="addFamilyMember('child')">
+                                <FamilyMemberCard v-for="(m, i) in getFamilyMembersByRelationship('child')" :key="m._key" :member="m" :title="__('Child')" :index="i" show-gender show-dependent :gender-options="genderOptions" @remove="removeFamilyMember(getMemberIndex(m))" />
                             </FamilySubSection>
                         </CardContent>
                     </CollapsibleContent>
@@ -252,9 +255,9 @@ const getEmploymentType = (item: JobExperienceFormData) => computed({
                 <CardHeader class="pb-4">
                     <CardTitle class="flex items-center gap-2 text-base">
                         <FolderOpen class="h-4 w-4 text-primary" />
-                        Background & Experience
+                        {{ __('Background & Experience') }}
                     </CardTitle>
-                    <CardDescription>Education, languages, and work history</CardDescription>
+                    <CardDescription>{{ __('Education, languages, and work history') }}</CardDescription>
                 </CardHeader>
                 <CardContent class="space-y-6">
                     <!-- Academic Levels Section -->
@@ -262,25 +265,25 @@ const getEmploymentType = (item: JobExperienceFormData) => computed({
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                                 <GraduationCap class="h-4 w-4" />
-                                <span>Education</span>
+                                <span>{{ __('Education') }}</span>
                             </div>
                             <Button type="button" variant="outline" size="sm" class="gap-1.5" @click="addAcademicLevel">
-                                <Plus class="h-3.5 w-3.5" /><span>Add</span>
+                                <Plus class="h-3.5 w-3.5" /><span>{{ __('Add') }}</span>
                             </Button>
                         </div>
                         <div class="space-y-3">
-                            <FormItemCard v-for="(item, idx) in form.academic_levels" :key="item._key" title="Education" :index="idx" @remove="removeAcademicLevel(idx)">
+                            <FormItemCard v-for="(item, idx) in form.academic_levels" :key="item._key" :title="__('Education')" :index="idx" @remove="removeAcademicLevel(idx)">
                                 <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                                    <div class="space-y-2"><Label class="text-xs font-medium">Level</Label><Select v-model="getAcademicLevelValue(item).value"><SelectTrigger class="bg-background"><SelectValue placeholder="Select level" /></SelectTrigger><SelectContent><SelectItem v-for="o in academicLevels" :key="o.value" :value="o.value">{{ o.label }}</SelectItem></SelectContent></Select></div>
-                                    <div class="space-y-2"><Label class="text-xs font-medium">Institution <span class="text-destructive">*</span></Label><Input v-model="item.institution" placeholder="University / School name" class="bg-background" /></div>
-                                    <div class="space-y-2"><Label class="text-xs font-medium">Field of Study</Label><Input v-model="item.field_of_study" placeholder="Computer Science" class="bg-background" /></div>
-                                    <div class="space-y-2"><Label class="text-xs font-medium">Degree</Label><Input v-model="item.degree" placeholder="Bachelor of Science" class="bg-background" /></div>
-                                    <div class="space-y-2"><Label class="text-xs font-medium">Start Date</Label><Input v-model="item.start_date" type="date" class="bg-background" /></div>
-                                    <div class="space-y-2"><Label class="text-xs font-medium">End Date</Label><Input v-model="item.end_date" type="date" class="bg-background" /></div>
+                                    <div class="space-y-2"><Label class="text-xs font-medium">{{ __('Level') }}</Label><Select v-model="getAcademicLevelValue(item).value"><SelectTrigger class="bg-background"><SelectValue :placeholder="__('Select level')" /></SelectTrigger><SelectContent><SelectItem v-for="o in academicLevels" :key="o.value" :value="o.value">{{ o.label }}</SelectItem></SelectContent></Select></div>
+                                    <div class="space-y-2"><Label class="text-xs font-medium">{{ __('Institution') }} <span class="text-destructive">*</span></Label><Input v-model="item.institution" :placeholder="__('University / School name')" class="bg-background" /></div>
+                                    <div class="space-y-2"><Label class="text-xs font-medium">{{ __('Field of Study') }}</Label><Input v-model="item.field_of_study" placeholder="Computer Science" class="bg-background" /></div>
+                                    <div class="space-y-2"><Label class="text-xs font-medium">{{ __('Degree') }}</Label><Input v-model="item.degree" placeholder="Bachelor of Science" class="bg-background" /></div>
+                                    <div class="space-y-2"><Label class="text-xs font-medium">{{ __('Start Date') }}</Label><Input v-model="item.start_date" type="date" class="bg-background" /></div>
+                                    <div class="space-y-2"><Label class="text-xs font-medium">{{ __('End Date') }}</Label><Input v-model="item.end_date" type="date" class="bg-background" /></div>
                                 </div>
                             </FormItemCard>
                             <div v-if="!form.academic_levels?.length" class="flex items-center justify-center rounded-lg border border-dashed bg-muted/20 p-6">
-                                <p class="text-sm text-muted-foreground">No education added yet.</p>
+                                <p class="text-sm text-muted-foreground">{{ __('No education added yet.') }}</p>
                             </div>
                         </div>
                     </div>
@@ -290,22 +293,22 @@ const getEmploymentType = (item: JobExperienceFormData) => computed({
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                                 <Languages class="h-4 w-4" />
-                                <span>Languages</span>
+                                <span>{{ __('Languages') }}</span>
                             </div>
                             <Button type="button" variant="outline" size="sm" class="gap-1.5" @click="addForeignLanguage">
-                                <Plus class="h-3.5 w-3.5" /><span>Add</span>
+                                <Plus class="h-3.5 w-3.5" /><span>{{ __('Add') }}</span>
                             </Button>
                         </div>
                         <div class="space-y-3">
-                            <FormItemCard v-for="(item, idx) in form.foreign_languages" :key="item._key" title="Language" :index="idx" @remove="removeForeignLanguage(idx)">
+                            <FormItemCard v-for="(item, idx) in form.foreign_languages" :key="item._key" :title="__('Language')" :index="idx" @remove="removeForeignLanguage(idx)">
                                 <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                                    <div class="space-y-2"><Label class="text-xs font-medium">Language <span class="text-destructive">*</span></Label><Input v-model="item.language" placeholder="English, French, etc." class="bg-background" /></div>
-                                    <div class="space-y-2"><Label class="text-xs font-medium">Proficiency</Label><Select v-model="getLanguageProficiency(item).value"><SelectTrigger class="bg-background"><SelectValue placeholder="Select proficiency" /></SelectTrigger><SelectContent><SelectItem v-for="o in languageProficiencies" :key="o.value" :value="o.value">{{ o.label }}</SelectItem></SelectContent></Select></div>
-                                    <div class="space-y-2"><Label class="text-xs font-medium">Certificate</Label><Input v-model="item.certificate" placeholder="TOEFL, IELTS, etc." class="bg-background" /></div>
+                                    <div class="space-y-2"><Label class="text-xs font-medium">{{ __('Language') }} <span class="text-destructive">*</span></Label><Input v-model="item.language" placeholder="English, French, etc." class="bg-background" /></div>
+                                    <div class="space-y-2"><Label class="text-xs font-medium">{{ __('Proficiency') }}</Label><Select v-model="getLanguageProficiency(item).value"><SelectTrigger class="bg-background"><SelectValue :placeholder="__('Select proficiency')" /></SelectTrigger><SelectContent><SelectItem v-for="o in languageProficiencies" :key="o.value" :value="o.value">{{ o.label }}</SelectItem></SelectContent></Select></div>
+                                    <div class="space-y-2"><Label class="text-xs font-medium">{{ __('Certificate') }}</Label><Input v-model="item.certificate" placeholder="TOEFL, IELTS, etc." class="bg-background" /></div>
                                 </div>
                             </FormItemCard>
                             <div v-if="!form.foreign_languages?.length" class="flex items-center justify-center rounded-lg border border-dashed bg-muted/20 p-6">
-                                <p class="text-sm text-muted-foreground">No languages added yet.</p>
+                                <p class="text-sm text-muted-foreground">{{ __('No languages added yet.') }}</p>
                             </div>
                         </div>
                     </div>
@@ -315,25 +318,25 @@ const getEmploymentType = (item: JobExperienceFormData) => computed({
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                                 <Briefcase class="h-4 w-4" />
-                                <span>Work Experience</span>
+                                <span>{{ __('Work Experience') }}</span>
                             </div>
                             <Button type="button" variant="outline" size="sm" class="gap-1.5" @click="addJobExperience">
-                                <Plus class="h-3.5 w-3.5" /><span>Add</span>
+                                <Plus class="h-3.5 w-3.5" /><span>{{ __('Add') }}</span>
                             </Button>
                         </div>
                         <div class="space-y-3">
-                            <FormItemCard v-for="(item, idx) in form.job_experiences" :key="item._key" title="Experience" :index="idx" @remove="removeJobExperience(idx)">
+                            <FormItemCard v-for="(item, idx) in form.job_experiences" :key="item._key" :title="__('Experience')" :index="idx" @remove="removeJobExperience(idx)">
                                 <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                                    <div class="space-y-2"><Label class="text-xs font-medium">Company <span class="text-destructive">*</span></Label><Input v-model="item.company" placeholder="Company name" class="bg-background" /></div>
-                                    <div class="space-y-2"><Label class="text-xs font-medium">Position</Label><Input v-model="item.position" placeholder="Job title" class="bg-background" /></div>
-                                    <div class="space-y-2"><Label class="text-xs font-medium">Employment Type</Label><Select v-model="getEmploymentType(item).value"><SelectTrigger class="bg-background"><SelectValue placeholder="Select type" /></SelectTrigger><SelectContent><SelectItem v-for="o in employmentTypes" :key="o.value" :value="o.value">{{ o.label }}</SelectItem></SelectContent></Select></div>
-                                    <div class="space-y-2"><Label class="text-xs font-medium">Start Date</Label><Input v-model="item.start_date" type="date" class="bg-background" /></div>
-                                    <div class="space-y-2"><Label class="text-xs font-medium">End Date</Label><Input v-model="item.end_date" type="date" :disabled="item.is_current" class="bg-background" /></div>
-                                    <div class="flex items-center gap-2 pt-6"><Switch v-model="item.is_current" /><Label class="text-sm font-normal">Currently Working</Label></div>
+                                    <div class="space-y-2"><Label class="text-xs font-medium">{{ __('Company') }} <span class="text-destructive">*</span></Label><Input v-model="item.company" :placeholder="__('Company name')" class="bg-background" /></div>
+                                    <div class="space-y-2"><Label class="text-xs font-medium">{{ __('Position') }}</Label><Input v-model="item.position" :placeholder="__('Job title')" class="bg-background" /></div>
+                                    <div class="space-y-2"><Label class="text-xs font-medium">{{ __('Employment Type') }}</Label><Select v-model="getEmploymentType(item).value"><SelectTrigger class="bg-background"><SelectValue :placeholder="__('Select type')" /></SelectTrigger><SelectContent><SelectItem v-for="o in employmentTypes" :key="o.value" :value="o.value">{{ o.label }}</SelectItem></SelectContent></Select></div>
+                                    <div class="space-y-2"><Label class="text-xs font-medium">{{ __('Start Date') }}</Label><Input v-model="item.start_date" type="date" class="bg-background" /></div>
+                                    <div class="space-y-2"><Label class="text-xs font-medium">{{ __('End Date') }}</Label><Input v-model="item.end_date" type="date" :disabled="item.is_current" class="bg-background" /></div>
+                                    <div class="flex items-center gap-2 pt-6"><Switch v-model="item.is_current" /><Label class="text-sm font-normal">{{ __('Currently Working') }}</Label></div>
                                 </div>
                             </FormItemCard>
                             <div v-if="!form.job_experiences?.length" class="flex items-center justify-center rounded-lg border border-dashed bg-muted/20 p-6">
-                                <p class="text-sm text-muted-foreground">No work experience added yet.</p>
+                                <p class="text-sm text-muted-foreground">{{ __('No work experience added yet.') }}</p>
                             </div>
                         </div>
                     </div>

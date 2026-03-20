@@ -40,7 +40,7 @@ import {
 import { computed } from 'vue';
 import type { BreadcrumbItem } from '@/types';
 import type { EmployeeShowProps } from '@employee/types';
-import Account from '@employee/Components/Dashboard/Account.vue';
+import Account from '@employee/Components/Dashboard/AccountForm.vue';
 
 const props = defineProps<EmployeeShowProps>();
 

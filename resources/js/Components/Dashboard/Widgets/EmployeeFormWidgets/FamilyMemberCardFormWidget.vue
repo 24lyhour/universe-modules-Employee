@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useTranslation } from '@/composables/useTranslation';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -14,6 +15,8 @@ import {
 } from '@/components/ui/select';
 import { Trash2, User, Calendar, Briefcase, Phone, Mail, AlertCircle, Heart } from 'lucide-vue-next';
 import type { FamilyMemberFormData, Gender } from '../../../../types';
+
+const { __ } = useTranslation();
 
 interface Props {
     member: FamilyMemberFormData;
@@ -62,53 +65,53 @@ const memberGender = computed({
                 @click="emit('remove')"
             >
                 <Trash2 class="h-3.5 w-3.5" />
-                <span class="text-xs">Remove</span>
+                <span class="text-xs">{{ __('Remove') }}</span>
             </Button>
         </div>
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <div class="space-y-2">
-                <Label class="text-xs font-medium">Name <span class="text-destructive">*</span></Label>
+                <Label class="text-xs font-medium">{{ __('Name') }} <span class="text-destructive">*</span></Label>
                 <div class="relative">
                     <User class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input v-model="member.name" placeholder="Full name" class="pl-10 bg-background" />
+                    <Input v-model="member.name" :placeholder="__('Full name')" class="pl-10 bg-background" />
                 </div>
             </div>
             <div v-if="showGender" class="space-y-2">
-                <Label class="text-xs font-medium">Gender</Label>
+                <Label class="text-xs font-medium">{{ __('Gender') }}</Label>
                 <Select v-model="memberGender">
                     <SelectTrigger class="bg-background">
-                        <SelectValue placeholder="Select gender" />
+                        <SelectValue :placeholder="__('Select gender')" />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem v-for="opt in genderOptions" :key="opt.value" :value="opt.value">
-                            {{ opt.label }}
+                            {{ __(opt.label) }}
                         </SelectItem>
                     </SelectContent>
                 </Select>
             </div>
             <div class="space-y-2">
-                <Label class="text-xs font-medium">Date of Birth</Label>
+                <Label class="text-xs font-medium">{{ __('Date of Birth') }}</Label>
                 <div class="relative">
                     <Calendar class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                     <Input v-model="member.date_of_birth" type="date" class="pl-10 bg-background" />
                 </div>
             </div>
             <div class="space-y-2">
-                <Label class="text-xs font-medium">Occupation</Label>
+                <Label class="text-xs font-medium">{{ __('Occupation') }}</Label>
                 <div class="relative">
                     <Briefcase class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input v-model="member.occupation" placeholder="Job / Occupation" class="pl-10 bg-background" />
+                    <Input v-model="member.occupation" :placeholder="__('Job / Occupation')" class="pl-10 bg-background" />
                 </div>
             </div>
             <div class="space-y-2">
-                <Label class="text-xs font-medium">Phone Number</Label>
+                <Label class="text-xs font-medium">{{ __('Phone Number') }}</Label>
                 <div class="relative">
                     <Phone class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input v-model="member.phone_number" placeholder="+1 234 567 8900" class="pl-10 bg-background" />
                 </div>
             </div>
             <div v-if="showEmail" class="space-y-2">
-                <Label class="text-xs font-medium">Email</Label>
+                <Label class="text-xs font-medium">{{ __('Email') }}</Label>
                 <div class="relative">
                     <Mail class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input v-model="member.email" type="email" placeholder="email@example.com" class="pl-10 bg-background" />
@@ -120,14 +123,14 @@ const memberGender = computed({
                 <Switch v-model="member.is_emergency_contact" />
                 <div class="flex items-center gap-1.5">
                     <AlertCircle class="h-3.5 w-3.5 text-muted-foreground" />
-                    <Label class="text-sm font-normal">Emergency Contact</Label>
+                    <Label class="text-sm font-normal">{{ __('Emergency Contact') }}</Label>
                 </div>
             </div>
             <div v-if="showDependent" class="flex items-center gap-2">
                 <Switch v-model="member.is_dependent" />
                 <div class="flex items-center gap-1.5">
                     <Heart class="h-3.5 w-3.5 text-muted-foreground" />
-                    <Label class="text-sm font-normal">Dependent</Label>
+                    <Label class="text-sm font-normal">{{ __('Dependent') }}</Label>
                 </div>
             </div>
         </div>

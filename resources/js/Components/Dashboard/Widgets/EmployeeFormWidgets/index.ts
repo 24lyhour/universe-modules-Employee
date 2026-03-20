@@ -1,6 +1,6 @@
-export { default as FormItemCard } from './FormItemCard.vue';
-export { default as FamilyMemberCard } from './FamilyMemberCard.vue';
-export { default as FamilySubSection } from './FamilySubSection.vue';
-export { default as BasicInformationCard } from './BasicInformationCard.vue';
-export { default as EmploymentInformationCard } from './EmploymentInformationCard.vue';
-export { default as ProfileSidebar } from './ProfileSidebar.vue';
+export { default as FormItemCard } from './FormItemCardFormWidget.vue';
+export { default as FamilyMemberCard } from './FamilyMemberCardFormWidget.vue';
+export { default as FamilySubSection } from './FamilySubSectionFormWidget.vue';
+export { default as BasicInformationCard } from './BasicInformationCardFormWidget.vue';
+export { default as EmploymentInformationCard } from './EmploymentInformationCardFormWidget.vue';
+export { default as ProfileSidebar } from './ProfileSidebarFormWidget.vue';

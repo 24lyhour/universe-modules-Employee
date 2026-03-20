@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useTranslation } from '@/composables/useTranslation';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -17,6 +18,8 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     mode: 'create',
 });
+
+const { __ } = useTranslation();
 
 // Avatar images
 const avatarImages = computed({
@@ -72,16 +75,16 @@ const createAccount = computed({
         <CardHeader class="pb-4">
             <CardTitle class="flex items-center gap-2 text-base">
                 <Camera class="h-4 w-4 text-primary" />
-                Profile & Settings
+                {{ __('Profile & Settings') }}
             </CardTitle>
-            <CardDescription>Photo, status, and account configuration</CardDescription>
+            <CardDescription>{{ __('Photo, status, and account configuration') }}</CardDescription>
         </CardHeader>
         <CardContent class="space-y-6">
             <!-- Profile Photo Section -->
             <div class="space-y-3">
                 <div class="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                     <Camera class="h-4 w-4" />
-                    <span>Profile Photo</span>
+                    <span>{{ __('Profile Photo') }}</span>
                 </div>
                 <ImageUpload
                     v-model="avatarImages"
@@ -97,13 +100,13 @@ const createAccount = computed({
             <div class="space-y-3 border-t pt-6">
                 <div class="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                     <Activity class="h-4 w-4" />
-                    <span>Status</span>
+                    <span>{{ __('Status') }}</span>
                 </div>
                 <div class="flex items-center justify-between rounded-lg border bg-muted/30 p-3">
                     <div>
-                        <p class="text-sm font-medium">Employee Status</p>
+                        <p class="text-sm font-medium">{{ __('Employee Status') }}</p>
                         <p class="text-xs text-muted-foreground">
-                            {{ isActive ? 'Active' : 'Inactive' }}
+                            {{ isActive ? __('Active') : __('Inactive') }}
                         </p>
                     </div>
                     <Switch v-model="isActive" />
@@ -114,23 +117,23 @@ const createAccount = computed({
             <div v-if="mode === 'create'" class="space-y-3 border-t pt-6">
                 <div class="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                     <UserCog class="h-4 w-4" />
-                    <span>Account Settings</span>
+                    <span>{{ __('Account Settings') }}</span>
                 </div>
                 <div class="flex items-center justify-between rounded-lg border bg-muted/30 p-3">
                     <div>
-                        <p class="text-sm font-medium">Create Login Account</p>
-                        <p class="text-xs text-muted-foreground">Allow employee to log in</p>
+                        <p class="text-sm font-medium">{{ __('Create Login Account') }}</p>
+                        <p class="text-xs text-muted-foreground">{{ __('Allow employee to log in') }}</p>
                     </div>
                     <Switch v-model="createAccount" />
                 </div>
                 <div v-if="createAccount" class="space-y-3 rounded-lg border bg-muted/30 p-3">
                     <div class="space-y-2">
-                        <Label for="password" class="text-xs font-medium">Password <span class="text-destructive">*</span></Label>
+                        <Label for="password" class="text-xs font-medium">{{ __('Password') }} <span class="text-destructive">*</span></Label>
                         <Input
                             id="password"
                             v-model="form.password"
                             type="password"
-                            placeholder="Minimum 8 characters"
+                            :placeholder="__('Minimum 8 characters')"
                             autocomplete="new-password"
                             class="bg-background"
                         />
@@ -139,17 +142,17 @@ const createAccount = computed({
                         </p>
                     </div>
                     <div class="space-y-2">
-                        <Label for="password_confirmation" class="text-xs font-medium">Confirm Password <span class="text-destructive">*</span></Label>
+                        <Label for="password_confirmation" class="text-xs font-medium">{{ __('Confirm Password') }} <span class="text-destructive">*</span></Label>
                         <Input
                             id="password_confirmation"
                             v-model="form.password_confirmation"
                             type="password"
-                            placeholder="Repeat password"
+                            :placeholder="__('Repeat password')"
                             autocomplete="new-password"
                             class="bg-background"
                         />
                     </div>
-                    <p class="text-xs text-muted-foreground">Employee will use their email to log in.</p>
+                    <p class="text-xs text-muted-foreground">{{ __('Employee will use their email to log in.') }}</p>
                 </div>
             </div>
 
@@ -158,9 +161,9 @@ const createAccount = computed({
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                         <FileImage class="h-4 w-4" />
-                        <span>Certificate Documents</span>
+                        <span>{{ __('Certificate Documents') }}</span>
                     </div>
-                    <span class="text-xs text-muted-foreground">Max 10 files</span>
+                    <span class="text-xs text-muted-foreground">{{ __('Max 10 files') }}</span>
                 </div>
                 <ImageUpload
                     v-model="certificateImages"
@@ -170,7 +173,7 @@ const createAccount = computed({
                     :max-size="5"
                     :error="form.errors.certificate_images || form.errors.certificate_image"
                 />
-                <p class="text-xs text-muted-foreground">Upload certificates, degrees, or qualification documents</p>
+                <p class="text-xs text-muted-foreground">{{ __('Upload certificates, degrees, or qualification documents') }}</p>
             </div>
         </CardContent>
     </Card>
