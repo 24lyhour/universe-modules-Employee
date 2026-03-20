@@ -170,6 +170,7 @@ export interface Employee {
     probation_end_date: string | null;
     certificate: string | null;
     certificate_image: string | null;
+    certificate_images: string[] | null;
     certificate_code: string | null;
     avatar_url: string | null;
     employee_qr_code: string | null;
@@ -298,6 +299,7 @@ export interface EmployeeFormData {
     probation_end_date: string;
     certificate: string;
     certificate_image: string;
+    certificate_images: string[];
     certificate_code: string;
     avatar_url: string;
     status: boolean;

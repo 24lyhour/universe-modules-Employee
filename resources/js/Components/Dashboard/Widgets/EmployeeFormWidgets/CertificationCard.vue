@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Award, FileText, Hash } from 'lucide-vue-next';
 import type { InertiaForm } from '@inertiajs/vue3';
 import type { EmployeeFormData } from '../../../../types';
 
@@ -14,21 +15,31 @@ defineProps<Props>();
 
 <template>
     <Card>
-        <CardHeader class="pb-3">
-            <CardTitle class="text-base">Certification</CardTitle>
+        <CardHeader class="pb-4">
+            <CardTitle class="flex items-center gap-2 text-base">
+                <Award class="h-4 w-4 text-primary" />
+                Certification
+            </CardTitle>
+            <CardDescription>Educational qualifications and credentials</CardDescription>
         </CardHeader>
         <CardContent>
-            <div class="grid gap-4 sm:grid-cols-2">
+            <div class="grid gap-4 sm:grid-cols-2 rounded-lg border bg-muted/30 p-4">
                 <div class="space-y-2">
-                    <Label for="certificate">Certificate Name</Label>
-                    <Input id="certificate" v-model="form.certificate" type="text" placeholder="Bachelor's Degree" />
+                    <Label for="certificate" class="text-xs font-medium">Certificate Name</Label>
+                    <div class="relative">
+                        <FileText class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input id="certificate" v-model="form.certificate" type="text" placeholder="Bachelor's Degree" class="pl-10 bg-background" />
+                    </div>
                     <p v-if="form.errors.certificate" class="text-xs text-destructive">
                         {{ form.errors.certificate }}
                     </p>
                 </div>
                 <div class="space-y-2">
-                    <Label for="certificate_code">Certificate Code</Label>
-                    <Input id="certificate_code" v-model="form.certificate_code" type="text" placeholder="CERT-2024-001" />
+                    <Label for="certificate_code" class="text-xs font-medium">Certificate Code</Label>
+                    <div class="relative">
+                        <Hash class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input id="certificate_code" v-model="form.certificate_code" type="text" placeholder="CERT-2024-001" class="pl-10 bg-background" />
+                    </div>
                     <p v-if="form.errors.certificate_code" class="text-xs text-destructive">
                         {{ form.errors.certificate_code }}
                     </p>

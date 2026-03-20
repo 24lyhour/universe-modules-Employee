@@ -3,8 +3,9 @@ import { computed } from 'vue';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ImageUpload } from '@/components/shared';
+import { Camera, Activity, UserCog, FileImage } from 'lucide-vue-next';
 import type { InertiaForm } from '@inertiajs/vue3';
 import type { EmployeeFormData } from '../../../../types';
 
@@ -25,10 +26,22 @@ const avatarImages = computed({
     },
 });
 
-// Certificate images
+// Certificate images (supports multiple)
 const certificateImages = computed({
-    get: () => props.form.certificate_image ? [props.form.certificate_image] : [],
+    get: () => {
+        // Handle both array and single string for backwards compatibility
+        if (Array.isArray(props.form.certificate_images)) {
+            return props.form.certificate_images;
+        }
+        // Fallback for old single image field
+        if (props.form.certificate_image) {
+            return [props.form.certificate_image];
+        }
+        return [];
+    },
     set: (value: string[]) => {
+        props.form.certificate_images = value;
+        // Keep single field updated for backwards compatibility
         props.form.certificate_image = value.length > 0 ? value[0] : '';
     },
 });
@@ -55,13 +68,21 @@ const createAccount = computed({
 </script>
 
 <template>
-    <div class="space-y-6">
-        <!-- Profile Photo Card -->
-        <Card>
-            <CardHeader class="pb-3">
-                <CardTitle class="text-base">Profile Photo</CardTitle>
-            </CardHeader>
-            <CardContent>
+    <Card>
+        <CardHeader class="pb-4">
+            <CardTitle class="flex items-center gap-2 text-base">
+                <Camera class="h-4 w-4 text-primary" />
+                Profile & Settings
+            </CardTitle>
+            <CardDescription>Photo, status, and account configuration</CardDescription>
+        </CardHeader>
+        <CardContent class="space-y-6">
+            <!-- Profile Photo Section -->
+            <div class="space-y-3">
+                <div class="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                    <Camera class="h-4 w-4" />
+                    <span>Profile Photo</span>
+                </div>
                 <ImageUpload
                     v-model="avatarImages"
                     label=""
@@ -70,85 +91,87 @@ const createAccount = computed({
                     :max-size="5"
                     :error="form.errors.avatar_url"
                 />
-            </CardContent>
-        </Card>
+            </div>
 
-        <!-- Status Card -->
-        <Card>
-            <CardHeader class="pb-3">
-                <CardTitle class="text-base">Status</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <div class="flex items-center justify-between">
+            <!-- Status Section -->
+            <div class="space-y-3 border-t pt-6">
+                <div class="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                    <Activity class="h-4 w-4" />
+                    <span>Status</span>
+                </div>
+                <div class="flex items-center justify-between rounded-lg border bg-muted/30 p-3">
                     <div>
                         <p class="text-sm font-medium">Employee Status</p>
                         <p class="text-xs text-muted-foreground">
-                            {{ isActive ? 'Employee is active' : 'Employee is inactive' }}
+                            {{ isActive ? 'Active' : 'Inactive' }}
                         </p>
                     </div>
                     <Switch v-model="isActive" />
                 </div>
-            </CardContent>
-        </Card>
+            </div>
 
-        <!-- Account Settings Card (Only for Create mode) -->
-        <Card v-if="mode === 'create'">
-            <CardHeader class="pb-3">
-                <CardTitle class="text-base">Account Settings</CardTitle>
-            </CardHeader>
-            <CardContent class="space-y-4">
-                <div class="flex items-center justify-between">
+            <!-- Account Settings Section (Create mode only) -->
+            <div v-if="mode === 'create'" class="space-y-3 border-t pt-6">
+                <div class="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                    <UserCog class="h-4 w-4" />
+                    <span>Account Settings</span>
+                </div>
+                <div class="flex items-center justify-between rounded-lg border bg-muted/30 p-3">
                     <div>
                         <p class="text-sm font-medium">Create Login Account</p>
                         <p class="text-xs text-muted-foreground">Allow employee to log in</p>
                     </div>
                     <Switch v-model="createAccount" />
                 </div>
-
-                <div v-if="createAccount" class="space-y-4 border-t pt-4">
+                <div v-if="createAccount" class="space-y-3 rounded-lg border bg-muted/30 p-3">
                     <div class="space-y-2">
-                        <Label for="password">Password <span class="text-destructive">*</span></Label>
+                        <Label for="password" class="text-xs font-medium">Password <span class="text-destructive">*</span></Label>
                         <Input
                             id="password"
                             v-model="form.password"
                             type="password"
                             placeholder="Minimum 8 characters"
                             autocomplete="new-password"
+                            class="bg-background"
                         />
                         <p v-if="form.errors.password" class="text-xs text-destructive">
                             {{ form.errors.password }}
                         </p>
                     </div>
                     <div class="space-y-2">
-                        <Label for="password_confirmation">Confirm Password <span class="text-destructive">*</span></Label>
+                        <Label for="password_confirmation" class="text-xs font-medium">Confirm Password <span class="text-destructive">*</span></Label>
                         <Input
                             id="password_confirmation"
                             v-model="form.password_confirmation"
                             type="password"
                             placeholder="Repeat password"
                             autocomplete="new-password"
+                            class="bg-background"
                         />
                     </div>
                     <p class="text-xs text-muted-foreground">Employee will use their email to log in.</p>
                 </div>
-            </CardContent>
-        </Card>
+            </div>
 
-        <!-- Certificate Document Card -->
-        <Card>
-            <CardHeader class="pb-3">
-                <CardTitle class="text-base">Certificate Document</CardTitle>
-            </CardHeader>
-            <CardContent>
+            <!-- Certificate Documents Section -->
+            <div class="space-y-3 border-t pt-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                        <FileImage class="h-4 w-4" />
+                        <span>Certificate Documents</span>
+                    </div>
+                    <span class="text-xs text-muted-foreground">Max 10 files</span>
+                </div>
                 <ImageUpload
                     v-model="certificateImages"
                     label=""
-                    :multiple="false"
-                    :max-files="1"
+                    :multiple="true"
+                    :max-files="10"
                     :max-size="5"
-                    :error="form.errors.certificate_image"
+                    :error="form.errors.certificate_images || form.errors.certificate_image"
                 />
-            </CardContent>
-        </Card>
-    </div>
+                <p class="text-xs text-muted-foreground">Upload certificates, degrees, or qualification documents</p>
+            </div>
+        </CardContent>
+    </Card>
 </template>

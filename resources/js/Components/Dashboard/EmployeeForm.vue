@@ -3,7 +3,7 @@ import { computed, ref } from 'vue';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
     Select,
@@ -13,16 +13,14 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Users, GraduationCap, Languages, Briefcase, ChevronDown } from 'lucide-vue-next';
+import { Users, GraduationCap, Languages, Briefcase, ChevronDown, FolderOpen, Plus } from 'lucide-vue-next';
 import {
-    CollapsibleSection,
     FormItemCard,
     FamilyMemberCard,
     FamilySubSection,
     BasicInformationCard,
     EmploymentInformationCard,
     ProfileSidebar,
-    CertificationCard,
 } from './Widgets/EmployeeFormWidgets';
 import type { InertiaForm } from '@inertiajs/vue3';
 import type {
@@ -150,11 +148,6 @@ const getAcademicLevelValue = (item: AcademicLevelFormData) => computed({
     set: (v: string | undefined) => { item.level = (v as AcademicLevel) || null; },
 });
 
-const getGpaValue = (item: AcademicLevelFormData) => computed({
-    get: () => item.gpa ?? undefined,
-    set: (v: number | undefined) => { item.gpa = v ?? null; },
-});
-
 // ========== FOREIGN LANGUAGES ==========
 let languageKeyCounter = ref(
     props.form.foreign_languages?.length > 0
@@ -215,20 +208,23 @@ const getEmploymentType = (item: JobExperienceFormData) => computed({
             <!-- Family Information -->
             <Collapsible v-model:open="familySectionOpen">
                 <Card>
-                    <CardHeader class="pb-3">
+                    <CardHeader class="pb-4">
                         <div class="flex items-center justify-between">
-                            <CardTitle class="flex items-center gap-2 text-base">
-                                <Users class="h-4 w-4" /> Family Information
-                            </CardTitle>
+                            <div class="space-y-1">
+                                <CardTitle class="flex items-center gap-2 text-base">
+                                    <Users class="h-4 w-4 text-primary" /> Family Information
+                                </CardTitle>
+                                <CardDescription>Parents, siblings, spouse, and children details</CardDescription>
+                            </div>
                             <CollapsibleTrigger as-child>
-                                <Button variant="ghost" size="sm">
-                                    <ChevronDown class="h-4 w-4 transition-transform" :class="{ 'rotate-180': familySectionOpen }" />
+                                <Button variant="ghost" size="icon" class="h-8 w-8">
+                                    <ChevronDown class="h-4 w-4 transition-transform duration-200" :class="{ 'rotate-180': familySectionOpen }" />
                                 </Button>
                             </CollapsibleTrigger>
                         </div>
                     </CardHeader>
                     <CollapsibleContent>
-                        <CardContent class="space-y-6">
+                        <CardContent class="space-y-6 pt-0">
                             <FamilySubSection title="Father" add-label="Add Father" :show-add-button="canAddMore('father')" empty-message="No father information added." :is-empty="getFamilyMembersByRelationship('father').length === 0" @add="addFamilyMember('father')">
                                 <FamilyMemberCard v-for="m in getFamilyMembersByRelationship('father')" :key="m._key" :member="m" title="Father Details" :gender-options="genderOptions" @remove="removeFamilyMember(getMemberIndex(m))" />
                             </FamilySubSection>
@@ -249,67 +245,100 @@ const getEmploymentType = (item: JobExperienceFormData) => computed({
                 </Card>
             </Collapsible>
 
-            <!-- Academic Levels -->
-            <CollapsibleSection title="Academic Levels" :icon="GraduationCap" show-add add-label="Add" @add="addAcademicLevel">
-                <div class="space-y-4">
-                    <FormItemCard v-for="(item, idx) in form.academic_levels" :key="item._key" title="Education" :index="idx" @remove="removeAcademicLevel(idx)">
-                        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                            <div class="space-y-2"><Label>Level</Label><Select v-model="getAcademicLevelValue(item).value"><SelectTrigger><SelectValue placeholder="Select level" /></SelectTrigger><SelectContent><SelectItem v-for="o in academicLevels" :key="o.value" :value="o.value">{{ o.label }}</SelectItem></SelectContent></Select></div>
-                            <div class="space-y-2"><Label>Institution <span class="text-destructive">*</span></Label><Input v-model="item.institution" placeholder="University / School name" /></div>
-                            <div class="space-y-2"><Label>Field of Study</Label><Input v-model="item.field_of_study" placeholder="Computer Science" /></div>
-                            <div class="space-y-2"><Label>Degree</Label><Input v-model="item.degree" placeholder="Bachelor of Science" /></div>
-                            <div class="space-y-2"><Label>Start Date</Label><Input v-model="item.start_date" type="date" /></div>
-                            <div class="space-y-2"><Label>End Date</Label><Input v-model="item.end_date" type="date" /></div>
-                            <div class="space-y-2"><Label>GPA</Label><Input v-model.number="getGpaValue(item).value" type="number" step="0.01" min="0" max="4" placeholder="3.5" /></div>
-                            <div class="space-y-2"><Label>Certificate</Label><Input v-model="item.certificate" placeholder="Certificate name" /></div>
-                            <div class="space-y-2"><Label>Notes</Label><Input v-model="item.notes" placeholder="Additional notes" /></div>
-                        </div>
-                    </FormItemCard>
-                    <p v-if="!form.academic_levels?.length" class="text-sm text-muted-foreground">No academic levels added yet.</p>
-                </div>
-            </CollapsibleSection>
-
-            <!-- Foreign Languages -->
-            <CollapsibleSection title="Foreign Languages" :icon="Languages" show-add add-label="Add" @add="addForeignLanguage">
-                <div class="space-y-4">
-                    <FormItemCard v-for="(item, idx) in form.foreign_languages" :key="item._key" title="Language" :index="idx" @remove="removeForeignLanguage(idx)">
-                        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                            <div class="space-y-2"><Label>Language <span class="text-destructive">*</span></Label><Input v-model="item.language" placeholder="English, French, etc." /></div>
-                            <div class="space-y-2"><Label>Proficiency</Label><Select v-model="getLanguageProficiency(item).value"><SelectTrigger><SelectValue placeholder="Select proficiency" /></SelectTrigger><SelectContent><SelectItem v-for="o in languageProficiencies" :key="o.value" :value="o.value">{{ o.label }}</SelectItem></SelectContent></Select></div>
-                            <div class="space-y-2"><Label>Certificate</Label><Input v-model="item.certificate" placeholder="TOEFL, IELTS, etc." /></div>
-                            <div class="space-y-2"><Label>Certificate Score</Label><Input v-model="item.certificate_score" placeholder="Score / Band" /></div>
-                            <div class="space-y-2"><Label>Notes</Label><Input v-model="item.notes" placeholder="Additional notes" /></div>
-                        </div>
-                    </FormItemCard>
-                    <p v-if="!form.foreign_languages?.length" class="text-sm text-muted-foreground">No foreign languages added yet.</p>
-                </div>
-            </CollapsibleSection>
-
-            <!-- Job Experience -->
-            <CollapsibleSection title="Job Experience" :icon="Briefcase" show-add add-label="Add" @add="addJobExperience">
-                <div class="space-y-4">
-                    <FormItemCard v-for="(item, idx) in form.job_experiences" :key="item._key" title="Experience" :index="idx" @remove="removeJobExperience(idx)">
-                        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                            <div class="space-y-2"><Label>Company <span class="text-destructive">*</span></Label><Input v-model="item.company" placeholder="Company name" /></div>
-                            <div class="space-y-2"><Label>Position</Label><Input v-model="item.position" placeholder="Job title" /></div>
-                            <div class="space-y-2"><Label>Employment Type</Label><Select v-model="getEmploymentType(item).value"><SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger><SelectContent><SelectItem v-for="o in employmentTypes" :key="o.value" :value="o.value">{{ o.label }}</SelectItem></SelectContent></Select></div>
-                            <div class="space-y-2"><Label>Province</Label><Input v-model="item.province" placeholder="Province / State" /></div>
-                            <div class="space-y-2"><Label>City</Label><Input v-model="item.city" placeholder="City" /></div>
-                            <div class="space-y-2"><Label>Start Date</Label><Input v-model="item.start_date" type="date" /></div>
-                            <div class="space-y-2"><Label>End Date</Label><Input v-model="item.end_date" type="date" :disabled="item.is_current" /></div>
-                            <div class="flex items-center gap-2 pt-6"><Switch v-model="item.is_current" /><Label class="text-sm font-normal">Currently Working</Label></div>
-                        </div>
-                        <div class="mt-4 grid gap-4 sm:grid-cols-2">
-                            <div class="space-y-2"><Label>Responsibilities</Label><Input v-model="item.responsibilities" placeholder="Main responsibilities" /></div>
-                            <div class="space-y-2"><Label>Reason for Leaving</Label><Input v-model="item.reason_for_leaving" placeholder="Reason" :disabled="item.is_current" /></div>
-                        </div>
-                    </FormItemCard>
-                    <p v-if="!form.job_experiences?.length" class="text-sm text-muted-foreground">No job experiences added yet.</p>
-                </div>
-            </CollapsibleSection>
-
             <EmploymentInformationCard :form="form" :schools="schools" :departments="departments" :employee-types="employeeTypes" @school-change="emit('schoolChange', $event)" />
-            <CertificationCard :form="form" />
+
+            <!-- Background Card (Education, Languages, Experience) -->
+            <Card>
+                <CardHeader class="pb-4">
+                    <CardTitle class="flex items-center gap-2 text-base">
+                        <FolderOpen class="h-4 w-4 text-primary" />
+                        Background & Experience
+                    </CardTitle>
+                    <CardDescription>Education, languages, and work history</CardDescription>
+                </CardHeader>
+                <CardContent class="space-y-6">
+                    <!-- Academic Levels Section -->
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                                <GraduationCap class="h-4 w-4" />
+                                <span>Education</span>
+                            </div>
+                            <Button type="button" variant="outline" size="sm" class="gap-1.5" @click="addAcademicLevel">
+                                <Plus class="h-3.5 w-3.5" /><span>Add</span>
+                            </Button>
+                        </div>
+                        <div class="space-y-3">
+                            <FormItemCard v-for="(item, idx) in form.academic_levels" :key="item._key" title="Education" :index="idx" @remove="removeAcademicLevel(idx)">
+                                <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                                    <div class="space-y-2"><Label class="text-xs font-medium">Level</Label><Select v-model="getAcademicLevelValue(item).value"><SelectTrigger class="bg-background"><SelectValue placeholder="Select level" /></SelectTrigger><SelectContent><SelectItem v-for="o in academicLevels" :key="o.value" :value="o.value">{{ o.label }}</SelectItem></SelectContent></Select></div>
+                                    <div class="space-y-2"><Label class="text-xs font-medium">Institution <span class="text-destructive">*</span></Label><Input v-model="item.institution" placeholder="University / School name" class="bg-background" /></div>
+                                    <div class="space-y-2"><Label class="text-xs font-medium">Field of Study</Label><Input v-model="item.field_of_study" placeholder="Computer Science" class="bg-background" /></div>
+                                    <div class="space-y-2"><Label class="text-xs font-medium">Degree</Label><Input v-model="item.degree" placeholder="Bachelor of Science" class="bg-background" /></div>
+                                    <div class="space-y-2"><Label class="text-xs font-medium">Start Date</Label><Input v-model="item.start_date" type="date" class="bg-background" /></div>
+                                    <div class="space-y-2"><Label class="text-xs font-medium">End Date</Label><Input v-model="item.end_date" type="date" class="bg-background" /></div>
+                                </div>
+                            </FormItemCard>
+                            <div v-if="!form.academic_levels?.length" class="flex items-center justify-center rounded-lg border border-dashed bg-muted/20 p-6">
+                                <p class="text-sm text-muted-foreground">No education added yet.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Foreign Languages Section -->
+                    <div class="space-y-4 border-t pt-6">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                                <Languages class="h-4 w-4" />
+                                <span>Languages</span>
+                            </div>
+                            <Button type="button" variant="outline" size="sm" class="gap-1.5" @click="addForeignLanguage">
+                                <Plus class="h-3.5 w-3.5" /><span>Add</span>
+                            </Button>
+                        </div>
+                        <div class="space-y-3">
+                            <FormItemCard v-for="(item, idx) in form.foreign_languages" :key="item._key" title="Language" :index="idx" @remove="removeForeignLanguage(idx)">
+                                <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                                    <div class="space-y-2"><Label class="text-xs font-medium">Language <span class="text-destructive">*</span></Label><Input v-model="item.language" placeholder="English, French, etc." class="bg-background" /></div>
+                                    <div class="space-y-2"><Label class="text-xs font-medium">Proficiency</Label><Select v-model="getLanguageProficiency(item).value"><SelectTrigger class="bg-background"><SelectValue placeholder="Select proficiency" /></SelectTrigger><SelectContent><SelectItem v-for="o in languageProficiencies" :key="o.value" :value="o.value">{{ o.label }}</SelectItem></SelectContent></Select></div>
+                                    <div class="space-y-2"><Label class="text-xs font-medium">Certificate</Label><Input v-model="item.certificate" placeholder="TOEFL, IELTS, etc." class="bg-background" /></div>
+                                </div>
+                            </FormItemCard>
+                            <div v-if="!form.foreign_languages?.length" class="flex items-center justify-center rounded-lg border border-dashed bg-muted/20 p-6">
+                                <p class="text-sm text-muted-foreground">No languages added yet.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Job Experience Section -->
+                    <div class="space-y-4 border-t pt-6">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                                <Briefcase class="h-4 w-4" />
+                                <span>Work Experience</span>
+                            </div>
+                            <Button type="button" variant="outline" size="sm" class="gap-1.5" @click="addJobExperience">
+                                <Plus class="h-3.5 w-3.5" /><span>Add</span>
+                            </Button>
+                        </div>
+                        <div class="space-y-3">
+                            <FormItemCard v-for="(item, idx) in form.job_experiences" :key="item._key" title="Experience" :index="idx" @remove="removeJobExperience(idx)">
+                                <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                                    <div class="space-y-2"><Label class="text-xs font-medium">Company <span class="text-destructive">*</span></Label><Input v-model="item.company" placeholder="Company name" class="bg-background" /></div>
+                                    <div class="space-y-2"><Label class="text-xs font-medium">Position</Label><Input v-model="item.position" placeholder="Job title" class="bg-background" /></div>
+                                    <div class="space-y-2"><Label class="text-xs font-medium">Employment Type</Label><Select v-model="getEmploymentType(item).value"><SelectTrigger class="bg-background"><SelectValue placeholder="Select type" /></SelectTrigger><SelectContent><SelectItem v-for="o in employmentTypes" :key="o.value" :value="o.value">{{ o.label }}</SelectItem></SelectContent></Select></div>
+                                    <div class="space-y-2"><Label class="text-xs font-medium">Start Date</Label><Input v-model="item.start_date" type="date" class="bg-background" /></div>
+                                    <div class="space-y-2"><Label class="text-xs font-medium">End Date</Label><Input v-model="item.end_date" type="date" :disabled="item.is_current" class="bg-background" /></div>
+                                    <div class="flex items-center gap-2 pt-6"><Switch v-model="item.is_current" /><Label class="text-sm font-normal">Currently Working</Label></div>
+                                </div>
+                            </FormItemCard>
+                            <div v-if="!form.job_experiences?.length" class="flex items-center justify-center rounded-lg border border-dashed bg-muted/20 p-6">
+                                <p class="text-sm text-muted-foreground">No work experience added yet.</p>
+                            </div>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
         </div>
 
         <!-- Right Column -->

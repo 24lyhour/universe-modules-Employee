@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import {
     Select,
     SelectContent,
@@ -10,6 +10,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Building2, Briefcase, DollarSign, Calendar, Award, FileText, Hash } from 'lucide-vue-next';
 import type { InertiaForm } from '@inertiajs/vue3';
 import type { EmployeeFormData, SchoolOption, DepartmentOption, EmployeeTypeOption } from '../../../../types';
 
@@ -64,108 +65,151 @@ const salaryValue = computed({
 
 <template>
     <Card>
-        <CardHeader class="pb-3">
-            <CardTitle class="text-base">Employment Information</CardTitle>
+        <CardHeader class="pb-4">
+            <CardTitle class="flex items-center gap-2 text-base">
+                <Briefcase class="h-4 w-4 text-primary" />
+                Employment Information
+            </CardTitle>
+            <CardDescription>Work assignment and compensation details</CardDescription>
         </CardHeader>
-        <CardContent>
-            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                <!-- School -->
-                <div class="space-y-2">
-                    <Label for="school_id">School</Label>
-                    <Select v-model="selectedSchool">
-                        <SelectTrigger id="school_id">
-                            <SelectValue placeholder="Select school" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem v-for="school in schools" :key="school.id" :value="school.id.toString()">
-                                {{ school.name }}
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <p v-if="form.errors.school_id" class="text-xs text-destructive">
-                        {{ form.errors.school_id }}
-                    </p>
+        <CardContent class="space-y-6">
+            <!-- Organization Section -->
+            <div class="space-y-4">
+                <div class="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                    <Building2 class="h-4 w-4" />
+                    <span>Organization</span>
                 </div>
+                <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 rounded-lg border bg-muted/30 p-4">
+                    <!-- School -->
+                    <div class="space-y-2">
+                        <Label for="school_id" class="text-xs font-medium">School</Label>
+                        <Select v-model="selectedSchool">
+                            <SelectTrigger id="school_id" class="bg-background">
+                                <SelectValue placeholder="Select school" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem v-for="school in schools" :key="school.id" :value="school.id.toString()">
+                                    {{ school.name }}
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <p v-if="form.errors.school_id" class="text-xs text-destructive">{{ form.errors.school_id }}</p>
+                    </div>
 
-                <!-- Department -->
-                <div class="space-y-2">
-                    <Label for="department_id">Department</Label>
-                    <Select v-model="selectedDepartment" :disabled="!form.school_id">
-                        <SelectTrigger id="department_id">
-                            <SelectValue placeholder="Select department" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem v-for="dept in departments" :key="dept.id" :value="dept.id.toString()">
-                                {{ dept.name }}
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <p v-if="form.errors.department_id" class="text-xs text-destructive">
-                        {{ form.errors.department_id }}
-                    </p>
+                    <!-- Department -->
+                    <div class="space-y-2">
+                        <Label for="department_id" class="text-xs font-medium">Department</Label>
+                        <Select v-model="selectedDepartment" :disabled="!form.school_id">
+                            <SelectTrigger id="department_id" class="bg-background">
+                                <SelectValue placeholder="Select department" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem v-for="dept in departments" :key="dept.id" :value="dept.id.toString()">
+                                    {{ dept.name }}
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <p v-if="form.errors.department_id" class="text-xs text-destructive">{{ form.errors.department_id }}</p>
+                        <p v-if="!form.school_id" class="text-xs text-muted-foreground">Select a school first</p>
+                    </div>
+
+                    <!-- Job Title -->
+                    <div class="space-y-2">
+                        <Label for="job_title" class="text-xs font-medium">Job Title</Label>
+                        <Input id="job_title" v-model="form.job_title" type="text" placeholder="e.g. Software Engineer" class="bg-background" />
+                        <p v-if="form.errors.job_title" class="text-xs text-destructive">{{ form.errors.job_title }}</p>
+                    </div>
                 </div>
+            </div>
 
-                <!-- Job Title -->
-                <div class="space-y-2">
-                    <Label for="job_title">Job Title</Label>
-                    <Input id="job_title" v-model="form.job_title" type="text" placeholder="Software Engineer" />
-                    <p v-if="form.errors.job_title" class="text-xs text-destructive">
-                        {{ form.errors.job_title }}
-                    </p>
+            <!-- Compensation Section -->
+            <div class="space-y-4">
+                <div class="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                    <DollarSign class="h-4 w-4" />
+                    <span>Compensation & Type</span>
                 </div>
+                <div class="grid gap-4 sm:grid-cols-2 rounded-lg border bg-muted/30 p-4">
+                    <!-- Employee Type -->
+                    <div class="space-y-2">
+                        <Label for="employee_type" class="text-xs font-medium">Employee Type</Label>
+                        <Select v-model="selectedEmployeeType">
+                            <SelectTrigger id="employee_type" class="bg-background">
+                                <SelectValue placeholder="Select type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem v-for="type in employeeTypes" :key="type.value" :value="type.value">
+                                    {{ type.label }}
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <p v-if="form.errors.employee_type" class="text-xs text-destructive">{{ form.errors.employee_type }}</p>
+                    </div>
 
-                <!-- Employee Type -->
-                <div class="space-y-2">
-                    <Label for="employee_type">Employee Type</Label>
-                    <Select v-model="selectedEmployeeType">
-                        <SelectTrigger id="employee_type">
-                            <SelectValue placeholder="Select type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem v-for="type in employeeTypes" :key="type.value" :value="type.value">
-                                {{ type.label }}
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <p v-if="form.errors.employee_type" class="text-xs text-destructive">
-                        {{ form.errors.employee_type }}
-                    </p>
+                    <!-- Salary -->
+                    <div class="space-y-2">
+                        <Label for="salary" class="text-xs font-medium">Monthly Salary</Label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
+                            <Input id="salary" v-model.number="salaryValue" type="number" min="0" step="0.01" placeholder="0.00" class="pl-7 bg-background" />
+                        </div>
+                        <p v-if="form.errors.salary" class="text-xs text-destructive">{{ form.errors.salary }}</p>
+                    </div>
                 </div>
+            </div>
 
-                <!-- Salary -->
-                <div class="space-y-2">
-                    <Label for="salary">Salary</Label>
-                    <Input id="salary" v-model.number="salaryValue" type="number" min="0" step="0.01" placeholder="0.00" />
-                    <p v-if="form.errors.salary" class="text-xs text-destructive">
-                        {{ form.errors.salary }}
-                    </p>
+            <!-- Timeline Section -->
+            <div class="space-y-4">
+                <div class="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                    <Calendar class="h-4 w-4" />
+                    <span>Employment Timeline</span>
                 </div>
+                <div class="grid gap-4 sm:grid-cols-3 rounded-lg border bg-muted/30 p-4">
+                    <!-- Hire Date -->
+                    <div class="space-y-2">
+                        <Label for="hire_date" class="text-xs font-medium">Hire Date</Label>
+                        <Input id="hire_date" v-model="form.hire_date" type="date" class="bg-background" />
+                        <p v-if="form.errors.hire_date" class="text-xs text-destructive">{{ form.errors.hire_date }}</p>
+                    </div>
 
-                <!-- Hire Date -->
-                <div class="space-y-2">
-                    <Label for="hire_date">Hire Date</Label>
-                    <Input id="hire_date" v-model="form.hire_date" type="date" />
-                    <p v-if="form.errors.hire_date" class="text-xs text-destructive">
-                        {{ form.errors.hire_date }}
-                    </p>
+                    <!-- Probation Start -->
+                    <div class="space-y-2">
+                        <Label for="probation_date" class="text-xs font-medium">Probation Start</Label>
+                        <Input id="probation_date" v-model="form.probation_date" type="date" class="bg-background" />
+                        <p v-if="form.errors.probation_date" class="text-xs text-destructive">{{ form.errors.probation_date }}</p>
+                    </div>
+
+                    <!-- Probation End -->
+                    <div class="space-y-2">
+                        <Label for="probation_end_date" class="text-xs font-medium">Probation End</Label>
+                        <Input id="probation_end_date" v-model="form.probation_end_date" type="date" class="bg-background" />
+                        <p v-if="form.errors.probation_end_date" class="text-xs text-destructive">{{ form.errors.probation_end_date }}</p>
+                    </div>
                 </div>
+            </div>
 
-                <!-- Probation Start -->
-                <div class="space-y-2">
-                    <Label for="probation_date">Probation Start</Label>
-                    <Input id="probation_date" v-model="form.probation_date" type="date" />
-                    <p v-if="form.errors.probation_date" class="text-xs text-destructive">
-                        {{ form.errors.probation_date }}
-                    </p>
+            <!-- Certification Section -->
+            <div class="space-y-4">
+                <div class="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                    <Award class="h-4 w-4" />
+                    <span>Certification</span>
                 </div>
-
-                <!-- Probation End -->
-                <div class="space-y-2">
-                    <Label for="probation_end_date">Probation End</Label>
-                    <Input id="probation_end_date" v-model="form.probation_end_date" type="date" />
-                    <p v-if="form.errors.probation_end_date" class="text-xs text-destructive">
-                        {{ form.errors.probation_end_date }}
-                    </p>
+                <div class="grid gap-4 sm:grid-cols-2 rounded-lg border bg-muted/30 p-4">
+                    <div class="space-y-2">
+                        <Label for="certificate" class="text-xs font-medium">Certificate Name</Label>
+                        <div class="relative">
+                            <FileText class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input id="certificate" v-model="form.certificate" type="text" placeholder="Bachelor's Degree" class="pl-10 bg-background" />
+                        </div>
+                        <p v-if="form.errors.certificate" class="text-xs text-destructive">{{ form.errors.certificate }}</p>
+                    </div>
+                    <div class="space-y-2">
+                        <Label for="certificate_code" class="text-xs font-medium">Certificate Code</Label>
+                        <div class="relative">
+                            <Hash class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input id="certificate_code" v-model="form.certificate_code" type="text" placeholder="CERT-2024-001" class="pl-10 bg-background" />
+                        </div>
+                        <p v-if="form.errors.certificate_code" class="text-xs text-destructive">{{ form.errors.certificate_code }}</p>
+                    </div>
                 </div>
             </div>
         </CardContent>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Trash2 } from 'lucide-vue-next';
 
 interface Props {
@@ -15,19 +16,22 @@ const emit = defineEmits<{
 </script>
 
 <template>
-    <div class="rounded-lg border bg-muted/30 p-4">
-        <div class="mb-3 flex items-center justify-between">
-            <span class="text-sm font-medium text-muted-foreground">
-                {{ title }}{{ index !== undefined ? ` ${index + 1}` : '' }}
-            </span>
+    <div class="rounded-lg border bg-muted/30 p-4 transition-colors hover:border-muted-foreground/30">
+        <div class="mb-4 flex items-center justify-between border-b pb-3">
+            <div class="flex items-center gap-2">
+                <Badge variant="secondary" class="font-medium">
+                    {{ title }}{{ index !== undefined ? ` #${index + 1}` : '' }}
+                </Badge>
+            </div>
             <Button
                 type="button"
                 variant="ghost"
-                size="icon"
-                class="h-8 w-8 text-destructive hover:text-destructive"
+                size="sm"
+                class="h-8 gap-1.5 text-destructive hover:bg-destructive/10 hover:text-destructive"
                 @click="emit('remove')"
             >
-                <Trash2 class="h-4 w-4" />
+                <Trash2 class="h-3.5 w-3.5" />
+                <span class="text-xs">Remove</span>
             </Button>
         </div>
         <slot />
