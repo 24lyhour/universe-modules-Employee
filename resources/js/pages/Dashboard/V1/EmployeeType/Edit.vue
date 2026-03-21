@@ -11,8 +11,11 @@ import { Switch } from '@/components/ui/switch';
 import { employeeTypeSchema } from '@employee/validation/employeeTypeSchema';
 import { useFormValidation } from '@/composables/useFormValidation';
 import type { EmployeeTypeFormData, EmployeeTypeEditProps } from '@employee/types';
+import { useTranslation } from '@/composables/useTranslation';
 
 const props = defineProps<EmployeeTypeEditProps>();
+
+const { __ } = useTranslation();
 
 const { show, close, redirect } = useModal();
 
@@ -55,7 +58,7 @@ const handleSubmit = () => {
     validateAndSubmit(getFormData(), form, () => {
         form.put(`/dashboard/employee-types/${props.employeeType.uuid}`, {
             onSuccess: () => {
-                toast.success('Employee type updated successfully.');
+                toast.success(__('Employee type updated successfully.'));
                 setTimeout(() => {
                     close();
                     redirect();
@@ -81,11 +84,11 @@ const isActive = computed({
 <template>
     <ModalForm
         v-model:open="isOpen"
-        title="Edit Employee Type"
-        :description="`Editing: ${employeeType.name}`"
+        :title="__('Edit Employee Type')"
+        :description="__('Editing: :name', { name: employeeType.name })"
         mode="edit"
         size="lg"
-        submit-text="Save Changes"
+        :submit-text="__('Save Changes')"
         :loading="form.processing"
         :disabled="isFormInvalid"
         @submit="handleSubmit"
@@ -95,12 +98,12 @@ const isActive = computed({
             <!-- Name -->
             <div class="space-y-2">
                 <Label for="name">
-                    Name <span class="text-destructive">*</span>
+                    {{ __('Name') }} <span class="text-destructive">*</span>
                 </Label>
                 <Input
                     id="name"
                     v-model="form.name"
-                    placeholder="Enter type name"
+                    :placeholder="__('Enter type name')"
                     :class="{ 'border-destructive': form.errors.name }"
                 />
                 <p v-if="form.errors.name" class="text-xs text-destructive">
@@ -110,10 +113,10 @@ const isActive = computed({
 
             <!-- Description -->
             <div class="space-y-2">
-                <Label for="description">Description</Label>
+                <Label for="description">{{ __('Description') }}</Label>
                 <TiptapEditor
                     v-model="form.description"
-                    placeholder="Enter type description..."
+                    :placeholder="__('Enter type description...')"
                     min-height="120px"
                     max-height="250px"
                 />
@@ -125,7 +128,7 @@ const isActive = computed({
             <!-- Time Range -->
             <div class="grid gap-4 sm:grid-cols-2">
                 <div class="space-y-2">
-                    <Label for="time_start">Start Time</Label>
+                    <Label for="time_start">{{ __('Start Time') }}</Label>
                     <Input
                         id="time_start"
                         type="time"
@@ -137,7 +140,7 @@ const isActive = computed({
                     </p>
                 </div>
                 <div class="space-y-2">
-                    <Label for="time_end">End Time</Label>
+                    <Label for="time_end">{{ __('End Time') }}</Label>
                     <Input
                         id="time_end"
                         type="time"
@@ -153,9 +156,9 @@ const isActive = computed({
             <!-- Status -->
             <div class="flex items-center justify-between rounded-lg border p-4">
                 <div>
-                    <p class="text-sm font-medium">Active Status</p>
+                    <p class="text-sm font-medium">{{ __('Active Status') }}</p>
                     <p class="text-xs text-muted-foreground">
-                        {{ isActive ? 'Type is active' : 'Type is inactive' }}
+                        {{ isActive ? __('Type is active') : __('Type is inactive') }}
                     </p>
                 </div>
                 <Switch v-model="isActive" />

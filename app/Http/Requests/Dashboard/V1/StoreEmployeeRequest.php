@@ -44,6 +44,8 @@ class StoreEmployeeRequest extends FormRequest
             'probation_end_date' => ['nullable', 'date', 'after:probation_date'],
             'certificate' => ['nullable', 'string', 'max:255'],
             'certificate_image' => ['nullable', 'string'],
+            'certificate_images' => ['nullable', 'array'],
+            'certificate_images.*' => ['nullable', 'string'],
             'certificate_code' => ['nullable', 'string', 'max:100'],
             'avatar_url' => ['nullable', 'string'],
             'status' => ['required', 'boolean'],

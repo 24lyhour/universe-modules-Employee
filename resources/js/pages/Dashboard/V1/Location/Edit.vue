@@ -19,6 +19,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { useTranslation } from '@/composables/useTranslation';
 
 interface Employee {
     id: number;
@@ -67,11 +68,13 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const { __ } = useTranslation();
+
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Dashboard', href: '/dashboard' },
-    { title: 'Attendance', href: '/dashboard/attendances' },
-    { title: 'Locations', href: '/dashboard/locations' },
-    { title: 'Edit', href: `/dashboard/locations/${props.locationData.uuid}/edit` },
+    { title: __('Dashboard'), href: '/dashboard' },
+    { title: __('Attendance'), href: '/dashboard/attendances' },
+    { title: __('Locations'), href: '/dashboard/locations' },
+    { title: __('Edit'), href: `/dashboard/locations/${props.locationData.uuid}/edit` },
 ];
 
 const form = useForm({
@@ -101,7 +104,7 @@ const form = useForm({
 const handleSubmit = () => {
     form.put(`/dashboard/locations/${props.locationData.uuid}`, {
         onSuccess: () => {
-            toast.success('Location updated successfully.');
+            toast.success(__('Location updated successfully.'));
         },
     });
 };
@@ -109,7 +112,7 @@ const handleSubmit = () => {
 const handleDelete = () => {
     router.delete(`/dashboard/locations/${props.locationData.uuid}`, {
         onSuccess: () => {
-            toast.success('Location deleted successfully.');
+            toast.success(__('Location deleted successfully.'));
         },
     });
 };
@@ -117,7 +120,7 @@ const handleDelete = () => {
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
-        <Head :title="`Edit ${locationData.name}`" />
+        <Head :title="__('Edit') + ' ' + locationData.name" />
 
         <div class="flex h-full flex-1 flex-col gap-6 p-6">
             <!-- Header -->
@@ -127,32 +130,32 @@ const handleDelete = () => {
                         <ChevronLeft class="h-5 w-5" />
                     </Link>
                     <div>
-                        <h1 class="text-xl font-semibold">Edit Location</h1>
-                        <p class="text-sm text-muted-foreground">Update location: {{ locationData.name }}</p>
+                        <h1 class="text-xl font-semibold">{{ __('Edit Location') }}</h1>
+                        <p class="text-sm text-muted-foreground">{{ __('Update location:') }} {{ locationData.name }}</p>
                     </div>
                 </div>
                 <AlertDialog>
                     <AlertDialogTrigger as-child>
                         <Button variant="destructive" size="sm">
                             <Trash2 class="mr-2 h-4 w-4" />
-                            Delete
+                            {{ __('Delete') }}
                         </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                         <AlertDialogHeader>
-                            <AlertDialogTitle>Delete Location</AlertDialogTitle>
+                            <AlertDialogTitle>{{ __('Delete Location') }}</AlertDialogTitle>
                             <AlertDialogDescription>
-                                Are you sure you want to delete "{{ locationData.name }}"?
-                                This action cannot be undone.
+                                {{ __('Are you sure you want to delete') }} "{{ locationData.name }}"?
+                                {{ __('This action cannot be undone.') }}
                             </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogCancel>{{ __('Cancel') }}</AlertDialogCancel>
                             <AlertDialogAction
                                 @click="handleDelete"
                                 class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                             >
-                                Delete
+                                {{ __('Delete') }}
                             </AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
@@ -172,10 +175,10 @@ const handleDelete = () => {
                 <!-- Actions at Bottom -->
                 <div class="flex justify-end gap-3 pt-4">
                     <Button type="button" variant="outline" as-child>
-                        <Link href="/dashboard/locations">Cancel</Link>
+                        <Link href="/dashboard/locations">{{ __('Cancel') }}</Link>
                     </Button>
                     <Button type="submit" :disabled="form.processing">
-                        {{ form.processing ? 'Saving...' : 'Save Changes' }}
+                        {{ form.processing ? __('Saving...') : __('Save Changes') }}
                     </Button>
                 </div>
             </form>

@@ -9,8 +9,11 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { AlertTriangle, FileText, Calendar, User } from 'lucide-vue-next';
 import type { PermissionRequestDeleteProps } from '@employee/types';
+import { useTranslation } from '@/composables/useTranslation';
 
 const props = defineProps<PermissionRequestDeleteProps>();
+
+const { __ } = useTranslation();
 
 const { show, close, redirect } = useModal();
 
@@ -39,7 +42,7 @@ const canSubmit = computed(() => confirmed.value === true);
 const handleSubmit = () => {
     form.delete(`/dashboard/permission-requests/${props.permissionRequest.uuid}`, {
         onSuccess: () => {
-            toast.success('Permission request deleted successfully.');
+            toast.success(__('Permission request deleted successfully.'));
             setTimeout(() => {
                 close();
                 redirect();
@@ -68,11 +71,11 @@ const getStatusVariant = (status: string) => {
 <template>
     <ModalForm
         v-model:open="isOpen"
-        title="Delete Permission Request"
-        description="This action cannot be undone"
+        :title="__('Delete Permission Request')"
+        :description="__('This action cannot be undone')"
         mode="delete"
         size="md"
-        submit-text="Delete Request"
+        :submit-text="__('Delete Request')"
         :loading="form.processing"
         :disabled="!canSubmit"
         @submit="handleSubmit"
@@ -95,13 +98,13 @@ const getStatusVariant = (status: string) => {
 
                 <div class="flex items-center gap-2 text-sm text-muted-foreground">
                     <User class="h-4 w-4" />
-                    <span>{{ permissionRequest.employee?.full_name || 'Unknown' }}</span>
+                    <span>{{ permissionRequest.employee?.full_name || __('Unknown') }}</span>
                 </div>
 
                 <div class="flex items-center gap-2 text-sm text-muted-foreground">
                     <Calendar class="h-4 w-4" />
                     <span>{{ permissionRequest.from_date }} - {{ permissionRequest.to_date }}</span>
-                    <Badge variant="outline">{{ permissionRequest.total_days }} day(s)</Badge>
+                    <Badge variant="outline">{{ permissionRequest.total_days }} {{ __('day(s)') }}</Badge>
                 </div>
             </div>
 
@@ -110,10 +113,10 @@ const getStatusVariant = (status: string) => {
                 <AlertTriangle class="mt-0.5 h-5 w-5 text-destructive" />
                 <div class="space-y-1">
                     <p class="text-sm font-medium text-destructive">
-                        You are about to delete this permission request
+                        {{ __('You are about to delete this permission request') }}
                     </p>
                     <p class="text-sm text-muted-foreground">
-                        This <strong>{{ permissionRequest.type_label }}</strong> request will be permanently removed.
+                        {{ __('This request will be permanently removed.') }}
                     </p>
                 </div>
             </div>
@@ -126,10 +129,10 @@ const getStatusVariant = (status: string) => {
                 />
                 <div class="space-y-1">
                     <Label for="confirmed" class="cursor-pointer font-medium">
-                        I confirm this deletion
+                        {{ __('I confirm this deletion') }}
                     </Label>
                     <p class="text-sm text-muted-foreground">
-                        I understand that this action cannot be undone.
+                        {{ __('I understand that this action cannot be undone.') }}
                     </p>
                 </div>
             </div>

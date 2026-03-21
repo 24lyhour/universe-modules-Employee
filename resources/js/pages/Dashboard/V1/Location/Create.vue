@@ -8,6 +8,7 @@ import { toast } from 'vue-sonner';
 import type { BreadcrumbItem } from '@/types';
 import type { GeofenceType } from '@/components/shared/GeofenceMap/types';
 import { ChevronLeft } from 'lucide-vue-next';
+import { useTranslation } from '@/composables/useTranslation';
 
 interface Employee {
     id: number;
@@ -29,11 +30,13 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const { __ } = useTranslation();
+
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Dashboard', href: '/dashboard' },
-    { title: 'Attendance', href: '/dashboard/attendances' },
-    { title: 'Locations', href: '/dashboard/locations' },
-    { title: 'Create', href: '/dashboard/locations/create' },
+    { title: __('Dashboard'), href: '/dashboard' },
+    { title: __('Attendance'), href: '/dashboard/attendances' },
+    { title: __('Locations'), href: '/dashboard/locations' },
+    { title: __('Create'), href: '/dashboard/locations/create' },
 ];
 
 // Get user's timezone
@@ -66,7 +69,7 @@ const form = useForm({
 const handleSubmit = () => {
     form.post('/dashboard/locations', {
         onSuccess: () => {
-            toast.success('Location created successfully.');
+            toast.success(__('Location created successfully.'));
             router.visit('/dashboard/locations');
         },
     });
@@ -75,7 +78,7 @@ const handleSubmit = () => {
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
-        <Head title="Create Location" />
+        <Head :title="__('Create Location')" />
 
         <div class="flex h-full flex-1 flex-col gap-6 p-6">
             <!-- Header -->
@@ -84,8 +87,8 @@ const handleSubmit = () => {
                     <ChevronLeft class="h-5 w-5" />
                 </Link>
                 <div>
-                    <h1 class="text-xl font-semibold">Create Location</h1>
-                    <p class="text-sm text-muted-foreground">Add a new geofence location for attendance tracking</p>
+                    <h1 class="text-xl font-semibold">{{ __('Create Location') }}</h1>
+                    <p class="text-sm text-muted-foreground">{{ __('Add a new geofence location for attendance tracking') }}</p>
                 </div>
             </div>
 
@@ -102,10 +105,10 @@ const handleSubmit = () => {
                 <!-- Actions at Bottom -->
                 <div class="flex justify-end gap-3 pt-4">
                     <Button type="button" variant="outline" as-child>
-                        <Link href="/dashboard/locations">Cancel</Link>
+                        <Link href="/dashboard/locations">{{ __('Cancel') }}</Link>
                     </Button>
                     <Button type="submit" :disabled="form.processing">
-                        {{ form.processing ? 'Creating...' : 'Create Location' }}
+                        {{ form.processing ? __('Creating...') : __('Create Location') }}
                     </Button>
                 </div>
             </form>

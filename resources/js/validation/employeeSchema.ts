@@ -1,6 +1,17 @@
 import { z } from 'zod';
 import { toTypedSchema } from '@vee-validate/zod';
 
+/**
+ * Helper for optional number fields that may come as strings from backend/inputs.
+ * Handles: "75000.00" -> 75000, "" -> null, null -> null, undefined -> undefined
+ */
+const coerceOptionalNumber = (schema: z.ZodNumber = z.number()) =>
+    z.preprocess((val) => {
+        if (val === '' || val === null || val === undefined) return null;
+        const num = Number(val);
+        return isNaN(num) ? null : num;
+    }, schema.nullable().optional());
+
 // Zod schema for academic level validation
 export const academicLevelSchema = z.object({
     _key: z.number(),
@@ -14,7 +25,7 @@ export const academicLevelSchema = z.object({
     degree: z.string().max(255).optional().nullable().or(z.literal('')),
     start_date: z.string().optional().nullable().or(z.literal('')),
     end_date: z.string().optional().nullable().or(z.literal('')),
-    gpa: z.number().min(0).max(4).optional().nullable(),
+    gpa: coerceOptionalNumber(z.number().min(0).max(4)),
     certificate: z.string().max(255).optional().nullable().or(z.literal('')),
     notes: z.string().max(500).optional().nullable().or(z.literal('')),
 });
@@ -70,7 +81,7 @@ export const familyMemberSchema = z.object({
         .max(100, 'Name must be less than 100 characters'),
     gender: z.enum(['male', 'female', 'other']).optional().nullable(),
     date_of_birth: z.string().optional().nullable().or(z.literal('')),
-    age: z.number().int().min(0).max(150).optional().nullable(),
+    age: coerceOptionalNumber(z.number().int().min(0).max(150)),
     occupation: z.string().max(100).optional().nullable().or(z.literal('')),
     phone_number: z.string().max(20).optional().nullable().or(z.literal('')),
     email: z.string().email('Invalid email').optional().nullable().or(z.literal('')),
@@ -133,7 +144,7 @@ export const employeeSchema = z.object({
         .optional()
         .nullable(),
     employee_type: z.enum(['full_time', 'part_time', 'contract', 'intern']).optional().nullable(),
-    salary: z.number().min(0, 'Salary must be positive').optional().nullable(),
+    salary: coerceOptionalNumber(z.number().min(0, 'Salary must be positive')),
     hire_date: z.string().optional().nullable(),
     probation_date: z.string().optional().nullable(),
     probation_end_date: z.string().optional().nullable(),

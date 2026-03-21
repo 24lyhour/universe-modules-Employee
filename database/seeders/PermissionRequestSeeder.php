@@ -2,6 +2,7 @@
 
 namespace Modules\Employee\Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Modules\Employee\Models\Employee;
 use Modules\Employee\Models\PermissionRequest;
@@ -13,6 +14,13 @@ class PermissionRequestSeeder extends Seeder
      */
     public function run(): void
     {
+        // Get a reviewer (first available user)
+        $reviewer = User::first();
+        if (!$reviewer) {
+            $this->command->warn('No users found. Please seed users first.');
+            return;
+        }
+
         // Get active employees
         $employees = Employee::where('status', true)->take(10)->get();
 
@@ -146,7 +154,7 @@ class PermissionRequestSeeder extends Seeder
 
                 // Add review data for non-pending requests
                 if ($status !== PermissionRequest::STATUS_PENDING) {
-                    $data['reviewed_by'] = 1; // Assuming admin user id is 1
+                    $data['reviewed_by'] = $reviewer->id;
                     $data['reviewed_at'] = $data['request_date']->addDays(rand(1, 3));
 
                     if ($status === PermissionRequest::STATUS_APPROVED) {

@@ -8,8 +8,11 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { AlertTriangle, Tags } from 'lucide-vue-next';
 import type { EmployeeTypeDeleteProps } from '@employee/types';
+import { useTranslation } from '@/composables/useTranslation';
 
 const props = defineProps<EmployeeTypeDeleteProps>();
+
+const { __ } = useTranslation();
 
 const { show, close, redirect } = useModal();
 
@@ -38,7 +41,7 @@ const canSubmit = computed(() => confirmed.value === true);
 const handleSubmit = () => {
     form.delete(`/dashboard/employee-types/${props.employeeType.uuid}`, {
         onSuccess: () => {
-            toast.success('Employee type deleted successfully.');
+            toast.success(__('Employee type deleted successfully.'));
             setTimeout(() => {
                 close();
                 redirect();
@@ -56,11 +59,11 @@ const handleCancel = () => {
 <template>
     <ModalForm
         v-model:open="isOpen"
-        title="Delete Employee Type"
-        description="This action cannot be undone"
+        :title="__('Delete Employee Type')"
+        :description="__('This action cannot be undone')"
         mode="delete"
         size="md"
-        submit-text="Delete Type"
+        :submit-text="__('Delete Type')"
         :loading="form.processing"
         :disabled="!canSubmit"
         @submit="handleSubmit"
@@ -85,13 +88,13 @@ const handleCancel = () => {
                 <AlertTriangle class="mt-0.5 h-5 w-5 text-destructive" />
                 <div class="space-y-1">
                     <p class="text-sm font-medium text-destructive">
-                        You are about to delete this employee type
+                        {{ __('You are about to delete this employee type') }}
                     </p>
                     <p class="text-sm text-muted-foreground">
-                        <strong>{{ employeeType.name }}</strong> will be permanently removed from the system.
+                        <strong>{{ employeeType.name }}</strong> {{ __('will be permanently removed from the system.') }}
                     </p>
                     <p v-if="employeeType.employees_count && employeeType.employees_count > 0" class="text-sm text-destructive">
-                        Warning: This type has <strong>{{ employeeType.employees_count }}</strong> employee(s) assigned to it.
+                        {{ __('Warning: This type has') }} <strong>{{ employeeType.employees_count }}</strong> {{ __('employee(s) assigned to it.') }}
                     </p>
                 </div>
             </div>
@@ -104,10 +107,10 @@ const handleCancel = () => {
                 />
                 <div class="space-y-1">
                     <Label for="confirmed" class="cursor-pointer font-medium">
-                        I confirm this deletion
+                        {{ __('I confirm this deletion') }}
                     </Label>
                     <p class="text-sm text-muted-foreground">
-                        I understand that this action cannot be undone.
+                        {{ __('I understand that this action cannot be undone.') }}
                     </p>
                 </div>
             </div>

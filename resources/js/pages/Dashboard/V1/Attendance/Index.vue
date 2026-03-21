@@ -32,12 +32,15 @@ import {
 } from 'lucide-vue-next';
 import type { BreadcrumbItem } from '@/types';
 import type { AttendanceIndexProps, Attendance } from '@employee/types';
+import { useTranslation } from '@/composables/useTranslation';
 
 const props = defineProps<AttendanceIndexProps>();
 
+const { __ } = useTranslation();
+
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Dashboard', href: '/dashboard' },
-    { title: 'Attendance', href: '/dashboard/attendances' },
+    { title: __('Dashboard'), href: '/dashboard' },
+    { title: __('Attendance'), href: '/dashboard/attendances' },
 ];
 
 const search = ref(props.filters.search || '');
@@ -75,57 +78,57 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
 const columns: TableColumn<Attendance>[] = [
     {
         key: 'employee',
-        label: 'Employee',
+        label: __('Employee'),
         render: (attendance) => attendance.employee_name || '-',
     },
     {
         key: 'attendance_date_formatted',
-        label: 'Date',
+        label: __('Date'),
         render: (attendance) => attendance.attendance_date_formatted,
     },
     {
         key: 'check_in_time',
-        label: 'Check In',
+        label: __('Check In'),
         render: (attendance) => attendance.check_in_time || '-',
     },
     {
         key: 'check_out_time',
-        label: 'Check Out',
+        label: __('Check Out'),
         render: (attendance) => attendance.check_out_time || '-',
     },
     {
         key: 'work_hours_formatted',
-        label: 'Work Hours',
+        label: __('Work Hours'),
         render: (attendance) => attendance.work_hours_formatted,
     },
     {
         key: 'status',
-        label: 'Status',
+        label: __('Status'),
         render: (attendance) => attendance.status_label,
     },
     {
         key: 'check_in_method_label',
-        label: 'Method',
+        label: __('Method'),
         render: (attendance) => attendance.check_in_method_label,
     },
 ];
 
 const actions: TableAction<Attendance>[] = [
     {
-        label: 'View',
+        label: __('View'),
         icon: Eye,
         onClick: (attendance) => router.visit(`/dashboard/attendances/${attendance.uuid}`),
     },
     {
-        label: 'Edit',
+        label: __('Edit'),
         icon: Pencil,
         onClick: (attendance) => router.visit(`/dashboard/attendances/${attendance.uuid}/edit`),
     },
     {
-        label: 'Delete',
+        label: __('Delete'),
         icon: Trash2,
         onClick: (attendance) => {
-            if (confirm('Are you sure you want to delete this attendance record?')) {
+            if (window.confirm(__('Are you sure you want to delete this attendance record?'))) {
                 router.delete(`/dashboard/attendances/${attendance.uuid}`);
             }
         },
@@ -200,36 +203,36 @@ const openBulkDeleteDialog = () => {
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
-        <Head title="Attendance" />
+        <Head :title="__('Attendance')" />
 
         <div class="flex h-full flex-1 flex-col gap-6 p-6">
             <!-- Stats -->
             <div class="grid gap-4 md:grid-cols-5">
                 <StatsCard
-                    title="Total Employees"
+                    :title="__('Total Employees')"
                     :value="props.stats.total_employees"
                     :icon="Users"
                 />
                 <StatsCard
-                    title="Present Today"
+                    :title="__('Present Today')"
                     :value="props.stats.present_today"
                     :icon="CheckCircle"
                     variant="success"
                 />
                 <StatsCard
-                    title="Late Today"
+                    :title="__('Late Today')"
                     :value="props.stats.late_today"
                     :icon="Clock"
                     variant="warning"
                 />
                 <StatsCard
-                    title="Absent Today"
+                    :title="__('Absent Today')"
                     :value="props.stats.absent_today"
                     :icon="XCircle"
                     variant="danger"
                 />
                 <StatsCard
-                    title="On Leave"
+                    :title="__('On Leave')"
                     :value="props.stats.on_leave_today"
                     :icon="CalendarDays"
                     variant="info"
@@ -240,31 +243,31 @@ const openBulkDeleteDialog = () => {
             <div class="flex flex-col gap-4">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h2 class="text-lg font-semibold">Attendance Records</h2>
-                        <p class="text-sm text-muted-foreground">Track employee attendance</p>
+                        <h2 class="text-lg font-semibold">{{ __('Attendance Records') }}</h2>
+                        <p class="text-sm text-muted-foreground">{{ __('Track employee attendance') }}</p>
                     </div>
                     <div class="flex items-center gap-2">
                         <ButtonGroup>
                             <Button variant="default">
                                 <Database class="mr-2 h-4 w-4" />
-                                All
+                                {{ __('All') }}
                             </Button>
                             <Button variant="outline" @click="handleTrash">
                                 <Trash2 class="mr-2 h-4 w-4" />
-                                Trash
+                                {{ __('Trash') }}
                             </Button>
                         </ButtonGroup>
                         <Button variant="outline" @click="handleAnalytics">
                             <BarChart3 class="mr-2 h-4 w-4" />
-                            Analytics
+                            {{ __('Analytics') }}
                         </Button>
                         <Button variant="outline" @click="handleOpenScanner">
                             <QrCode class="mr-2 h-4 w-4" />
-                            QR Scanner
+                            {{ __('QR Scanner') }}
                         </Button>
                         <Button @click="handleCreate">
                             <Plus class="mr-2 h-4 w-4" />
-                            Manual Entry
+                            {{ __('Manual Entry') }}
                         </Button>
                     </div>
                 </div>
@@ -275,17 +278,17 @@ const openBulkDeleteDialog = () => {
                         <Search class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
                             v-model="search"
-                            placeholder="Search by employee..."
+                            :placeholder="__('Search by employee...')"
                             class="pl-9"
                             @keyup.enter="handleSearch"
                         />
                     </div>
                     <Select v-model="statusFilter">
                         <SelectTrigger class="w-[150px]">
-                            <SelectValue placeholder="Status" />
+                            <SelectValue :placeholder="__('Status')" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">All Status</SelectItem>
+                            <SelectItem value="all">{{ __('All Status') }}</SelectItem>
                             <SelectItem
                                 v-for="(label, value) in props.statuses"
                                 :key="value"
@@ -297,10 +300,10 @@ const openBulkDeleteDialog = () => {
                     </Select>
                     <Select v-model="departmentFilter">
                         <SelectTrigger class="w-[180px]">
-                            <SelectValue placeholder="Department" />
+                            <SelectValue :placeholder="__('Department')" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">All Departments</SelectItem>
+                            <SelectItem value="all">{{ __('All Departments') }}</SelectItem>
                             <SelectItem
                                 v-for="dept in props.departmentOptions"
                                 :key="dept.id"
@@ -314,13 +317,13 @@ const openBulkDeleteDialog = () => {
                         v-model="dateFrom"
                         type="date"
                         class="w-[150px]"
-                        placeholder="From"
+                        :placeholder="__('From')"
                     />
                     <Input
                         v-model="dateTo"
                         type="date"
                         class="w-[150px]"
-                        placeholder="To"
+                        :placeholder="__('To')"
                     />
                 </div>
 
@@ -340,7 +343,7 @@ const openBulkDeleteDialog = () => {
                     <template #bulk-actions>
                         <Button variant="destructive" size="sm" @click="openBulkDeleteDialog">
                             <Trash2 class="mr-2 h-4 w-4" />
-                            Delete Selected
+                            {{ __('Delete Selected') }}
                         </Button>
                     </template>
                     <template #cell-employee="{ item }">

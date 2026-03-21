@@ -41,8 +41,10 @@ import { computed } from 'vue';
 import type { BreadcrumbItem } from '@/types';
 import type { EmployeeShowProps } from '@employee/types';
 import Account from '@employee/Components/Dashboard/AccountForm.vue';
+import { useTranslation } from '@/composables/useTranslation';
 
 const props = defineProps<EmployeeShowProps>();
+const { __ } = useTranslation();
 
 // Family members that should always be shown
 const alwaysVisibleRelationships = ['father', 'mother', 'sibling'];
@@ -67,12 +69,12 @@ const displayableFamilyMembers = computed(() => {
 });
 
 const formatRelationship = (relationship: string) => {
-    return relationship.charAt(0).toUpperCase() + relationship.slice(1);
+    return __(relationship.charAt(0).toUpperCase() + relationship.slice(1));
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Dashboard', href: '/dashboard' },
-    { title: 'Employees', href: '/dashboard/employees' },
+    { title: __('Dashboard'), href: '/dashboard' },
+    { title: __('Employees'), href: '/dashboard/employees' },
     { title: props.employee.full_name, href: `/dashboard/employees/${props.employee.uuid}` },
 ];
 
@@ -115,7 +117,7 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
                 <Button variant="ghost" size="icon" as-child>
                     <Link href="/dashboard/employees"><ArrowLeft class="h-4 w-4" /></Link>
                 </Button>
-                <h1 class="text-xl font-semibold">Employee Profile</h1>
+                <h1 class="text-xl font-semibold">{{ __('Employee Profile') }}</h1>
             </div>
 
             <!-- Profile Card -->
@@ -129,21 +131,21 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
                     <div class="flex-1">
                         <div class="flex flex-wrap items-center gap-2 mb-1">
                             <h2 class="text-2xl font-bold">{{ employee.full_name }}</h2>
-                            <Badge :variant="employee.status ? 'default' : 'secondary'">{{ employee.status ? 'Active' : 'Inactive' }}</Badge>
-                            <Badge v-if="employee.is_on_probation" variant="outline" class="border-orange-400 text-orange-500">Probation</Badge>
+                            <Badge :variant="employee.status ? 'default' : 'secondary'">{{ employee.status ? __('Active') : __('Inactive') }}</Badge>
+                            <Badge v-if="employee.is_on_probation" variant="outline" class="border-orange-400 text-orange-500">{{ __('Probation') }}</Badge>
                         </div>
-                        <p class="text-muted-foreground">{{ employee.job_title || 'Employee' }}</p>
+                        <p class="text-muted-foreground">{{ employee.job_title || __('Employee') }}</p>
                         <p class="text-sm text-muted-foreground font-mono mt-1">{{ employee.employee_code }}</p>
                     </div>
                     <div class="flex items-center gap-2">
                         <Button variant="outline" as-child>
                             <Link :href="`/dashboard/employees/${employee.uuid}/qr-badge`">
-                                <QrCode class="h-4 w-4 mr-2" /> QR Badge
+                                <QrCode class="h-4 w-4 mr-2" /> {{ __('QR Badge') }}
                             </Link>
                         </Button>
                         <Button as-child>
                             <Link :href="`/dashboard/employees/${employee.uuid}/edit`">
-                                <Pencil class="h-4 w-4 mr-2" /> Edit
+                                <Pencil class="h-4 w-4 mr-2" /> {{ __('Edit') }}
                             </Link>
                         </Button>
                         <DropdownMenu>
@@ -157,26 +159,26 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
                                 <DropdownMenuItem v-if="employee.has_account" as-child>
                                     <Link :href="`/dashboard/employees/${employee.uuid}/change-password`" class="flex items-center cursor-pointer">
                                         <Key class="h-4 w-4 mr-2" />
-                                        Change Password
+                                        {{ __('Change Password') }}
                                     </Link>
                                 </DropdownMenuItem>
                                 <!-- No account but has email or phone: Show Create Account -->
                                 <DropdownMenuItem v-else-if="employee.email || employee.phone_number" as-child>
                                     <Link :href="`/dashboard/employees/${employee.uuid}/create-account`" class="flex items-center cursor-pointer">
                                         <UserPlus class="h-4 w-4 mr-2" />
-                                        Create Account
+                                        {{ __('Create Account') }}
                                     </Link>
                                 </DropdownMenuItem>
                                 <!-- No account and no email/phone: Show disabled Create Account -->
                                 <DropdownMenuItem v-else disabled class="opacity-50">
                                     <UserPlus class="h-4 w-4 mr-2" />
-                                    Create Account (No contact info)
+                                    {{ __('Create Account (No contact info)') }}
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem as-child>
                                     <Link :href="`/dashboard/employees/${employee.uuid}/delete`" class="flex items-center cursor-pointer text-destructive">
                                         <XCircle class="h-4 w-4 mr-2" />
-                                        Delete
+                                        {{ __('Delete') }}
                                     </Link>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -188,14 +190,14 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 divide-y md:divide-y-0 md:divide-x">
                     <!-- Contact -->
                     <div class="p-6 space-y-4">
-                        <h3 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Contact</h3>
+                        <h3 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Contact') }}</h3>
                         <div class="space-y-3">
                             <div class="flex items-center gap-3">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-full bg-muted">
                                     <Mail class="h-4 w-4 text-muted-foreground" />
                                 </div>
                                 <div>
-                                    <p class="text-xs text-muted-foreground">Email</p>
+                                    <p class="text-xs text-muted-foreground">{{ __('Email') }}</p>
                                     <p class="text-sm">{{ employee.email || '-' }}</p>
                                 </div>
                             </div>
@@ -204,7 +206,7 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
                                     <Phone class="h-4 w-4 text-muted-foreground" />
                                 </div>
                                 <div>
-                                    <p class="text-xs text-muted-foreground">Phone</p>
+                                    <p class="text-xs text-muted-foreground">{{ __('Phone') }}</p>
                                     <p class="text-sm">{{ employee.phone_number || '-' }}</p>
                                 </div>
                             </div>
@@ -213,7 +215,7 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
                                     <MapPin class="h-4 w-4 text-muted-foreground" />
                                 </div>
                                 <div>
-                                    <p class="text-xs text-muted-foreground">Address</p>
+                                    <p class="text-xs text-muted-foreground">{{ __('Address') }}</p>
                                     <p class="text-sm">{{ employee.current_address || '-' }}</p>
                                 </div>
                             </div>
@@ -222,14 +224,14 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
 
                     <!-- Employment -->
                     <div class="p-6 space-y-4">
-                        <h3 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Employment</h3>
+                        <h3 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Employment') }}</h3>
                         <div class="space-y-3">
                             <div class="flex items-center gap-3">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-full bg-muted">
                                     <Building2 class="h-4 w-4 text-muted-foreground" />
                                 </div>
                                 <div>
-                                    <p class="text-xs text-muted-foreground">Organization</p>
+                                    <p class="text-xs text-muted-foreground">{{ __('Organization') }}</p>
                                     <p class="text-sm">{{ employee.school_name || '-' }}</p>
                                     <p v-if="employee.department_name" class="text-xs text-muted-foreground">{{ employee.department_name }}</p>
                                 </div>
@@ -239,7 +241,7 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
                                     <Banknote class="h-4 w-4 text-muted-foreground" />
                                 </div>
                                 <div>
-                                    <p class="text-xs text-muted-foreground">Salary</p>
+                                    <p class="text-xs text-muted-foreground">{{ __('Salary') }}</p>
                                     <p class="text-sm font-semibold">{{ formatCurrency(employee.salary) }}</p>
                                 </div>
                             </div>
@@ -248,7 +250,7 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
                                     <Calendar class="h-4 w-4 text-muted-foreground" />
                                 </div>
                                 <div>
-                                    <p class="text-xs text-muted-foreground">Hire Date</p>
+                                    <p class="text-xs text-muted-foreground">{{ __('Hire Date') }}</p>
                                     <p class="text-sm">{{ formatDate(employee.hire_date) }}</p>
                                 </div>
                             </div>
@@ -260,35 +262,35 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
 
                     <!-- Personal & Certification -->
                     <div class="p-6 space-y-4">
-                        <h3 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Details</h3>
+                        <h3 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Details') }}</h3>
                         <div class="space-y-3">
                             <div class="grid grid-cols-2 gap-2 text-sm">
                                 <div>
-                                    <p class="text-xs text-muted-foreground">Gender</p>
-                                    <p>{{ employee.gender ? employee.gender.charAt(0).toUpperCase() + employee.gender.slice(1) : '-' }}</p>
+                                    <p class="text-xs text-muted-foreground">{{ __('Gender') }}</p>
+                                    <p>{{ employee.gender ? __(employee.gender.charAt(0).toUpperCase() + employee.gender.slice(1)) : '-' }}</p>
                                 </div>
                                 <div>
-                                    <p class="text-xs text-muted-foreground">Birth Date</p>
+                                    <p class="text-xs text-muted-foreground">{{ __('Birth Date') }}</p>
                                     <p>{{ formatDate(employee.date_of_birth) }}</p>
                                 </div>
                                 <div>
-                                    <p class="text-xs text-muted-foreground">Birth Place</p>
+                                    <p class="text-xs text-muted-foreground">{{ __('Birth Place') }}</p>
                                     <p>{{ employee.birth_place || '-' }}</p>
                                 </div>
                                 <div>
-                                    <p class="text-xs text-muted-foreground">Ethnicity</p>
+                                    <p class="text-xs text-muted-foreground">{{ __('Ethnicity') }}</p>
                                     <p>{{ employee.ethnicity || '-' }}</p>
                                 </div>
                                 <div>
-                                    <p class="text-xs text-muted-foreground">Marital Status</p>
-                                    <p>{{ employee.marital_status ? employee.marital_status.charAt(0).toUpperCase() + employee.marital_status.slice(1) : '-' }}</p>
+                                    <p class="text-xs text-muted-foreground">{{ __('Marital Status') }}</p>
+                                    <p>{{ employee.marital_status ? __(employee.marital_status.charAt(0).toUpperCase() + employee.marital_status.slice(1)) : '-' }}</p>
                                 </div>
                             </div>
 
                             <div v-if="employee.certificate || employee.certificate_code" class="pt-3 border-t">
                                 <div class="flex items-center gap-2 mb-2">
                                     <Award class="h-4 w-4 text-muted-foreground" />
-                                    <span class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Certification</span>
+                                    <span class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Certification') }}</span>
                                 </div>
                                 <p class="text-sm">{{ employee.certificate || '-' }}</p>
                                 <p v-if="employee.certificate_code" class="text-xs text-muted-foreground font-mono">{{ employee.certificate_code }}</p>
@@ -302,22 +304,45 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
                     <div class="flex flex-wrap items-center gap-4">
                         <div class="flex items-center gap-2">
                             <Calendar class="h-4 w-4 text-muted-foreground" />
-                            <span class="text-sm font-medium">Probation:</span>
+                            <span class="text-sm font-medium">{{ __('Probation:') }}</span>
                         </div>
                         <div class="flex items-center gap-2 text-sm">
                             <span class="text-muted-foreground">{{ formatDate(employee.probation_date) }}</span>
                             <span class="text-muted-foreground">→</span>
                             <span class="text-muted-foreground">{{ formatDate(employee.probation_end_date) }}</span>
                             <Badge :variant="employee.is_on_probation ? 'outline' : 'default'" :class="employee.is_on_probation ? 'border-orange-400 text-orange-500' : ''">
-                                {{ employee.is_on_probation ? 'In Progress' : 'Completed' }}
+                                {{ employee.is_on_probation ? __('In Progress') : __('Completed') }}
                             </Badge>
                         </div>
                     </div>
                 </div>
 
-                <!-- Certificate Image -->
-                <div v-if="employee.certificate_image" class="p-6 border-t">
-                    <h3 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Certificate Document</h3>
+                <!-- Certificate Images (Array) -->
+                <div v-if="employee.certificate_images && Array.isArray(employee.certificate_images) && employee.certificate_images.length > 0" class="p-6 border-t">
+                    <h3 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">{{ __('Certificate Documents') }} ({{ employee.certificate_images.length }})</h3>
+                    <div class="flex flex-wrap gap-4">
+                        <a
+                            v-for="(image, index) in employee.certificate_images"
+                            :key="index"
+                            :href="image"
+                            target="_blank"
+                            class="inline-block group relative"
+                        >
+                            <img
+                                :src="image"
+                                :alt="`${employee.full_name} Certificate ${index + 1}`"
+                                class="max-h-48 rounded-lg border shadow-sm object-contain hover:shadow-md transition-shadow"
+                                @error="($event.target as HTMLImageElement).style.display = 'none'"
+                            />
+                            <span class="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                {{ index + 1 }}/{{ employee.certificate_images.length }}
+                            </span>
+                        </a>
+                    </div>
+                </div>
+                <!-- Fallback: Single Certificate Image (legacy) -->
+                <div v-else-if="employee.certificate_image" class="p-6 border-t">
+                    <h3 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">{{ __('Certificate Document') }}</h3>
                     <a :href="employee.certificate_image" target="_blank" class="inline-block">
                         <img
                             :src="employee.certificate_image"
@@ -343,7 +368,7 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
                 <CardHeader class="pb-3">
                     <CardTitle class="flex items-center gap-2 text-base">
                         <Users class="h-4 w-4" />
-                        Family Members
+                        {{ __('Family Members') }}
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -359,25 +384,25 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
                             </div>
                             <div class="grid grid-cols-2 gap-2 text-sm">
                                 <div v-if="member.gender">
-                                    <p class="text-xs text-muted-foreground">Gender</p>
-                                    <p>{{ member.gender.charAt(0).toUpperCase() + member.gender.slice(1) }}</p>
+                                    <p class="text-xs text-muted-foreground">{{ __('Gender') }}</p>
+                                    <p>{{ __(member.gender.charAt(0).toUpperCase() + member.gender.slice(1)) }}</p>
                                 </div>
                                 <div v-if="member.date_of_birth">
-                                    <p class="text-xs text-muted-foreground">Birth Date</p>
+                                    <p class="text-xs text-muted-foreground">{{ __('Birth Date') }}</p>
                                     <p>{{ formatDate(member.date_of_birth) }}</p>
                                 </div>
                                 <div v-if="member.occupation">
-                                    <p class="text-xs text-muted-foreground">Occupation</p>
+                                    <p class="text-xs text-muted-foreground">{{ __('Occupation') }}</p>
                                     <p>{{ member.occupation }}</p>
                                 </div>
                                 <div v-if="member.phone_number">
-                                    <p class="text-xs text-muted-foreground">Phone</p>
+                                    <p class="text-xs text-muted-foreground">{{ __('Phone') }}</p>
                                     <p>{{ member.phone_number }}</p>
                                 </div>
                             </div>
                             <div v-if="member.is_emergency_contact || member.is_dependent" class="flex gap-2 pt-1">
-                                <Badge v-if="member.is_emergency_contact" variant="secondary" class="text-xs">Emergency Contact</Badge>
-                                <Badge v-if="member.is_dependent" variant="outline" class="text-xs">Dependent</Badge>
+                                <Badge v-if="member.is_emergency_contact" variant="secondary" class="text-xs">{{ __('Emergency Contact') }}</Badge>
+                                <Badge v-if="member.is_dependent" variant="outline" class="text-xs">{{ __('Dependent') }}</Badge>
                             </div>
                         </div>
                     </div>
@@ -389,7 +414,7 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
                 <CardHeader class="pb-3">
                     <CardTitle class="flex items-center gap-2 text-base">
                         <GraduationCap class="h-4 w-4" />
-                        Academic Levels
+                        {{ __('Academic Levels') }}
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -401,23 +426,23 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
                         >
                             <div class="flex items-center justify-between">
                                 <span class="font-medium">{{ level.institution }}</span>
-                                <Badge variant="outline">{{ level.level.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) }}</Badge>
+                                <Badge variant="outline">{{ __(level.level.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())) }}</Badge>
                             </div>
                             <div class="grid grid-cols-2 gap-2 text-sm">
                                 <div v-if="level.field_of_study">
-                                    <p class="text-xs text-muted-foreground">Field of Study</p>
+                                    <p class="text-xs text-muted-foreground">{{ __('Field of Study') }}</p>
                                     <p>{{ level.field_of_study }}</p>
                                 </div>
                                 <div v-if="level.degree">
-                                    <p class="text-xs text-muted-foreground">Degree</p>
+                                    <p class="text-xs text-muted-foreground">{{ __('Degree') }}</p>
                                     <p>{{ level.degree }}</p>
                                 </div>
                                 <div v-if="level.start_date || level.end_date">
-                                    <p class="text-xs text-muted-foreground">Period</p>
+                                    <p class="text-xs text-muted-foreground">{{ __('Period') }}</p>
                                     <p>{{ formatDate(level.start_date) }} - {{ formatDate(level.end_date) }}</p>
                                 </div>
                                 <div v-if="level.gpa">
-                                    <p class="text-xs text-muted-foreground">GPA</p>
+                                    <p class="text-xs text-muted-foreground">{{ __('GPA') }}</p>
                                     <p>{{ level.gpa }}</p>
                                 </div>
                             </div>
@@ -434,7 +459,7 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
                 <CardHeader class="pb-3">
                     <CardTitle class="flex items-center gap-2 text-base">
                         <Languages class="h-4 w-4" />
-                        Foreign Languages
+                        {{ __('Foreign Languages') }}
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -446,15 +471,15 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
                         >
                             <div class="flex items-center justify-between">
                                 <span class="font-medium">{{ lang.language }}</span>
-                                <Badge variant="outline">{{ lang.proficiency.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) }}</Badge>
+                                <Badge variant="outline">{{ __(lang.proficiency.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())) }}</Badge>
                             </div>
                             <div class="grid grid-cols-2 gap-2 text-sm">
                                 <div v-if="lang.certificate">
-                                    <p class="text-xs text-muted-foreground">Certificate</p>
+                                    <p class="text-xs text-muted-foreground">{{ __('Certificate') }}</p>
                                     <p>{{ lang.certificate }}</p>
                                 </div>
                                 <div v-if="lang.certificate_score">
-                                    <p class="text-xs text-muted-foreground">Score</p>
+                                    <p class="text-xs text-muted-foreground">{{ __('Score') }}</p>
                                     <p>{{ lang.certificate_score }}</p>
                                 </div>
                             </div>
@@ -468,7 +493,7 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
                 <CardHeader class="pb-3">
                     <CardTitle class="flex items-center gap-2 text-base">
                         <Briefcase class="h-4 w-4" />
-                        Job Experience
+                        {{ __('Job Experience') }}
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -480,32 +505,32 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
                         >
                             <div class="flex items-start justify-between">
                                 <div>
-                                    <span class="font-medium">{{ exp.position || 'Position' }}</span>
+                                    <span class="font-medium">{{ exp.position || __('Position') }}</span>
                                     <p class="text-sm text-muted-foreground">{{ exp.company }}</p>
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <Badge v-if="exp.employment_type" variant="outline">
-                                        {{ exp.employment_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) }}
+                                        {{ __(exp.employment_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())) }}
                                     </Badge>
-                                    <Badge v-if="exp.is_current" variant="default">Current</Badge>
+                                    <Badge v-if="exp.is_current" variant="default">{{ __('Current') }}</Badge>
                                 </div>
                             </div>
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
                                 <div v-if="exp.province || exp.city">
-                                    <p class="text-xs text-muted-foreground">Location</p>
+                                    <p class="text-xs text-muted-foreground">{{ __('Location') }}</p>
                                     <p>{{ [exp.city, exp.province].filter(Boolean).join(', ') || '-' }}</p>
                                 </div>
                                 <div>
-                                    <p class="text-xs text-muted-foreground">Period</p>
-                                    <p>{{ formatDate(exp.start_date) }} - {{ exp.is_current ? 'Present' : formatDate(exp.end_date) }}</p>
+                                    <p class="text-xs text-muted-foreground">{{ __('Period') }}</p>
+                                    <p>{{ formatDate(exp.start_date) }} - {{ exp.is_current ? __('Present') : formatDate(exp.end_date) }}</p>
                                 </div>
                                 <div v-if="exp.responsibilities" class="col-span-2">
-                                    <p class="text-xs text-muted-foreground">Responsibilities</p>
+                                    <p class="text-xs text-muted-foreground">{{ __('Responsibilities') }}</p>
                                     <p>{{ exp.responsibilities }}</p>
                                 </div>
                             </div>
                             <div v-if="exp.reason_for_leaving && !exp.is_current" class="text-sm">
-                                <p class="text-xs text-muted-foreground">Reason for Leaving</p>
+                                <p class="text-xs text-muted-foreground">{{ __('Reason for Leaving') }}</p>
                                 <p>{{ exp.reason_for_leaving }}</p>
                             </div>
                         </div>
@@ -516,10 +541,10 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
             <!-- Attendance Statistics -->
             <div class="space-y-4">
                 <div class="flex items-center justify-between">
-                    <h2 class="text-lg font-semibold">Attendance Statistics</h2>
+                    <h2 class="text-lg font-semibold">{{ __('Attendance Statistics') }}</h2>
                     <Button variant="outline" size="sm" as-child>
                         <Link href="/dashboard/attendances/analytics">
-                            <TrendingUp class="h-4 w-4 mr-2" /> View Analytics
+                            <TrendingUp class="h-4 w-4 mr-2" /> {{ __('View Analytics') }}
                         </Link>
                     </Button>
                 </div>
@@ -534,7 +559,7 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
                                 </div>
                                 <div>
                                     <p class="text-2xl font-bold">{{ attendanceStats.this_month.total }}</p>
-                                    <p class="text-xs text-muted-foreground">Total Days</p>
+                                    <p class="text-xs text-muted-foreground">{{ __('Total Days') }}</p>
                                 </div>
                             </div>
                         </CardContent>
@@ -547,7 +572,7 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
                                 </div>
                                 <div>
                                     <p class="text-2xl font-bold text-green-600">{{ attendanceStats.this_month.present }}</p>
-                                    <p class="text-xs text-muted-foreground">Present</p>
+                                    <p class="text-xs text-muted-foreground">{{ __('Present') }}</p>
                                 </div>
                             </div>
                         </CardContent>
@@ -560,7 +585,7 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
                                 </div>
                                 <div>
                                     <p class="text-2xl font-bold text-yellow-600">{{ attendanceStats.this_month.late }}</p>
-                                    <p class="text-xs text-muted-foreground">Late</p>
+                                    <p class="text-xs text-muted-foreground">{{ __('Late') }}</p>
                                 </div>
                             </div>
                         </CardContent>
@@ -573,7 +598,7 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
                                 </div>
                                 <div>
                                     <p class="text-2xl font-bold text-red-600">{{ attendanceStats.this_month.absent }}</p>
-                                    <p class="text-xs text-muted-foreground">Absent</p>
+                                    <p class="text-xs text-muted-foreground">{{ __('Absent') }}</p>
                                 </div>
                             </div>
                         </CardContent>
@@ -586,7 +611,7 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
                                 </div>
                                 <div>
                                     <p class="text-2xl font-bold">{{ attendanceStats.this_month.work_hours_formatted }}</p>
-                                    <p class="text-xs text-muted-foreground">Work Hours</p>
+                                    <p class="text-xs text-muted-foreground">{{ __('Work Hours') }}</p>
                                 </div>
                             </div>
                         </CardContent>
@@ -598,24 +623,24 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
                     <!-- Year & All Time Summary -->
                     <Card>
                         <CardHeader class="pb-3">
-                            <CardTitle class="text-base">Summary</CardTitle>
+                            <CardTitle class="text-base">{{ __('Summary') }}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div class="space-y-3">
                                 <div class="flex items-center justify-between py-2 border-b">
-                                    <span class="text-sm text-muted-foreground">This Year Total</span>
-                                    <span class="font-semibold">{{ attendanceStats.this_year.total }} days</span>
+                                    <span class="text-sm text-muted-foreground">{{ __('This Year Total') }}</span>
+                                    <span class="font-semibold">{{ attendanceStats.this_year.total }} {{ __('days') }}</span>
                                 </div>
                                 <div class="flex items-center justify-between py-2 border-b">
-                                    <span class="text-sm text-muted-foreground">This Year Work Hours</span>
+                                    <span class="text-sm text-muted-foreground">{{ __('This Year Work Hours') }}</span>
                                     <span class="font-semibold">{{ attendanceStats.this_year.work_hours_formatted }}</span>
                                 </div>
                                 <div class="flex items-center justify-between py-2 border-b">
-                                    <span class="text-sm text-muted-foreground">All Time Total</span>
-                                    <span class="font-semibold">{{ attendanceStats.all_time.total }} days</span>
+                                    <span class="text-sm text-muted-foreground">{{ __('All Time Total') }}</span>
+                                    <span class="font-semibold">{{ attendanceStats.all_time.total }} {{ __('days') }}</span>
                                 </div>
                                 <div class="flex items-center justify-between py-2">
-                                    <span class="text-sm text-muted-foreground">All Time Work Hours</span>
+                                    <span class="text-sm text-muted-foreground">{{ __('All Time Work Hours') }}</span>
                                     <span class="font-semibold">{{ attendanceStats.all_time.work_hours_formatted }}</span>
                                 </div>
                             </div>
@@ -625,7 +650,7 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
                     <!-- Recent Attendance -->
                     <Card>
                         <CardHeader class="pb-3">
-                            <CardTitle class="text-base">Recent Attendance</CardTitle>
+                            <CardTitle class="text-base">{{ __('Recent Attendance') }}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div class="space-y-2">
@@ -649,7 +674,7 @@ const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructiv
                                     </div>
                                 </div>
                                 <div v-if="attendanceStats.recent.length === 0" class="text-center py-4 text-muted-foreground text-sm">
-                                    No attendance records yet
+                                    {{ __('No attendance records yet') }}
                                 </div>
                             </div>
                         </CardContent>

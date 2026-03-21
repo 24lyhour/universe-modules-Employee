@@ -7,12 +7,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Pencil, Tags, Users, Calendar, Clock } from 'lucide-vue-next';
 import type { BreadcrumbItem } from '@/types';
 import type { EmployeeTypeShowProps } from '@employee/types';
+import { useTranslation } from '@/composables/useTranslation';
 
 const props = defineProps<EmployeeTypeShowProps>();
 
+const { __ } = useTranslation();
+
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Dashboard', href: '/dashboard' },
-    { title: 'Employee Types', href: '/dashboard/employee-types' },
+    { title: __('Dashboard'), href: '/dashboard' },
+    { title: __('Employee Types'), href: '/dashboard/employee-types' },
     { title: props.employeeType.name, href: `/dashboard/employee-types/${props.employeeType.uuid}` },
 ];
 
@@ -32,7 +35,7 @@ const formatDate = (date: string | null) => {
                 <Button variant="ghost" size="icon" as-child>
                     <Link href="/dashboard/employee-types"><ArrowLeft class="h-4 w-4" /></Link>
                 </Button>
-                <h1 class="text-xl font-semibold">Employee Type Details</h1>
+                <h1 class="text-xl font-semibold">{{ __('Employee Type Details') }}</h1>
             </div>
 
             <!-- Main Card -->
@@ -46,27 +49,27 @@ const formatDate = (date: string | null) => {
                             <CardTitle class="text-2xl">{{ employeeType.name }}</CardTitle>
                             <div class="flex items-center gap-2 mt-1">
                                 <Badge :variant="employeeType.status ? 'default' : 'secondary'">
-                                    {{ employeeType.status ? 'Active' : 'Inactive' }}
+                                    {{ employeeType.status ? __('Active') : __('Inactive') }}
                                 </Badge>
                             </div>
                         </div>
                     </div>
                     <Button as-child>
                         <Link :href="`/dashboard/employee-types/${employeeType.uuid}/edit`">
-                            <Pencil class="h-4 w-4 mr-2" /> Edit
+                            <Pencil class="h-4 w-4 mr-2" /> {{ __('Edit') }}
                         </Link>
                     </Button>
                 </CardHeader>
                 <CardContent class="grid gap-6">
                     <!-- Description -->
                     <div>
-                        <h3 class="text-sm font-medium text-muted-foreground mb-2">Description</h3>
-                        <p class="text-sm">{{ employeeType.description || 'No description provided.' }}</p>
+                        <h3 class="text-sm font-medium text-muted-foreground mb-2">{{ __('Description') }}</h3>
+                        <p class="text-sm">{{ employeeType.description || __('No description provided.') }}</p>
                     </div>
 
                     <!-- Working Hours -->
                     <div v-if="employeeType.time_start || employeeType.time_end">
-                        <h3 class="text-sm font-medium text-muted-foreground mb-2">Working Hours</h3>
+                        <h3 class="text-sm font-medium text-muted-foreground mb-2">{{ __('Working Hours') }}</h3>
                         <div class="flex items-center gap-2">
                             <Clock class="h-4 w-4 text-muted-foreground" />
                             <span class="text-sm">
@@ -82,7 +85,7 @@ const formatDate = (date: string | null) => {
                                 <Users class="h-5 w-5 text-muted-foreground" />
                             </div>
                             <div>
-                                <p class="text-xs text-muted-foreground">Total Employees</p>
+                                <p class="text-xs text-muted-foreground">{{ __('Total Employees') }}</p>
                                 <p class="text-lg font-semibold">{{ employeeType.employees_count || 0 }}</p>
                             </div>
                         </div>
@@ -91,7 +94,7 @@ const formatDate = (date: string | null) => {
                                 <Calendar class="h-5 w-5 text-muted-foreground" />
                             </div>
                             <div>
-                                <p class="text-xs text-muted-foreground">Created</p>
+                                <p class="text-xs text-muted-foreground">{{ __('Created') }}</p>
                                 <p class="text-sm font-medium">{{ formatDate(employeeType.created_at) }}</p>
                             </div>
                         </div>
@@ -100,7 +103,7 @@ const formatDate = (date: string | null) => {
                                 <Calendar class="h-5 w-5 text-muted-foreground" />
                             </div>
                             <div>
-                                <p class="text-xs text-muted-foreground">Last Updated</p>
+                                <p class="text-xs text-muted-foreground">{{ __('Last Updated') }}</p>
                                 <p class="text-sm font-medium">{{ formatDate(employeeType.updated_at) }}</p>
                             </div>
                         </div>

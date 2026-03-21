@@ -11,8 +11,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import TiptapEditor from '@/components/TiptapEditor.vue';
 import { FileText, Calendar, CheckCircle, XCircle } from 'lucide-vue-next';
 import type { PermissionRequestReviewProps } from '@employee/types';
+import { useTranslation } from '@/composables/useTranslation';
 
 const props = defineProps<PermissionRequestReviewProps>();
+
+const { __ } = useTranslation();
 
 const { show, close, redirect } = useModal();
 
@@ -53,8 +56,8 @@ const handleSubmit = () => {
     form.post(`/dashboard/permission-requests/${props.permissionRequest.uuid}/review`, {
         onSuccess: () => {
             const message = form.action === 'approve'
-                ? 'Permission request approved successfully.'
-                : 'Permission request rejected.';
+                ? __('Permission request approved successfully.')
+                : __('Permission request rejected.');
             toast.success(message);
             setTimeout(() => {
                 close();
@@ -97,11 +100,11 @@ watch(() => form.action, (newAction) => {
 <template>
     <ModalForm
         v-model:open="isOpen"
-        title="Review Permission Request"
-        description="Approve or reject this request"
+        :title="__('Review Permission Request')"
+        :description="__('Approve or reject this request')"
         mode="edit"
         size="lg"
-        :submit-text="form.action === 'approve' ? 'Approve Request' : 'Reject Request'"
+        :submit-text="form.action === 'approve' ? __('Approve Request') : __('Reject Request')"
         :loading="form.processing"
         @submit="handleSubmit"
         @cancel="handleCancel"
@@ -133,20 +136,20 @@ watch(() => form.action, (newAction) => {
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <Badge variant="outline">{{ permissionRequest.total_days }} day(s)</Badge>
+                    <Badge variant="outline">{{ permissionRequest.total_days }} {{ __('day(s)') }}</Badge>
                     <Badge variant="secondary">{{ permissionRequest.status_label }}</Badge>
                 </div>
 
                 <!-- Reason -->
                 <div class="border-t pt-3">
-                    <p class="text-xs text-muted-foreground mb-1">Reason:</p>
+                    <p class="text-xs text-muted-foreground mb-1">{{ __('Reason') }}:</p>
                     <p class="text-sm">{{ permissionRequest.reason }}</p>
                 </div>
             </div>
 
             <!-- Action Selection -->
             <div class="space-y-3">
-                <Label>Decision</Label>
+                <Label>{{ __('Decision') }}</Label>
                 <div class="grid grid-cols-2 gap-4">
                     <button
                         type="button"
@@ -157,7 +160,7 @@ watch(() => form.action, (newAction) => {
                             : 'border-muted bg-popover hover:bg-accent hover:text-accent-foreground'"
                     >
                         <CheckCircle class="mb-3 h-6 w-6 text-green-600" />
-                        <span class="text-sm font-medium">Approve</span>
+                        <span class="text-sm font-medium">{{ __('Approve') }}</span>
                     </button>
                     <button
                         type="button"
@@ -168,17 +171,17 @@ watch(() => form.action, (newAction) => {
                             : 'border-muted bg-popover hover:bg-accent hover:text-accent-foreground'"
                     >
                         <XCircle class="mb-3 h-6 w-6 text-red-600" />
-                        <span class="text-sm font-medium">Reject</span>
+                        <span class="text-sm font-medium">{{ __('Reject') }}</span>
                     </button>
                 </div>
             </div>
 
             <!-- Approve: Review Note -->
             <div v-if="form.action === 'approve'" class="space-y-2">
-                <Label>Approval Note (Optional)</Label>
+                <Label>{{ __('Approval Note (Optional)') }}</Label>
                 <TiptapEditor
                     v-model="reviewNoteContent"
-                    placeholder="Add any notes about your approval decision..."
+                    :placeholder="__('Add any notes about your approval decision...')"
                     min-height="120px"
                     max-height="200px"
                 />
@@ -191,9 +194,9 @@ watch(() => form.action, (newAction) => {
             <div v-if="form.action === 'reject'" class="space-y-4">
                 <div class="flex items-center justify-between rounded-lg border p-4">
                     <div>
-                        <p class="text-sm font-medium">Provide Detailed Rejection Reason</p>
+                        <p class="text-sm font-medium">{{ __('Provide Detailed Rejection Reason') }}</p>
                         <p class="text-xs text-muted-foreground">
-                            Enable to add a detailed explanation for the rejection
+                            {{ __('Enable to add a detailed explanation for the rejection') }}
                         </p>
                     </div>
                     <Switch v-model="form.rejected_status" />
@@ -201,11 +204,11 @@ watch(() => form.action, (newAction) => {
 
                 <div v-if="form.rejected_status" class="space-y-2">
                     <Label>
-                        Rejection Reason <span class="text-destructive">*</span>
+                        {{ __('Rejection Reason') }} <span class="text-destructive">*</span>
                     </Label>
                     <TiptapEditor
                         v-model="rejectedReasonContent"
-                        placeholder="Please provide a detailed reason for rejecting this request..."
+                        :placeholder="__('Please provide a detailed reason for rejecting this request...')"
                         min-height="150px"
                         max-height="250px"
                     />

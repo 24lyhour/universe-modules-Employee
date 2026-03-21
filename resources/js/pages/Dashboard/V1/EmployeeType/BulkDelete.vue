@@ -7,12 +7,15 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { AlertTriangle, Tags } from 'lucide-vue-next';
 import type { EmployeeTypeModel } from '@employee/types';
+import { useTranslation } from '@/composables/useTranslation';
 
 interface BulkDeleteProps {
     employeeTypes: EmployeeTypeModel[];
 }
 
 const props = defineProps<BulkDeleteProps>();
+
+const { __ } = useTranslation();
 
 const { show, close, redirect } = useModal();
 const confirmed = ref(false);
@@ -56,11 +59,11 @@ const handleCancel = () => {
 <template>
     <ModalForm
         v-model:open="isOpen"
-        :title="`Delete ${employeeTypes.length} Employee Type${employeeTypes.length > 1 ? 's' : ''}`"
-        description="This action will move the selected employee types to trash"
+        :title="__('Delete') + ' ' + employeeTypes.length + ' ' + __('Employee Type(s)')"
+        :description="__('This action will move the selected employee types to trash')"
         mode="delete"
         size="md"
-        :submit-text="`Delete ${employeeTypes.length} Employee Type${employeeTypes.length > 1 ? 's' : ''}`"
+        :submit-text="__('Delete') + ' ' + employeeTypes.length + ' ' + __('Employee Type(s)')"
         :loading="form.processing"
         :disabled="!canSubmit"
         @submit="handleSubmit"
@@ -71,10 +74,10 @@ const handleCancel = () => {
             <div class="flex items-start gap-3">
                 <AlertTriangle class="h-5 w-5 text-destructive mt-0.5" />
                 <div>
-                    <p class="text-sm font-medium text-destructive">Warning</p>
+                    <p class="text-sm font-medium text-destructive">{{ __('Warning') }}</p>
                     <p class="text-sm text-muted-foreground mt-1">
-                        You are about to delete {{ employeeTypes.length }} employee type{{ employeeTypes.length > 1 ? 's' : '' }}.
-                        This will move them to trash.
+                        {{ __('You are about to delete') }} {{ employeeTypes.length }} {{ __('Employee Type(s)') }}.
+                        {{ __('This will move them to trash.') }}
                     </p>
                 </div>
             </div>
@@ -82,7 +85,7 @@ const handleCancel = () => {
 
         <!-- Items to delete -->
         <div class="space-y-2">
-            <Label class="text-sm font-medium">Items to delete:</Label>
+            <Label class="text-sm font-medium">{{ __('Items to delete:') }}</Label>
             <div class="max-h-[200px] overflow-y-auto rounded-md border p-3 space-y-2">
                 <div
                     v-for="type in employeeTypes"
@@ -95,7 +98,7 @@ const handleCancel = () => {
                     <div>
                         <span class="font-medium">{{ type.name }}</span>
                         <span v-if="type.employees_count" class="text-xs text-muted-foreground ml-2">
-                            ({{ type.employees_count }} employees)
+                            ({{ type.employees_count }} {{ __('employees') }})
                         </span>
                     </div>
                 </div>
@@ -110,7 +113,7 @@ const handleCancel = () => {
                 @update:model-value="confirmed = $event as boolean"
             />
             <Label for="confirm-delete" class="text-sm cursor-pointer">
-                I understand that this will delete {{ employeeTypes.length }} employee type{{ employeeTypes.length > 1 ? 's' : '' }}
+                {{ __('I understand that this will delete') }} {{ employeeTypes.length }} {{ __('Employee Type(s)') }}
             </Label>
         </div>
     </ModalForm>

@@ -15,8 +15,11 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import type { AttendanceCreateProps, AttendanceStatus } from '@employee/types';
+import { useTranslation } from '@/composables/useTranslation';
 
 const props = defineProps<AttendanceCreateProps>();
+
+const { __ } = useTranslation();
 
 const { show, close, redirect } = useModal();
 
@@ -47,7 +50,7 @@ const isFormInvalid = computed(() => {
 const handleSubmit = () => {
     form.post('/dashboard/attendances', {
         onSuccess: () => {
-            toast.success('Attendance recorded successfully.');
+            toast.success(__('Attendance recorded successfully.'));
             setTimeout(() => {
                 close();
                 redirect();
@@ -85,11 +88,11 @@ const employeeOptions = computed(() => {
 <template>
     <ModalForm
         v-model:open="isOpen"
-        title="Manual Attendance Entry"
-        description="Record attendance manually for an employee"
+        :title="__('Manual Attendance Entry')"
+        :description="__('Record attendance manually for an employee')"
         mode="create"
         size="lg"
-        submit-text="Record Attendance"
+        :submit-text="__('Record Attendance')"
         :loading="form.processing"
         :disabled="isFormInvalid"
         @submit="handleSubmit"
@@ -99,14 +102,14 @@ const employeeOptions = computed(() => {
             <!-- Employee -->
             <div class="space-y-2">
                 <Label for="employee_id">
-                    Employee <span class="text-destructive">*</span>
+                    {{ __('Employee') }} <span class="text-destructive">*</span>
                 </Label>
                 <SearchableSelect
                     :model-value="form.employee_id"
                     :options="employeeOptions"
-                    placeholder="Select employee"
-                    search-placeholder="Search employees..."
-                    empty-message="No employees found."
+                    :placeholder="__('Select employee')"
+                    :search-placeholder="__('Search employees...')"
+                    :empty-message="__('No employees found.')"
                     @update:model-value="handleEmployeeChange"
                 />
                 <p v-if="form.errors.employee_id" class="text-xs text-destructive">
@@ -117,7 +120,7 @@ const employeeOptions = computed(() => {
             <!-- Date -->
             <div class="space-y-2">
                 <Label for="attendance_date">
-                    Date <span class="text-destructive">*</span>
+                    {{ __('Date') }} <span class="text-destructive">*</span>
                 </Label>
                 <Input
                     id="attendance_date"
@@ -133,7 +136,7 @@ const employeeOptions = computed(() => {
             <!-- Time -->
             <div class="grid gap-4 sm:grid-cols-2">
                 <div class="space-y-2">
-                    <Label for="check_in_time">Check In Time</Label>
+                    <Label for="check_in_time">{{ __('Check In Time') }}</Label>
                     <Input
                         id="check_in_time"
                         type="time"
@@ -141,7 +144,7 @@ const employeeOptions = computed(() => {
                     />
                 </div>
                 <div class="space-y-2">
-                    <Label for="check_out_time">Check Out Time</Label>
+                    <Label for="check_out_time">{{ __('Check Out Time') }}</Label>
                     <Input
                         id="check_out_time"
                         type="time"
@@ -153,11 +156,11 @@ const employeeOptions = computed(() => {
             <!-- Status -->
             <div class="space-y-2">
                 <Label for="status">
-                    Status <span class="text-destructive">*</span>
+                    {{ __('Status') }} <span class="text-destructive">*</span>
                 </Label>
                 <Select :model-value="form.status" @update:model-value="handleStatusChange">
                     <SelectTrigger :class="{ 'border-destructive': form.errors.status }">
-                        <SelectValue placeholder="Select status" />
+                        <SelectValue :placeholder="__('Select status')" />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem
@@ -176,11 +179,11 @@ const employeeOptions = computed(() => {
 
             <!-- Notes -->
             <div class="space-y-2">
-                <Label for="notes">Notes</Label>
+                <Label for="notes">{{ __('Notes') }}</Label>
                 <Textarea
                     id="notes"
                     v-model="form.notes"
-                    placeholder="Add any notes..."
+                    :placeholder="__('Add any notes...')"
                     rows="3"
                 />
             </div>

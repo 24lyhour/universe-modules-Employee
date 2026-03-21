@@ -18,12 +18,15 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Tags, CheckCircle, XCircle, Search, Eye, Pencil, Trash2, Database } from 'lucide-vue-next';
 import type { BreadcrumbItem } from '@/types';
 import type { EmployeeTypeIndexProps, EmployeeTypeModel } from '@employee/types';
+import { useTranslation } from '@/composables/useTranslation';
 
 const props = defineProps<EmployeeTypeIndexProps>();
 
+const { __ } = useTranslation();
+
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Dashboard', href: '/dashboard' },
-    { title: 'Employee Types', href: '/dashboard/employee-types' },
+    { title: __('Dashboard'), href: '/dashboard' },
+    { title: __('Employee Types'), href: '/dashboard/employee-types' },
 ];
 
 const search = ref(props.filters.search || '');
@@ -44,39 +47,39 @@ const openBulkDeleteDialog = () => {
 const columns: TableColumn<EmployeeTypeModel>[] = [
     {
         key: 'name',
-        label: 'Name',
+        label: __('Name'),
         render: (type) => type.name,
     },
     {
         key: 'description',
-        label: 'Description',
+        label: __('Description'),
         render: (type) => type.description || '-',
     },
     {
         key: 'employees_count',
-        label: 'Employees',
+        label: __('Employees'),
         render: (type) => type.employees_count?.toString() || '0',
     },
     {
         key: 'status',
-        label: 'Status',
-        render: (type) => type.status ? 'Active' : 'Inactive',
+        label: __('Status'),
+        render: (type) => type.status ? __('Active') : __('Inactive'),
     },
 ];
 
 const actions: TableAction<EmployeeTypeModel>[] = [
     {
-        label: 'View',
+        label: __('View'),
         icon: Eye,
         onClick: (type) => router.visit(`/dashboard/employee-types/${type.uuid}`),
     },
     {
-        label: 'Edit',
+        label: __('Edit'),
         icon: Pencil,
         onClick: (type) => router.visit(`/dashboard/employee-types/${type.uuid}/edit`),
     },
     {
-        label: 'Delete',
+        label: __('Delete'),
         icon: Trash2,
         onClick: (type) => router.visit(`/dashboard/employee-types/${type.uuid}/delete`),
         variant: 'destructive',
@@ -139,24 +142,24 @@ const handleStatusToggle = (type: EmployeeTypeModel, newStatus: boolean) => {
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
-        <Head title="Employee Types" />
+        <Head :title="__('Employee Types')" />
 
         <div class="flex h-full flex-1 flex-col gap-6 p-6">
             <!-- Stats -->
             <div class="grid gap-4 md:grid-cols-3">
                 <StatsCard
-                    title="Total Types"
+                    :title="__('Total Types')"
                     :value="props.stats.total"
                     :icon="Tags"
                 />
                 <StatsCard
-                    title="Active"
+                    :title="__('Active')"
                     :value="props.stats.active"
                     :icon="CheckCircle"
                     variant="success"
                 />
                 <StatsCard
-                    title="Inactive"
+                    :title="__('Inactive')"
                     :value="props.stats.inactive"
                     :icon="XCircle"
                     variant="warning"
@@ -167,23 +170,23 @@ const handleStatusToggle = (type: EmployeeTypeModel, newStatus: boolean) => {
             <div class="flex flex-col gap-4">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h2 class="text-lg font-semibold">Employee Types</h2>
-                        <p class="text-sm text-muted-foreground">Manage employee type categories</p>
+                        <h2 class="text-lg font-semibold">{{ __('Employee Types') }}</h2>
+                        <p class="text-sm text-muted-foreground">{{ __('Manage employee type categories') }}</p>
                     </div>
                     <div class="flex items-center gap-2">
                         <ButtonGroup>
                             <Button variant="default">
                                 <Database class="mr-2 h-4 w-4" />
-                                All
+                                {{ __('All') }}
                             </Button>
                             <Button variant="outline" @click="handleTrash">
                                 <Trash2 class="mr-2 h-4 w-4" />
-                                Trash
+                                {{ __('Trash') }}
                             </Button>
                         </ButtonGroup>
                         <Button @click="handleCreate">
                             <Plus class="mr-2 h-4 w-4" />
-                            Add Type
+                            {{ __('Add Type') }}
                         </Button>
                     </div>
                 </div>
@@ -194,19 +197,19 @@ const handleStatusToggle = (type: EmployeeTypeModel, newStatus: boolean) => {
                         <Search class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
                             v-model="search"
-                            placeholder="Search employee types..."
+                            :placeholder="__('Search employee types...')"
                             class="pl-9"
                             @keyup.enter="handleSearch"
                         />
                     </div>
                     <Select v-model="statusFilter">
                         <SelectTrigger class="w-[150px]">
-                            <SelectValue placeholder="Status" />
+                            <SelectValue :placeholder="__('Status')" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">All Status</SelectItem>
-                            <SelectItem value="1">Active</SelectItem>
-                            <SelectItem value="0">Inactive</SelectItem>
+                            <SelectItem value="all">{{ __('All Status') }}</SelectItem>
+                            <SelectItem value="1">{{ __('Active') }}</SelectItem>
+                            <SelectItem value="0">{{ __('Inactive') }}</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
@@ -227,7 +230,7 @@ const handleStatusToggle = (type: EmployeeTypeModel, newStatus: boolean) => {
                     <template #bulk-actions>
                         <Button variant="destructive" size="sm" @click="openBulkDeleteDialog">
                             <Trash2 class="mr-2 h-4 w-4" />
-                            Delete Selected
+                            {{ __('Delete Selected') }}
                         </Button>
                     </template>
                     <template #cell-name="{ item }">
@@ -235,7 +238,7 @@ const handleStatusToggle = (type: EmployeeTypeModel, newStatus: boolean) => {
                     </template>
                     <template #cell-employees_count="{ item }">
                         <Badge variant="secondary">
-                            {{ item.employees_count || 0 }} employees
+                            {{ item.employees_count || 0 }} {{ __('employees') }}
                         </Badge>
                     </template>
                     <template #cell-status="{ item }">
@@ -245,7 +248,7 @@ const handleStatusToggle = (type: EmployeeTypeModel, newStatus: boolean) => {
                                 @update:model-value="handleStatusToggle(item, $event)"
                             />
                             <span class="text-sm text-muted-foreground">
-                                {{ item.status ? 'Active' : 'Inactive' }}
+                                {{ item.status ? __('Active') : __('Inactive') }}
                             </span>
                         </div>
                     </template>

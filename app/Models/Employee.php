@@ -64,6 +64,7 @@ class Employee extends Model
         'probation_end_date',
         'certificate',
         'certificate_image',
+        'certificate_images',
         'certificate_code',
         'avatar_url',
         'employee_qr_code',
@@ -82,6 +83,7 @@ class Employee extends Model
         'salary' => 'decimal:2',
         'status' => 'boolean',
         'marital_status' => MaritalStatusEnum::class,
+        'certificate_images' => 'array',
     ];
 
     /**

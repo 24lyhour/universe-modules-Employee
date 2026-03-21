@@ -60,6 +60,7 @@ import {
     ChevronRight,
 } from 'lucide-vue-next';
 import type { BreadcrumbItem } from '@/types';
+import { useTranslation } from '@/composables/useTranslation';
 
 interface School {
     id: number;
@@ -107,10 +108,12 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const { __ } = useTranslation();
+
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Dashboard', href: '/dashboard' },
-    { title: 'Attendance', href: '/dashboard/attendances' },
-    { title: 'Locations', href: '/dashboard/locations' },
+    { title: __('Dashboard'), href: '/dashboard' },
+    { title: __('Attendance'), href: '/dashboard/attendances' },
+    { title: __('Locations'), href: '/dashboard/locations' },
 ];
 
 const searchQuery = ref(props.filters.search || '');
@@ -123,13 +126,13 @@ const isSavingSchedule = ref(false);
 
 // Days of the week
 const daysOfWeek = [
-    { key: 'monday', label: 'Monday', short: 'Mon' },
-    { key: 'tuesday', label: 'Tuesday', short: 'Tue' },
-    { key: 'wednesday', label: 'Wednesday', short: 'Wed' },
-    { key: 'thursday', label: 'Thursday', short: 'Thu' },
-    { key: 'friday', label: 'Friday', short: 'Fri' },
-    { key: 'saturday', label: 'Saturday', short: 'Sat' },
-    { key: 'sunday', label: 'Sunday', short: 'Sun' },
+    { key: 'monday', label: __('Monday'), short: __('Mon') },
+    { key: 'tuesday', label: __('Tuesday'), short: __('Tue') },
+    { key: 'wednesday', label: __('Wednesday'), short: __('Wed') },
+    { key: 'thursday', label: __('Thursday'), short: __('Thu') },
+    { key: 'friday', label: __('Friday'), short: __('Fri') },
+    { key: 'saturday', label: __('Saturday'), short: __('Sat') },
+    { key: 'sunday', label: __('Sunday'), short: __('Sun') },
 ];
 
 // Default operating hours
@@ -377,19 +380,19 @@ const handleStatusToggle = (location: Location, newStatus: boolean) => {
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
-        <Head title="Locations - Geofence Management" />
+        <Head :title="__('Locations - Geofence Management')" />
 
         <div class="flex h-full flex-1 flex-col gap-4 p-4 md:p-6">
             <!-- Header -->
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-xl font-semibold">Scan Locations</h1>
-                    <p class="text-sm text-muted-foreground">Manage geofence locations for attendance</p>
+                    <h1 class="text-xl font-semibold">{{ __('Scan Locations') }}</h1>
+                    <p class="text-sm text-muted-foreground">{{ __('Manage geofence locations for attendance') }}</p>
                 </div>
                 <Button as-child>
                     <Link href="/dashboard/locations/create">
                         <Plus class="mr-2 h-4 w-4" />
-                        Add Location
+                        {{ __('Add Location') }}
                     </Link>
                 </Button>
             </div>
@@ -397,26 +400,26 @@ const handleStatusToggle = (location: Location, newStatus: boolean) => {
             <!-- Stats -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <StatsCard
-                    title="Total Locations"
+                    :title="__('Total Locations')"
                     :value="stats.total"
                     :icon="MapPin"
                 />
                 <StatsCard
-                    title="Active"
+                    :title="__('Active')"
                     :value="stats.active"
                     :icon="CheckCircle"
                     variant="success"
                     value-color="text-green-600"
                 />
                 <StatsCard
-                    title="Inactive"
+                    :title="__('Inactive')"
                     :value="stats.inactive"
                     :icon="XCircle"
                     variant="secondary"
                     value-color="text-gray-500"
                 />
                 <StatsCard
-                    title="Geofence Enforced"
+                    :title="__('Geofence Enforced')"
                     :value="stats.enforced"
                     :icon="Shield"
                     variant="info"
@@ -430,17 +433,17 @@ const handleStatusToggle = (location: Location, newStatus: boolean) => {
                     <Search class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                         v-model="searchQuery"
-                        placeholder="Search locations..."
+                        :placeholder="__('Search locations...')"
                         class="pl-9"
                         @keyup.enter="handleSearch"
                     />
                 </div>
                 <Select v-model="typeFilter" @update:modelValue="handleFilter">
                     <SelectTrigger class="w-[140px]">
-                        <SelectValue placeholder="All Types" />
+                        <SelectValue :placeholder="__('All Types')" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">All Types</SelectItem>
+                        <SelectItem value="all">{{ __('All Types') }}</SelectItem>
                         <SelectItem v-for="(label, key) in types" :key="key" :value="key">
                             {{ label }}
                         </SelectItem>
@@ -448,12 +451,12 @@ const handleStatusToggle = (location: Location, newStatus: boolean) => {
                 </Select>
                 <Select v-model="statusFilter" @update:modelValue="handleFilter">
                     <SelectTrigger class="w-[140px]">
-                        <SelectValue placeholder="All Status" />
+                        <SelectValue :placeholder="__('All Status')" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">All Status</SelectItem>
-                        <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="inactive">Inactive</SelectItem>
+                        <SelectItem value="all">{{ __('All Status') }}</SelectItem>
+                        <SelectItem value="active">{{ __('Active') }}</SelectItem>
+                        <SelectItem value="inactive">{{ __('Inactive') }}</SelectItem>
                     </SelectContent>
                 </Select>
             </div>
@@ -479,7 +482,7 @@ const handleStatusToggle = (location: Location, newStatus: boolean) => {
                                         location.is_active ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
                                     ]"
                                 >
-                                    {{ location.is_active ? 'Active' : 'Inactive' }}
+                                    {{ location.is_active ? __('Active') : __('Inactive') }}
                                 </span>
                             </div>
                             <div class="flex items-center gap-2 mt-1">
@@ -503,12 +506,12 @@ const handleStatusToggle = (location: Location, newStatus: boolean) => {
                                     <DropdownMenuItem as-child>
                                         <Link :href="`/dashboard/locations/${location.uuid}/edit`" class="flex items-center gap-2">
                                             <Pencil class="h-4 w-4" />
-                                            Edit Location
+                                            {{ __('Edit Location') }}
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem @click="openScheduleDialog(location)" class="flex items-center gap-2">
                                         <CalendarClock class="h-4 w-4" />
-                                        Manage Schedule
+                                        {{ __('Manage Schedule') }}
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem
@@ -516,7 +519,7 @@ const handleStatusToggle = (location: Location, newStatus: boolean) => {
                                         class="flex items-center gap-2 text-destructive"
                                     >
                                         <Trash2 class="h-4 w-4" />
-                                        Delete
+                                        {{ __('Delete') }}
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
@@ -526,39 +529,39 @@ const handleStatusToggle = (location: Location, newStatus: boolean) => {
                     <!-- Info Grid -->
                     <div class="grid grid-cols-2 gap-3 text-sm">
                         <div>
-                            <p class="text-xs text-muted-foreground mb-0.5">School</p>
+                            <p class="text-xs text-muted-foreground mb-0.5">{{ __('School') }}</p>
                             <div class="flex items-center gap-1.5">
                                 <Building2 class="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                                <span class="truncate">{{ location.school?.name || 'No School' }}</span>
+                                <span class="truncate">{{ location.school?.name || __('No School') }}</span>
                             </div>
                         </div>
                         <div>
-                            <p class="text-xs text-muted-foreground mb-0.5">Location</p>
+                            <p class="text-xs text-muted-foreground mb-0.5">{{ __('Location') }}</p>
                             <div class="flex items-center gap-1.5">
                                 <MapPin class="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                                <span class="truncate">{{ location.city || 'Unknown' }}</span>
+                                <span class="truncate">{{ location.city || __('Unknown') }}</span>
                             </div>
                         </div>
                         <!-- Circle/Dynamic Geofence -->
                         <div v-if="location.geofence_type !== 'polygon'" class="col-span-2">
-                            <p class="text-xs text-muted-foreground mb-0.5">Geofence Radius</p>
+                            <p class="text-xs text-muted-foreground mb-0.5">{{ __('Geofence Radius') }}</p>
                             <div class="flex items-center gap-1.5">
                                 <Shield :class="['h-3.5 w-3.5 shrink-0', location.enforce_geofence ? 'text-green-500' : 'text-muted-foreground']" />
                                 <span>{{ formatDistance(location.geofence_radius) }}</span>
-                                <span class="text-muted-foreground text-xs">({{ location.enforce_geofence ? 'Required' : 'Optional' }})</span>
+                                <span class="text-muted-foreground text-xs">({{ location.enforce_geofence ? __('Required') : __('Optional') }})</span>
                             </div>
                         </div>
                         <!-- Polygon Geofence -->
                         <template v-else-if="location.polygon_coordinates">
                             <div>
-                                <p class="text-xs text-muted-foreground mb-0.5">Total Area</p>
+                                <p class="text-xs text-muted-foreground mb-0.5">{{ __('Total Area') }}</p>
                                 <div class="flex items-center gap-1.5">
                                     <Shield :class="['h-3.5 w-3.5 shrink-0', location.enforce_geofence ? 'text-green-500' : 'text-muted-foreground']" />
                                     <span class="font-medium">{{ formatArea(calculatePolygonArea(location.polygon_coordinates)) }}</span>
                                 </div>
                             </div>
                             <div>
-                                <p class="text-xs text-muted-foreground mb-0.5">Total Distance</p>
+                                <p class="text-xs text-muted-foreground mb-0.5">{{ __('Total Distance') }}</p>
                                 <div class="flex items-center gap-1.5">
                                     <MapPin class="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                                     <span class="font-medium">{{ formatPerimeter(calculatePolygonPerimeter(location.polygon_coordinates)) }}</span>
@@ -572,9 +575,9 @@ const handleStatusToggle = (location: Location, newStatus: boolean) => {
                         <div class="flex items-center gap-3 text-xs text-muted-foreground">
                             <span v-if="hasSchedule(location)" class="flex items-center gap-1">
                                 <Clock class="h-3 w-3 text-blue-500" />
-                                Schedule set
+                                {{ __('Schedule set') }}
                             </span>
-                            <span v-else>No schedule</span>
+                            <span v-else>{{ __('No schedule') }}</span>
                         </div>
                         <Button
                             variant="ghost"
@@ -583,7 +586,7 @@ const handleStatusToggle = (location: Location, newStatus: boolean) => {
                             @click="openInMaps(Number(location.latitude), Number(location.longitude))"
                         >
                             <ExternalLink class="h-3 w-3 mr-1" />
-                            View Map
+                            {{ __('View Map') }}
                         </Button>
                     </div>
                 </div>
@@ -592,9 +595,9 @@ const handleStatusToggle = (location: Location, newStatus: boolean) => {
             <!-- Pagination -->
             <div v-if="pagination && pagination.last_page > 1" class="flex items-center justify-between border-t pt-4">
                 <p class="text-sm text-muted-foreground">
-                    Showing {{ ((pagination.current_page - 1) * pagination.per_page) + 1 }}
-                    to {{ Math.min(pagination.current_page * pagination.per_page, pagination.total) }}
-                    of {{ pagination.total }} locations
+                    {{ __('Showing') }} {{ ((pagination.current_page - 1) * pagination.per_page) + 1 }}
+                    {{ __('to') }} {{ Math.min(pagination.current_page * pagination.per_page, pagination.total) }}
+                    {{ __('of') }} {{ pagination.total }} {{ __('locations') }}
                 </p>
                 <div class="flex items-center gap-2">
                     <Button
@@ -604,7 +607,7 @@ const handleStatusToggle = (location: Location, newStatus: boolean) => {
                         @click="goToPage(pagination.current_page - 1)"
                     >
                         <ChevronLeft class="h-4 w-4 mr-1" />
-                        Previous
+                        {{ __('Previous') }}
                     </Button>
                     <div class="flex items-center gap-1">
                         <template v-for="page in pagination.last_page" :key="page">
@@ -631,7 +634,7 @@ const handleStatusToggle = (location: Location, newStatus: boolean) => {
                         :disabled="pagination.current_page === pagination.last_page"
                         @click="goToPage(pagination.current_page + 1)"
                     >
-                        Next
+                        {{ __('Next') }}
                         <ChevronRight class="h-4 w-4 ml-1" />
                     </Button>
                 </div>
@@ -640,12 +643,12 @@ const handleStatusToggle = (location: Location, newStatus: boolean) => {
             <!-- Empty State -->
             <div v-if="locations.length === 0" class="flex flex-col items-center justify-center py-12">
                 <MapPinned class="h-12 w-12 text-muted-foreground mb-4" />
-                <h3 class="font-medium mb-1">No locations found</h3>
-                <p class="text-sm text-muted-foreground mb-4">Create your first scan location</p>
+                <h3 class="font-medium mb-1">{{ __('No locations found') }}</h3>
+                <p class="text-sm text-muted-foreground mb-4">{{ __('Create your first scan location') }}</p>
                 <Button as-child size="sm">
                     <Link href="/dashboard/locations/create">
                         <Plus class="mr-2 h-4 w-4" />
-                        Add Location
+                        {{ __('Add Location') }}
                     </Link>
                 </Button>
             </div>
@@ -655,19 +658,19 @@ const handleStatusToggle = (location: Location, newStatus: boolean) => {
         <AlertDialog v-model:open="showDeleteDialog">
             <AlertDialogContent>
                 <AlertDialogHeader>
-                    <AlertDialogTitle>Delete Location</AlertDialogTitle>
+                    <AlertDialogTitle>{{ __('Delete Location') }}</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Are you sure you want to delete "{{ selectedLocation?.name }}"?
-                        This action cannot be undone.
+                        {{ __('Are you sure you want to delete') }} "{{ selectedLocation?.name }}"?
+                        {{ __('This action cannot be undone.') }}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogCancel>{{ __('Cancel') }}</AlertDialogCancel>
                     <AlertDialogAction
                         @click="handleDelete"
                         class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                     >
-                        Delete
+                        {{ __('Delete') }}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
@@ -682,7 +685,7 @@ const handleStatusToggle = (location: Location, newStatus: boolean) => {
                             <CalendarClock class="h-5 w-5 text-blue-500" />
                         </div>
                         <div>
-                            <DialogTitle>Manage Schedule</DialogTitle>
+                            <DialogTitle>{{ __('Manage Schedule') }}</DialogTitle>
                             <DialogDescription>
                                 {{ selectedLocation?.name }}
                             </DialogDescription>
@@ -699,11 +702,11 @@ const handleStatusToggle = (location: Location, newStatus: boolean) => {
                             : 'bg-muted/30'
                     ]">
                         <div>
-                            <Label class="text-base font-medium">Enable Operating Hours</Label>
+                            <Label class="text-base font-medium">{{ __('Enable Operating Hours') }}</Label>
                             <p class="text-sm text-muted-foreground mt-1">
                                 {{ scheduleEnabled
-                                    ? 'Scanning allowed only during set hours'
-                                    : 'No time restrictions for attendance'
+                                    ? __('Scanning allowed only during set hours')
+                                    : __('No time restrictions for attendance')
                                 }}
                             </p>
                         </div>
@@ -715,15 +718,15 @@ const handleStatusToggle = (location: Location, newStatus: boolean) => {
                             @click="scheduleEnabled = !scheduleEnabled"
                         >
                             <Clock class="h-4 w-4 mr-1.5" />
-                            {{ scheduleEnabled ? 'Enabled' : 'Disabled' }}
+                            {{ scheduleEnabled ? __('Enabled') : __('Disabled') }}
                         </Button>
                     </div>
 
                     <!-- Daily Hours -->
                     <div v-if="scheduleEnabled" class="space-y-3">
                         <div class="flex items-center justify-between">
-                            <Label class="text-sm font-medium">Daily Operating Hours</Label>
-                            <span class="text-xs text-muted-foreground">Check days to enable</span>
+                            <Label class="text-sm font-medium">{{ __('Daily Operating Hours') }}</Label>
+                            <span class="text-xs text-muted-foreground">{{ __('Check days to enable') }}</span>
                         </div>
                         <div class="rounded-lg border divide-y">
                             <div
@@ -757,7 +760,7 @@ const handleStatusToggle = (location: Location, newStatus: boolean) => {
                                         type="time"
                                         class="w-28 h-9 text-sm font-mono"
                                     />
-                                    <span class="text-muted-foreground text-sm font-medium">to</span>
+                                    <span class="text-muted-foreground text-sm font-medium">{{ __('to') }}</span>
                                     <Input
                                         v-model="operatingHours[day.key].end"
                                         type="time"
@@ -766,7 +769,7 @@ const handleStatusToggle = (location: Location, newStatus: boolean) => {
                                 </div>
                                 <div v-else class="flex-1">
                                     <Badge variant="outline" class="text-xs text-muted-foreground">
-                                        Closed
+                                        {{ __('Closed') }}
                                     </Badge>
                                 </div>
                             </div>
@@ -777,17 +780,17 @@ const handleStatusToggle = (location: Location, newStatus: boolean) => {
                     <div v-if="!scheduleEnabled" class="rounded-lg bg-muted/50 p-4 text-center">
                         <Clock class="h-8 w-8 mx-auto text-muted-foreground mb-2" />
                         <p class="text-sm text-muted-foreground">
-                            Operating hours are disabled. Employees can scan attendance at any time.
+                            {{ __('Operating hours are disabled. Employees can scan attendance at any time.') }}
                         </p>
                     </div>
                 </div>
 
                 <DialogFooter class="border-t pt-4">
                     <Button variant="outline" @click="closeScheduleDialog">
-                        Cancel
+                        {{ __('Cancel') }}
                     </Button>
                     <Button @click="saveSchedule" :disabled="isSavingSchedule" class="min-w-24">
-                        {{ isSavingSchedule ? 'Saving...' : 'Save Schedule' }}
+                        {{ isSavingSchedule ? __('Saving...') : __('Save Schedule') }}
                     </Button>
                 </DialogFooter>
             </DialogContent>

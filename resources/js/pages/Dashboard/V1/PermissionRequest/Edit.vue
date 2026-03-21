@@ -17,8 +17,11 @@ import {
 import { permissionRequestSchema } from '@employee/validation/permissionRequestSchema';
 import { useFormValidation } from '@/composables/useFormValidation';
 import type { PermissionRequestEditProps, PermissionRequestType } from '@employee/types';
+import { useTranslation } from '@/composables/useTranslation';
 
 const props = defineProps<PermissionRequestEditProps>();
+
+const { __ } = useTranslation();
 
 const { show, close, redirect } = useModal();
 
@@ -63,7 +66,7 @@ const handleSubmit = () => {
     validateAndSubmit(getFormData(), form, () => {
         form.put(`/dashboard/permission-requests/${props.permissionRequest.uuid}`, {
             onSuccess: () => {
-                toast.success('Permission request updated successfully.');
+                toast.success(__('Permission request updated successfully.'));
                 setTimeout(() => {
                     close();
                     redirect();
@@ -90,11 +93,11 @@ const getTypeDescription = (type: PermissionRequestType) => {
 <template>
     <ModalForm
         v-model:open="isOpen"
-        title="Edit Permission Request"
-        description="Update your permission request details"
+        :title="__('Edit Permission Request')"
+        :description="__('Update your permission request details')"
         mode="edit"
         size="lg"
-        submit-text="Update Request"
+        :submit-text="__('Update Request')"
         :loading="form.processing"
         :disabled="isFormInvalid"
         @submit="handleSubmit"
@@ -103,7 +106,7 @@ const getTypeDescription = (type: PermissionRequestType) => {
         <div class="space-y-4">
             <!-- Employee (Read-only) -->
             <div class="space-y-2">
-                <Label>Employee</Label>
+                <Label>{{ __('Employee') }}</Label>
                 <div class="flex items-center gap-3 p-3 rounded-lg border bg-muted/30">
                     <div>
                         <p class="font-medium">{{ props.permissionRequest.employee?.full_name }}</p>
@@ -115,11 +118,11 @@ const getTypeDescription = (type: PermissionRequestType) => {
             <!-- Type -->
             <div class="space-y-2">
                 <Label for="type">
-                    Request Type <span class="text-destructive">*</span>
+                    {{ __('Request Type') }} <span class="text-destructive">*</span>
                 </Label>
                 <Select :model-value="form.type" @update:model-value="handleTypeChange">
                     <SelectTrigger :class="{ 'border-destructive': form.errors.type }">
-                        <SelectValue placeholder="Select type" />
+                        <SelectValue :placeholder="__('Select type')" />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem
@@ -143,7 +146,7 @@ const getTypeDescription = (type: PermissionRequestType) => {
             <div class="grid gap-4 sm:grid-cols-2">
                 <div class="space-y-2">
                     <Label for="from_date">
-                        From Date <span class="text-destructive">*</span>
+                        {{ __('From Date') }} <span class="text-destructive">*</span>
                     </Label>
                     <Input
                         id="from_date"
@@ -157,7 +160,7 @@ const getTypeDescription = (type: PermissionRequestType) => {
                 </div>
                 <div class="space-y-2">
                     <Label for="to_date">
-                        To Date <span class="text-destructive">*</span>
+                        {{ __('To Date') }} <span class="text-destructive">*</span>
                     </Label>
                     <Input
                         id="to_date"
@@ -174,17 +177,17 @@ const getTypeDescription = (type: PermissionRequestType) => {
             <!-- Reason -->
             <div class="space-y-2">
                 <Label for="reason">
-                    Reason <span class="text-destructive">*</span>
+                    {{ __('Reason') }} <span class="text-destructive">*</span>
                 </Label>
                 <Textarea
                     id="reason"
                     v-model="form.reason"
-                    placeholder="Please provide a detailed reason for your request..."
+                    :placeholder="__('Please provide a detailed reason for your request...')"
                     rows="4"
                     :class="{ 'border-destructive': form.errors.reason }"
                 />
                 <p class="text-xs text-muted-foreground">
-                    Minimum 10 characters required
+                    {{ __('Minimum 10 characters required') }}
                 </p>
                 <p v-if="form.errors.reason" class="text-xs text-destructive">
                     {{ form.errors.reason }}

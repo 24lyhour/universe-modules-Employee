@@ -21,12 +21,15 @@ import {
 } from 'lucide-vue-next';
 import type { BreadcrumbItem } from '@/types';
 import type { PermissionRequestIndexProps, PermissionRequest } from '@employee/types';
+import { useTranslation } from '@/composables/useTranslation';
 
 const props = defineProps<PermissionRequestIndexProps>();
 
+const { __ } = useTranslation();
+
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Dashboard', href: '/dashboard' },
-    { title: 'Permission Requests', href: '/dashboard/permission-requests' },
+    { title: __('Dashboard'), href: '/dashboard' },
+    { title: __('Permission Requests'), href: '/dashboard/permission-requests' },
 ];
 
 const search = ref(props.filters.search || '');
@@ -36,56 +39,56 @@ const typeFilter = ref(props.filters.type || 'all');
 const columns: TableColumn<PermissionRequest>[] = [
     {
         key: 'employee',
-        label: 'Employee',
+        label: __('Employee'),
         render: (item) => item.employee?.full_name || '-',
     },
     {
         key: 'type',
-        label: 'Type',
+        label: __('Type'),
         render: (item) => item.type_label,
     },
     {
         key: 'dates',
-        label: 'Period',
+        label: __('Period'),
         render: (item) => `${item.from_date} - ${item.to_date}`,
     },
     {
         key: 'total_days',
-        label: 'Days',
-        render: (item) => `${item.total_days} day(s)`,
+        label: __('Days'),
+        render: (item) => `${item.total_days} ${__('day(s)')}`,
     },
     {
         key: 'status',
-        label: 'Status',
+        label: __('Status'),
         render: (item) => item.status_label,
     },
     {
         key: 'request_date',
-        label: 'Requested',
+        label: __('Requested'),
         render: (item) => item.request_date_formatted || '-',
     },
 ];
 
 const actions: TableAction<PermissionRequest>[] = [
     {
-        label: 'View',
+        label: __('View'),
         icon: Eye,
         onClick: (item: PermissionRequest) => router.visit(`/dashboard/permission-requests/${item.uuid}`),
     },
     {
-        label: 'Review',
+        label: __('Review'),
         icon: ClipboardCheck,
         onClick: (item: PermissionRequest) => router.visit(`/dashboard/permission-requests/${item.uuid}/review`),
         show: (item: PermissionRequest) => item.status === 'pending',
     },
     {
-        label: 'Edit',
+        label: __('Edit'),
         icon: Pencil,
         onClick: (item: PermissionRequest) => router.visit(`/dashboard/permission-requests/${item.uuid}/edit`),
         show: (item: PermissionRequest) => item.status === 'pending',
     },
     {
-        label: 'Delete',
+        label: __('Delete'),
         icon: Trash2,
         onClick: (item: PermissionRequest) => router.visit(`/dashboard/permission-requests/${item.uuid}/delete`),
         variant: 'destructive',
@@ -171,24 +174,24 @@ const getInitials = (name: string | null | undefined) => {
             <!-- Stats -->
             <div class="grid gap-4 md:grid-cols-4">
                 <StatsCard
-                    title="Total Requests"
+                    :title="__('Total Requests')"
                     :value="props.stats.total"
                     :icon="FileText"
                 />
                 <StatsCard
-                    title="Pending"
+                    :title="__('Pending')"
                     :value="props.stats.pending"
                     :icon="Clock"
                     variant="warning"
                 />
                 <StatsCard
-                    title="Approved"
+                    :title="__('Approved')"
                     :value="props.stats.approved"
                     :icon="CheckCircle"
                     variant="success"
                 />
                 <StatsCard
-                    title="Rejected"
+                    :title="__('Rejected')"
                     :value="props.stats.rejected"
                     :icon="XCircle"
                     variant="destructive"
@@ -199,12 +202,12 @@ const getInitials = (name: string | null | undefined) => {
             <div class="flex flex-col gap-4">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h2 class="text-lg font-semibold">Permission Requests</h2>
-                        <p class="text-sm text-muted-foreground">Manage employee leave and permission requests</p>
+                        <h2 class="text-lg font-semibold">{{ __('Permission Requests') }}</h2>
+                        <p class="text-sm text-muted-foreground">{{ __('Manage employee leave and permission requests') }}</p>
                     </div>
                     <Button @click="handleCreate">
                         <Plus class="mr-2 h-4 w-4" />
-                        New Request
+                        {{ __('New Request') }}
                     </Button>
                 </div>
 
@@ -214,17 +217,17 @@ const getInitials = (name: string | null | undefined) => {
                         <Search class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
                             v-model="search"
-                            placeholder="Search requests..."
+                            :placeholder="__('Search requests...')"
                             class="pl-9"
                             @keyup.enter="handleSearch"
                         />
                     </div>
                     <Select v-model="statusFilter">
                         <SelectTrigger class="w-[150px]">
-                            <SelectValue placeholder="Status" />
+                            <SelectValue :placeholder="__('Status')" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">All Status</SelectItem>
+                            <SelectItem value="all">{{ __('All Status') }}</SelectItem>
                             <SelectItem v-for="(label, key) in props.statuses" :key="key" :value="key">
                                 {{ label }}
                             </SelectItem>
@@ -232,10 +235,10 @@ const getInitials = (name: string | null | undefined) => {
                     </Select>
                     <Select v-model="typeFilter">
                         <SelectTrigger class="w-[180px]">
-                            <SelectValue placeholder="Type" />
+                            <SelectValue :placeholder="__('Type')" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">All Types</SelectItem>
+                            <SelectItem value="all">{{ __('All Types') }}</SelectItem>
                             <SelectItem v-for="(label, key) in props.types" :key="key" :value="key">
                                 {{ label }}
                             </SelectItem>
@@ -277,7 +280,7 @@ const getInitials = (name: string | null | undefined) => {
                         </div>
                     </template>
                     <template #cell-total_days="{ item }">
-                        <Badge variant="outline">{{ item.total_days }} day(s)</Badge>
+                        <Badge variant="outline">{{ item.total_days }} {{ __('day(s)') }}</Badge>
                     </template>
                     <template #cell-status="{ item }">
                         <Badge :variant="getStatusVariant(item.status)">

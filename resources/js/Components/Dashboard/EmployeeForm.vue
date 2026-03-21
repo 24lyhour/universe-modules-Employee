@@ -22,6 +22,7 @@ import {
     BasicInformationCard,
     EmploymentInformationCard,
     ProfileSidebar,
+    CertificationCard,
 } from './Widgets/EmployeeFormWidgets';
 import type { InertiaForm } from '@inertiajs/vue3';
 import type {
@@ -250,6 +251,8 @@ const getEmploymentType = (item: JobExperienceFormData) => computed({
 
             <EmploymentInformationCard :form="form" :schools="schools" :departments="departments" :employee-types="employeeTypes" @school-change="emit('schoolChange', $event)" />
 
+            <CertificationCard :form="form" />
+
             <!-- Background Card (Education, Languages, Experience) -->
             <Card>
                 <CardHeader class="pb-4">
@@ -280,6 +283,9 @@ const getEmploymentType = (item: JobExperienceFormData) => computed({
                                     <div class="space-y-2"><Label class="text-xs font-medium">{{ __('Degree') }}</Label><Input v-model="item.degree" placeholder="Bachelor of Science" class="bg-background" /></div>
                                     <div class="space-y-2"><Label class="text-xs font-medium">{{ __('Start Date') }}</Label><Input v-model="item.start_date" type="date" class="bg-background" /></div>
                                     <div class="space-y-2"><Label class="text-xs font-medium">{{ __('End Date') }}</Label><Input v-model="item.end_date" type="date" class="bg-background" /></div>
+                                    <div class="space-y-2"><Label class="text-xs font-medium">{{ __('GPA') }}</Label><Input :model-value="item.gpa ?? undefined" @update:model-value="item.gpa = $event ? Number($event) : null" type="number" step="0.01" min="0" max="4" placeholder="3.50" class="bg-background" /></div>
+                                    <div class="space-y-2"><Label class="text-xs font-medium">{{ __('Certificate') }}</Label><Input v-model="item.certificate" :placeholder="__('Certificate name')" class="bg-background" /></div>
+                                    <div class="space-y-2 sm:col-span-2 lg:col-span-1"><Label class="text-xs font-medium">{{ __('Notes') }}</Label><Input v-model="item.notes" :placeholder="__('Additional notes')" class="bg-background" /></div>
                                 </div>
                             </FormItemCard>
                             <div v-if="!form.academic_levels?.length" class="flex items-center justify-center rounded-lg border border-dashed bg-muted/20 p-6">

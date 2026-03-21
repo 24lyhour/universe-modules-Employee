@@ -207,7 +207,7 @@ const handleStatusToggle = (employee: Employee, newStatus: boolean) => {
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
-        <Head title="Employees" />
+        <Head :title="__('Employees')" />
 
         <div class="flex h-full flex-1 flex-col gap-6 p-6">
             <!-- Employee Stats -->
@@ -350,14 +350,14 @@ const handleStatusToggle = (employee: Employee, newStatus: boolean) => {
                             v-model="dateFrom"
                             type="date"
                             class="w-[150px]"
-                            placeholder="From"
+                            :placeholder="__('From')"
                         />
-                        <span class="text-muted-foreground">to</span>
+                        <span class="text-muted-foreground">{{ __('to') }}</span>
                         <Input
                             v-model="dateTo"
                             type="date"
                             class="w-[150px]"
-                            placeholder="To"
+                            :placeholder="__('To')"
                         />
                     </div>
                 </div>
@@ -419,7 +419,7 @@ const handleStatusToggle = (employee: Employee, newStatus: boolean) => {
                                 @update:model-value="handleStatusToggle(item, $event)"
                             />
                             <span class="text-sm text-muted-foreground">
-                                {{ item.status ? 'Active' : 'Inactive' }}
+                                {{ item.status ? __('Active') : __('Inactive') }}
                             </span>
                         </div>
                     </template>

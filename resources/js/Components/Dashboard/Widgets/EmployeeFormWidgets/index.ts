@@ -4,3 +4,4 @@ export { default as FamilySubSection } from './FamilySubSectionFormWidget.vue';
 export { default as BasicInformationCard } from './BasicInformationCardFormWidget.vue';
 export { default as EmploymentInformationCard } from './EmploymentInformationCardFormWidget.vue';
 export { default as ProfileSidebar } from './ProfileSidebarFormWidget.vue';
+export { default as CertificationCard } from './CertificationCardFormWidget.vue';

@@ -101,12 +101,15 @@ interface Props {
     employeeOptions: SelectOption[];
 }
 
+import { useTranslation } from '@/composables/useTranslation';
+
 const props = defineProps<Props>();
+const { __ } = useTranslation();
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Dashboard', href: '/dashboard' },
-    { title: 'Attendance', href: '/dashboard/attendances' },
-    { title: 'Analytics', href: '/dashboard/attendances/analytics' },
+    { title: __('Dashboard'), href: '/dashboard' },
+    { title: __('Attendance'), href: '/dashboard/attendances' },
+    { title: __('Analytics'), href: '/dashboard/attendances/analytics' },
 ];
 
 // Filters
@@ -151,15 +154,15 @@ const totalStatusCount = computed(() => {
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
-        <Head title="Attendance Analytics" />
+        <Head :title="__('Attendance Analytics')" />
 
         <div class="flex h-full flex-1 flex-col gap-6 p-6">
             <!-- Header -->
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h1 class="text-2xl font-bold">Attendance Analytics</h1>
+                    <h1 class="text-2xl font-bold">{{ __('Attendance Analytics') }}</h1>
                     <p class="text-sm text-muted-foreground">
-                        Overview of attendance patterns and work hours
+                        {{ __('Overview of attendance patterns and work hours') }}
                     </p>
                 </div>
             </div>
@@ -169,27 +172,27 @@ const totalStatusCount = computed(() => {
                 <CardHeader class="pb-3">
                     <CardTitle class="flex items-center gap-2 text-base">
                         <Filter class="h-4 w-4" />
-                        Filters
+                        {{ __('Filters') }}
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div class="flex flex-col sm:flex-row gap-4">
                         <div class="flex-1">
-                            <Label class="text-xs text-muted-foreground">Start Date</Label>
+                            <Label class="text-xs text-muted-foreground">{{ __('Start Date') }}</Label>
                             <Input type="date" v-model="startDate" />
                         </div>
                         <div class="flex-1">
-                            <Label class="text-xs text-muted-foreground">End Date</Label>
+                            <Label class="text-xs text-muted-foreground">{{ __('End Date') }}</Label>
                             <Input type="date" v-model="endDate" />
                         </div>
                         <div class="flex-1">
-                            <Label class="text-xs text-muted-foreground">Department</Label>
+                            <Label class="text-xs text-muted-foreground">{{ __('Department') }}</Label>
                             <Select v-model="departmentId">
                                 <SelectTrigger>
-                                    <SelectValue placeholder="All Departments" />
+                                    <SelectValue :placeholder="__('All Departments')" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">All Departments</SelectItem>
+                                    <SelectItem value="all">{{ __('All Departments') }}</SelectItem>
                                     <SelectItem
                                         v-for="dept in departmentOptions"
                                         :key="dept.value"
@@ -201,13 +204,13 @@ const totalStatusCount = computed(() => {
                             </Select>
                         </div>
                         <div class="flex-1">
-                            <Label class="text-xs text-muted-foreground">Employee</Label>
+                            <Label class="text-xs text-muted-foreground">{{ __('Employee') }}</Label>
                             <Select v-model="employeeId">
                                 <SelectTrigger>
-                                    <SelectValue placeholder="All Employees" />
+                                    <SelectValue :placeholder="__('All Employees')" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">All Employees</SelectItem>
+                                    <SelectItem value="all">{{ __('All Employees') }}</SelectItem>
                                     <SelectItem
                                         v-for="emp in employeeOptions"
                                         :key="emp.value"
@@ -219,7 +222,7 @@ const totalStatusCount = computed(() => {
                             </Select>
                         </div>
                         <div class="flex items-end">
-                            <Button @click="applyFilters">Apply</Button>
+                            <Button @click="applyFilters">{{ __('Apply') }}</Button>
                         </div>
                     </div>
                 </CardContent>
@@ -228,31 +231,31 @@ const totalStatusCount = computed(() => {
             <!-- Summary Stats -->
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 <StatsCard
-                    title="Attendance Rate"
+                    :title="__('Attendance Rate')"
                     :value="`${analytics.summary.attendance_rate}%`"
                     :icon="TrendingUp"
                     variant="info"
                 />
                 <StatsCard
-                    title="Present"
+                    :title="__('Present')"
                     :value="analytics.summary.present"
                     :icon="CheckCircle"
                     variant="success"
                 />
                 <StatsCard
-                    title="Late"
+                    :title="__('Late')"
                     :value="analytics.summary.late"
                     :icon="Clock"
                     variant="warning"
                 />
                 <StatsCard
-                    title="Absent"
+                    :title="__('Absent')"
                     :value="analytics.summary.absent"
                     :icon="AlertTriangle"
                     variant="destructive"
                 />
                 <StatsCard
-                    title="Avg Work Hours"
+                    :title="__('Avg Work Hours')"
                     :value="formatHours(analytics.summary.avg_work_hours)"
                     :icon="BarChart3"
                 />
@@ -268,7 +271,7 @@ const totalStatusCount = computed(() => {
                             </div>
                             <div>
                                 <p class="text-2xl font-bold">{{ analytics.summary.unique_employees }}</p>
-                                <p class="text-xs text-muted-foreground">Unique Employees</p>
+                                <p class="text-xs text-muted-foreground">{{ __('Unique Employees') }}</p>
                             </div>
                         </div>
                     </CardContent>
@@ -281,7 +284,7 @@ const totalStatusCount = computed(() => {
                             </div>
                             <div>
                                 <p class="text-2xl font-bold">{{ formatHours(analytics.summary.total_work_hours) }}</p>
-                                <p class="text-xs text-muted-foreground">Total Work Hours</p>
+                                <p class="text-xs text-muted-foreground">{{ __('Total Work Hours') }}</p>
                             </div>
                         </div>
                     </CardContent>
@@ -294,7 +297,7 @@ const totalStatusCount = computed(() => {
                             </div>
                             <div>
                                 <p class="text-2xl font-bold">{{ analytics.summary.working_days }}</p>
-                                <p class="text-xs text-muted-foreground">Working Days</p>
+                                <p class="text-xs text-muted-foreground">{{ __('Working Days') }}</p>
                             </div>
                         </div>
                     </CardContent>
@@ -307,7 +310,7 @@ const totalStatusCount = computed(() => {
                             </div>
                             <div>
                                 <p class="text-2xl font-bold">{{ analytics.summary.on_leave }}</p>
-                                <p class="text-xs text-muted-foreground">On Leave</p>
+                                <p class="text-xs text-muted-foreground">{{ __('On Leave') }}</p>
                             </div>
                         </div>
                     </CardContent>
@@ -319,8 +322,8 @@ const totalStatusCount = computed(() => {
                 <!-- Status Distribution -->
                 <Card>
                     <CardHeader>
-                        <CardTitle class="text-base">Status Distribution</CardTitle>
-                        <CardDescription>Breakdown of attendance statuses</CardDescription>
+                        <CardTitle class="text-base">{{ __('Status Distribution') }}</CardTitle>
+                        <CardDescription>{{ __('Breakdown of attendance statuses') }}</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div class="space-y-3">
@@ -329,7 +332,7 @@ const totalStatusCount = computed(() => {
                                 :key="status.status"
                                 class="flex items-center gap-3"
                             >
-                                <div class="w-24 text-sm">{{ status.label }}</div>
+                                <div class="w-24 text-sm">{{ __(status.label) }}</div>
                                 <div class="flex-1 bg-muted rounded-full h-4 overflow-hidden">
                                     <div
                                         :class="[statusColors[status.status] || 'bg-gray-400', 'h-full rounded-full transition-all']"
@@ -345,8 +348,8 @@ const totalStatusCount = computed(() => {
                 <!-- Department Stats -->
                 <Card>
                     <CardHeader>
-                        <CardTitle class="text-base">Department Performance</CardTitle>
-                        <CardDescription>Attendance by department</CardDescription>
+                        <CardTitle class="text-base">{{ __('Department Performance') }}</CardTitle>
+                        <CardDescription>{{ __('Attendance by department') }}</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div class="space-y-3">
@@ -358,16 +361,16 @@ const totalStatusCount = computed(() => {
                                 <div>
                                     <p class="font-medium text-sm">{{ dept.department_name }}</p>
                                     <p class="text-xs text-muted-foreground">
-                                        {{ dept.present_count }} present · Avg {{ formatHours(dept.avg_hours) }}/day
+                                        {{ dept.present_count }} {{ __('present') }} &middot; {{ __('Avg') }} {{ formatHours(dept.avg_hours) }}/{{ __('day') }}
                                     </p>
                                 </div>
                                 <div class="text-right">
                                     <p class="font-medium text-sm">{{ formatHours(dept.total_hours) }}</p>
-                                    <p class="text-xs text-muted-foreground">total hours</p>
+                                    <p class="text-xs text-muted-foreground">{{ __('total hours') }}</p>
                                 </div>
                             </div>
                             <div v-if="analytics.department_stats.length === 0" class="text-center py-8 text-muted-foreground">
-                                No department data available
+                                {{ __('No department data available') }}
                             </div>
                         </div>
                     </CardContent>
@@ -376,8 +379,8 @@ const totalStatusCount = computed(() => {
                 <!-- Top Employees -->
                 <Card>
                     <CardHeader>
-                        <CardTitle class="text-base">Top Performers</CardTitle>
-                        <CardDescription>Employees with most work hours</CardDescription>
+                        <CardTitle class="text-base">{{ __('Top Performers') }}</CardTitle>
+                        <CardDescription>{{ __('Employees with most work hours') }}</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div class="space-y-3">
@@ -392,16 +395,16 @@ const totalStatusCount = computed(() => {
                                 <div class="flex-1">
                                     <p class="font-medium text-sm">{{ emp.employee_name }}</p>
                                     <p class="text-xs text-muted-foreground">
-                                        {{ emp.department || 'N/A' }} · {{ emp.days_worked }} days
+                                        {{ emp.department || 'N/A' }} &middot; {{ emp.days_worked }} {{ __('days') }}
                                     </p>
                                 </div>
                                 <div class="text-right">
                                     <p class="font-medium text-sm">{{ formatHours(emp.total_hours) }}</p>
-                                    <p class="text-xs text-muted-foreground">{{ formatHours(emp.avg_hours) }}/day</p>
+                                    <p class="text-xs text-muted-foreground">{{ formatHours(emp.avg_hours) }}/{{ __('day') }}</p>
                                 </div>
                             </div>
                             <div v-if="analytics.top_employees.length === 0" class="text-center py-8 text-muted-foreground">
-                                No employee data available
+                                {{ __('No employee data available') }}
                             </div>
                         </div>
                     </CardContent>
@@ -410,8 +413,8 @@ const totalStatusCount = computed(() => {
                 <!-- Late Arrivals -->
                 <Card>
                     <CardHeader>
-                        <CardTitle class="text-base">Frequent Late Arrivals</CardTitle>
-                        <CardDescription>Employees with most late check-ins</CardDescription>
+                        <CardTitle class="text-base">{{ __('Frequent Late Arrivals') }}</CardTitle>
+                        <CardDescription>{{ __('Employees with most late check-ins') }}</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div class="space-y-3">
@@ -427,11 +430,11 @@ const totalStatusCount = computed(() => {
                                 <div class="flex items-center gap-1 text-yellow-600">
                                     <AlertTriangle class="h-4 w-4" />
                                     <span class="font-medium">{{ emp.late_count }}</span>
-                                    <span class="text-xs">times</span>
+                                    <span class="text-xs">{{ __('times') }}</span>
                                 </div>
                             </div>
                             <div v-if="analytics.late_arrivals.length === 0" class="text-center py-8 text-muted-foreground">
-                                No late arrivals in this period
+                                {{ __('No late arrivals in this period') }}
                             </div>
                         </div>
                     </CardContent>
@@ -441,21 +444,21 @@ const totalStatusCount = computed(() => {
             <!-- Daily Attendance Table -->
             <Card>
                 <CardHeader>
-                    <CardTitle class="text-base">Daily Attendance</CardTitle>
-                    <CardDescription>Day-by-day attendance records</CardDescription>
+                    <CardTitle class="text-base">{{ __('Daily Attendance') }}</CardTitle>
+                    <CardDescription>{{ __('Day-by-day attendance records') }}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm">
                             <thead>
                                 <tr class="border-b">
-                                    <th class="py-2 px-3 text-left font-medium">Date</th>
-                                    <th class="py-2 px-3 text-left font-medium">Day</th>
-                                    <th class="py-2 px-3 text-right font-medium">Total</th>
-                                    <th class="py-2 px-3 text-right font-medium">Present</th>
-                                    <th class="py-2 px-3 text-right font-medium">Late</th>
-                                    <th class="py-2 px-3 text-right font-medium">Absent</th>
-                                    <th class="py-2 px-3 text-right font-medium">Avg Hours</th>
+                                    <th class="py-2 px-3 text-left font-medium">{{ __('Date') }}</th>
+                                    <th class="py-2 px-3 text-left font-medium">{{ __('Day') }}</th>
+                                    <th class="py-2 px-3 text-right font-medium">{{ __('Total') }}</th>
+                                    <th class="py-2 px-3 text-right font-medium">{{ __('Present') }}</th>
+                                    <th class="py-2 px-3 text-right font-medium">{{ __('Late') }}</th>
+                                    <th class="py-2 px-3 text-right font-medium">{{ __('Absent') }}</th>
+                                    <th class="py-2 px-3 text-right font-medium">{{ __('Avg Hours') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -465,7 +468,7 @@ const totalStatusCount = computed(() => {
                                     class="border-b hover:bg-muted/50"
                                 >
                                     <td class="py-2 px-3">{{ day.date }}</td>
-                                    <td class="py-2 px-3">{{ day.day }}</td>
+                                    <td class="py-2 px-3">{{ __(day.day) }}</td>
                                     <td class="py-2 px-3 text-right">{{ day.total }}</td>
                                     <td class="py-2 px-3 text-right text-green-600">{{ day.present }}</td>
                                     <td class="py-2 px-3 text-right text-yellow-600">{{ day.late }}</td>
