@@ -25,6 +25,7 @@ use Modules\Employee\Enums\FamilyRelationshipEnum;
 class Employee extends Model
 {
     use HasFactory, SoftDeletes, BelongsToSchool;
+    // use HasSwitchDatabase;
 
     /**
      * Employee types.
